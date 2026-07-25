@@ -73,5 +73,13 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow write: if isAuthenticated() && request.auth.uid == userId;
     }
+    
+    // Reglas para Sync por QR
+    match /qr_sessions/{sessionId} {
+      // Permitimos lectura sin autenticación temporalmente para que el dispositivo secundario escuche
+      allow read: if true;
+      // Solo un dispositivo autenticado puede autorizar una sesión
+      allow write: if isAuthenticated();
+    }
   }
 }

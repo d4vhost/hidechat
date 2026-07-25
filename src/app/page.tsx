@@ -4,13 +4,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronRight, Settings as SettingsIcon, LogOut, Moon, Sun, Eye, EyeOff, Edit, Edit3, Smartphone, XCircle } from "lucide-react";
+import { ChevronRight, Settings as SettingsIcon, LogOut, Moon, Sun, Eye, EyeOff, Edit, Edit3, Smartphone, XCircle, QrCode } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { auth, db } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
-import { doc, getDoc, updateDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, updateDoc, setDoc, onSnapshot } from "firebase/firestore";
 import { useFriendRequests } from "@/hooks/useFriendRequests";
 import { UserPlus, Check, X } from "lucide-react";
+import { Scanner } from "@yudiel/react-qr-scanner";
 
 export default function Inbox() {
   const { user, loading } = useAuth();
@@ -21,6 +22,8 @@ export default function Inbox() {
   const [devices, setDevices] = useState<string[]>([]);
   const [username, setUsername] = useState("");
   const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [scanStatus, setScanStatus] = useState<"IDLE" | "SUCCESS" | "ERROR">("IDLE");
   
   // Friend Request States
   const [showAddFriend, setShowAddFriend] = useState(false);
@@ -95,6 +98,31 @@ export default function Inbox() {
       username: username
     });
     setIsEditingUsername(false);
+  };
+
+  const handleScanQR = async (detectedCodes: any[]) => {
+    if (detectedCodes.length > 0 && scanStatus === "IDLE") {
+      const qrValue = detectedCodes[0].rawValue;
+      if (qrValue) {
+        setScanStatus("SUCCESS");
+        try {
+          await setDoc(doc(db, "qr_sessions", qrValue), {
+            authorized: true,
+            authorizingUid: user?.uid,
+            timestamp: new Date()
+          }, { merge: true });
+          
+          setTimeout(() => {
+            setShowScanner(false);
+            setScanStatus("IDLE");
+          }, 2000);
+        } catch (error) {
+          console.error("Error writing to QR session", error);
+          setScanStatus("ERROR");
+          setTimeout(() => setScanStatus("IDLE"), 2000);
+        }
+      }
+    }
   };
 
   const handleAddFriend = async (e: React.FormEvent) => {
@@ -460,6 +488,14 @@ export default function Inbox() {
                     )}
                   </div>
                 ))}
+                
+                <button
+                  onClick={() => setShowScanner(true)}
+                  className="w-full flex items-center justify-between px-4 py-3 active:bg-gray-100 dark:active:bg-[#2a2a2a]"
+                >
+                  <span className="flex items-center gap-2 font-bold"><QrCode className="w-5 h-5 text-[#4b77ad]"/> Sync New Device via QR</span>
+                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                </button>
               </div>
             </div>
 
@@ -469,6 +505,37 @@ export default function Inbox() {
                  <LogOut className="w-5 h-5" /> Sign Out
                </button>
             </div>
+          </div>
+        </div>
+      )}
+      {/* Scanner Modal (Retro Style) */}
+      {showScanner && (
+        <div className="fixed inset-0 z-50 flex flex-col retro-bg dark:bg-[#121212]">
+          <div className="retro-nav px-4 py-3 flex items-center justify-between shadow-md shrink-0">
+            <h2 className="text-white font-bold text-lg text-shadow-sm">Scan QR to Sync</h2>
+            <button onClick={() => { setShowScanner(false); setScanStatus("IDLE"); }} className="retro-btn px-3 py-1 text-white text-sm font-bold">Cancel</button>
+          </div>
+          
+          <div className="flex-1 flex flex-col items-center justify-center p-4 bg-black">
+            <div className="w-full max-w-sm overflow-hidden rounded-xl border-2 border-white shadow-2xl relative">
+              <Scanner 
+                onScan={handleScanQR}
+                components={{
+                  audio: false,
+                  finder: true,
+                }}
+              />
+              {scanStatus === "SUCCESS" && (
+                <div className="absolute inset-0 bg-green-500/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 animate-in fade-in duration-300">
+                  <Check className="w-16 h-16 text-white mb-2" />
+                  <p className="text-white font-bold text-xl drop-shadow-md">Device Synced!</p>
+                </div>
+              )}
+            </div>
+            
+            <p className="text-gray-300 font-bold text-sm text-center mt-6 max-w-xs">
+              Point your camera at the QR code displayed on the login screen of your other device.
+            </p>
           </div>
         </div>
       )}

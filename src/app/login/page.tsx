@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
-import { doc, getDoc, setDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, arrayUnion, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { Key, AlertTriangle, QrCode } from "lucide-react";
 import QRCode from "react-qr-code";
@@ -67,6 +67,26 @@ export default function LoginPage() {
       }
     };
   }, []);
+
+  // Listen for QR Sync
+  useEffect(() => {
+    if (!showQR || !qrValue) return;
+    
+    // Listen to the session document
+    const unsubscribe = onSnapshot(doc(db, "qr_sessions", qrValue), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.authorized) {
+          setShowQR(false);
+          // In a production environment with a backend, we would retrieve a custom token here and sign in.
+          // For now, we mock the success.
+          alert("Device Synced Successfully! (Note: Firebase Custom Token required to complete authentication.)");
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [showQR, qrValue]);
 
   const getDeviceId = () => {
     let deviceId = localStorage.getItem('pop-device-id');
@@ -529,6 +549,7 @@ export default function LoginPage() {
               </p>
               <p className="text-gray-600 dark:text-gray-400 font-semibold text-sm">
                 Scan this unique code from your primary device to log in automatically.
+                This QR code is generated securely and uniquely for this session. Do not share it with anyone.
               </p>
             </div>
           </div>
