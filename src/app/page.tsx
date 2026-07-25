@@ -138,7 +138,7 @@ export default function Inbox() {
   }
 
   return (
-    <div className="min-h-screen retro-bg flex flex-col">
+    <div className="min-h-screen retro-bg dark:!bg-[#1a1a1a] dark:!bg-none flex flex-col">
       <header className="retro-nav px-3 py-2 flex justify-between items-center sticky top-0 z-10 shadow-md">
         <button 
           onClick={() => setShowSettings(true)}
@@ -146,7 +146,7 @@ export default function Inbox() {
         >
           Edit
         </button>
-        <h1 className="text-xl font-bold text-white drop-shadow-md text-shadow-sm">Messages</h1>
+        <h1 className="text-white font-bold text-lg text-shadow-sm">Messages</h1>
         <button 
           onClick={() => setShowAddFriend(true)}
           className="retro-btn p-1.5 text-white font-bold text-sm shadow-sm active:opacity-70 transition-opacity flex items-center justify-center"
@@ -156,25 +156,25 @@ export default function Inbox() {
       </header>
       
       {pendingRequests.length > 0 && (
-        <div className="p-3 bg-blue-50 border-b border-blue-200">
-          <h3 className="text-xs font-bold text-blue-800 uppercase tracking-wider mb-2">Friend Requests</h3>
+        <div className="p-3 bg-blue-50 dark:bg-[#1e2a3a] border-b border-blue-200 dark:border-[#2d4c75]">
+          <h3 className="text-xs font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wider mb-2">Friend Requests</h3>
           <div className="space-y-2">
             {pendingRequests.map(req => (
-              <div key={req.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 flex justify-between items-center">
+              <div key={req.id} className="bg-white dark:bg-[#2a2a2a] rounded-lg shadow-sm border border-gray-200 dark:border-[#333] p-3 flex justify-between items-center">
                 <div>
-                  <div className="font-bold text-sm text-gray-800">{req.fromPhone}</div>
-                  <div className="text-xs text-gray-500">Wants to add you</div>
+                  <div className="font-bold text-sm text-gray-800 dark:text-gray-200">{req.fromPhone}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">Wants to add you</div>
                 </div>
                 <div className="flex gap-2">
                   <button 
                     onClick={() => acceptRequest(req.id, req.fromId)}
-                    className="p-2 bg-green-100 text-green-700 rounded-full hover:bg-green-200 active:bg-green-300"
+                    className="p-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full hover:bg-green-200 dark:hover:bg-green-900/50 active:bg-green-300"
                   >
                     <Check className="w-4 h-4" />
                   </button>
                   <button 
                     onClick={() => rejectRequest(req.id)}
-                    className="p-2 bg-red-100 text-red-700 rounded-full hover:bg-red-200 active:bg-red-300"
+                    className="p-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full hover:bg-red-200 dark:hover:bg-red-900/50 active:bg-red-300"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -185,9 +185,9 @@ export default function Inbox() {
         </div>
       )}
 
-      <div className="flex-1 flex flex-col contacts-bg shadow-inner">
+      <div className="flex-1 flex flex-col contacts-bg dark:!bg-[#121212] shadow-inner">
         {contacts.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 font-bold bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm relative z-10">
+          <div className="p-8 text-center text-gray-500 dark:text-gray-400 font-bold bg-white/90 dark:bg-[#1e1e1e]/90 backdrop-blur-sm border-b border-gray-200 dark:border-[#333] shadow-sm relative z-10">
             No contacts yet. Tap the + icon to add a friend.
           </div>
         ) : (
@@ -197,16 +197,16 @@ export default function Inbox() {
               <Link 
                 key={contact.uid}
                 href={`/chat/${conversationId}`}
-                className="flex items-center px-4 py-3 border-b border-gray-200 bg-white hover:bg-gray-100 active:bg-blue-500 active:text-white transition-colors group"
+                className="flex items-center px-4 py-3 border-b border-gray-200 dark:border-[#333] bg-white dark:bg-[#1e1e1e] hover:bg-gray-100 dark:hover:bg-[#2a2a2a] active:bg-[#4b77ad] active:text-white transition-colors group"
               >
                 <div className="flex-1 min-w-0 pr-2">
                   <div className="flex justify-between items-center mb-1">
-                    <h2 className="font-bold text-[18px] text-black group-active:text-white truncate">
+                    <h2 className="font-bold text-[18px] text-black dark:text-white group-active:text-white truncate">
                       {contact.username || contact.phoneNumber}
                     </h2>
-                    <ChevronRight className="w-5 h-5 text-gray-400 group-active:text-white opacity-80" />
+                    <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-600 group-active:text-white opacity-80" />
                   </div>
-                  <p className="text-[14px] text-gray-500 group-active:text-white truncate">
+                  <p className="text-[14px] text-gray-500 dark:text-gray-400 group-active:text-white truncate">
                     Tap to view conversation...
                   </p>
                 </div>
@@ -218,16 +218,16 @@ export default function Inbox() {
 
       {/* Add Friend Full Screen Panel */}
       {showAddFriend && (
-        <div className="fixed inset-0 z-50 flex flex-col retro-bg">
+        <div className="fixed inset-0 z-50 flex flex-col retro-bg dark:bg-[#121212]">
           <div className="retro-nav px-4 py-3 flex items-center justify-between shadow-md shrink-0">
             <h2 className="text-white font-bold text-lg text-shadow-sm">Add Friend</h2>
             <button onClick={() => {setShowAddFriend(false); setAddFriendError(""); setAddFriendSuccess(""); setAddFriendAlias("");}} className="retro-btn px-3 py-1 text-white text-sm font-bold">Close</button>
           </div>
           
           <div className="flex-1 overflow-hidden pb-2 sm:pb-6">
-            <div className="w-full sm:max-w-md sm:mx-auto sm:mt-6 bg-white sm:border sm:border-gray-300 sm:rounded-xl shadow-md overflow-hidden flex flex-col min-h-[calc(100vh-50px)] sm:min-h-0">
+            <div className="w-full sm:max-w-md sm:mx-auto sm:mt-6 bg-white dark:bg-[#1e1e1e] sm:border sm:border-gray-300 dark:sm:border-[#333] sm:rounded-xl shadow-md overflow-hidden flex flex-col min-h-[calc(100vh-50px)] sm:min-h-0">
               {/* Toggle Switch */}
-              <div className="p-3 bg-gray-100 border-b border-gray-300 flex justify-center shrink-0">
+              <div className="p-3 bg-gray-100 dark:bg-[#2a2a2a] border-b border-gray-300 dark:border-[#333] flex justify-center shrink-0">
                 <div className="retro-segmented-control w-full sm:max-w-sm">
                   <button 
                     onClick={() => setAddMethod('phone')}
@@ -245,10 +245,10 @@ export default function Inbox() {
               </div>
 
               {/* Content Container */}
-              <div className="p-4 sm:p-5 text-black shrink-0">
+              <div className="p-4 sm:p-5 text-black dark:text-white shrink-0">
                 {addMethod === 'phone' ? (
                   <div>
-                    <p className="text-sm font-bold text-gray-600 mb-4 text-center">Enter a phone number to send a friend request.</p>
+                    <p className="text-sm font-bold text-gray-600 dark:text-gray-400 mb-4 text-center">Enter a phone number to send a friend request.</p>
                     <form onSubmit={handleAddFriend} className="space-y-4">
                       
                       <div className="flex flex-col gap-3 my-5 max-w-sm mx-auto">
@@ -268,7 +268,7 @@ export default function Inbox() {
                                 onKeyDown={(e) => {
                                   if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
                                 }}
-                                className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                                className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 dark:bg-[#2a2a2a] border border-gray-400 dark:border-[#444] rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
                             ))}
                           </div>
                           <div className="text-gray-500 font-bold shrink-0">-</div>
@@ -288,7 +288,7 @@ export default function Inbox() {
                                 onKeyDown={(e) => {
                                   if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
                                 }}
-                                className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                                className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 dark:bg-[#2a2a2a] border border-gray-400 dark:border-[#444] rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
                             ))}
                           </div>
                           <div className="text-gray-500 font-bold shrink-0">-</div>
@@ -308,7 +308,7 @@ export default function Inbox() {
                                 onKeyDown={(e) => {
                                   if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
                                 }}
-                                className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                                className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 dark:bg-[#2a2a2a] border border-gray-400 dark:border-[#444] rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
                             ))}
                           </div>
                         </div>
@@ -324,14 +324,14 @@ export default function Inbox() {
                   </div>
                 ) : (
                   <div>
-                    <p className="text-sm font-bold text-gray-600 mb-4 text-center">Add a friend using their unique Pop Chat alias.</p>
+                    <p className="text-sm font-bold text-gray-600 dark:text-gray-400 mb-4 text-center">Add a friend using their unique Pop Chat alias.</p>
                     <form onSubmit={(e) => { e.preventDefault(); alert("Alias functionality coming soon!"); }} className="space-y-4">
                       <input
                         type="text"
                         placeholder="Enter Alias (e.g. majito_123)"
                         value={addFriendAlias}
                         onChange={(e) => setAddFriendAlias(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-3 font-bold outline-none focus:border-blue-500 retro-input-field"
+                        className="w-full bg-gray-50 dark:bg-[#2a2a2a] border border-gray-300 dark:border-[#444] rounded-md px-3 py-3 font-bold outline-none focus:border-blue-500 retro-input-field dark:text-white"
                       />
                       
                       <button type="submit" className="w-full retro-btn text-white font-bold py-3 sm:py-2 rounded-md shadow-sm active:opacity-70 flex justify-center items-center text-base">
@@ -343,8 +343,8 @@ export default function Inbox() {
               </div>
 
               {/* Informational Text (Merged into the same container) */}
-              <div className="flex-1 bg-gray-50 border-t border-gray-200 p-5 sm:p-6 text-gray-800">
-                <h3 className="text-base font-bold mb-4 text-center text-gray-900 border-b border-gray-300 pb-2">Pop Chat (Private Open Protocol)</h3>
+              <div className="flex-1 bg-gray-50 dark:bg-[#252525] border-t border-gray-200 dark:border-[#333] p-5 sm:p-6 text-gray-800 dark:text-gray-300">
+                <h3 className="text-base font-bold mb-4 text-center text-gray-900 dark:text-white border-b border-gray-300 dark:border-[#444] pb-2">Pop Chat (Private Open Protocol)</h3>
                 
                 {addMethod === 'phone' ? (
                   <div className="space-y-4">
@@ -374,78 +374,80 @@ export default function Inbox() {
       {/* Settings Modal (Retro Style) */}
       {showSettings && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4">
-          <div className="bg-[#cbd5e1] sm:border sm:border-[#86a7cc] w-full h-full sm:h-auto sm:max-h-[90vh] sm:max-w-md sm:rounded-xl overflow-hidden shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200">
-            <div className="retro-nav px-4 py-3 flex items-center justify-between">
+          <div className="bg-[#cbd5e1] dark:bg-[#1a1a1a] sm:border sm:border-[#86a7cc] dark:sm:border-[#333] w-full h-full sm:h-auto sm:max-h-[90vh] sm:max-w-md sm:rounded-xl overflow-hidden shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200">
+            <div className="retro-nav px-4 py-3 flex items-center justify-between shrink-0">
               <h2 className="text-white font-bold text-lg text-shadow-sm">Settings</h2>
               <button onClick={() => setShowSettings(false)} className="retro-btn px-3 py-1 text-white text-sm font-bold">Done</button>
             </div>
             
-            <div className="flex-1 p-4 space-y-4 text-black overflow-y-auto pb-6">
+            <div className="flex-1 p-4 space-y-4 text-black dark:text-white overflow-y-auto pb-6">
               {/* Profile Section */}
-              <div className="bg-white rounded-lg border border-gray-300 overflow-hidden p-4">
+              <div className="bg-white dark:bg-[#1e1e1e] rounded-lg border border-gray-300 dark:border-[#333] overflow-hidden p-4">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Profile</span>
+                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Profile</span>
                   {!isEditingUsername ? (
-                    <button onClick={() => setIsEditingUsername(true)} className="text-blue-600 font-bold text-sm">Edit</button>
+                    <button onClick={() => setIsEditingUsername(true)} className="text-[#4b77ad] font-bold text-sm">Edit</button>
                   ) : (
-                    <button onClick={handleSaveUsername} className="text-green-600 font-bold text-sm">Save</button>
+                    <button onClick={handleSaveUsername} className="text-[#4b77ad] font-bold text-sm">Save</button>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-500 font-bold text-sm w-20">Username</span>
+                  <span className="text-gray-500 dark:text-gray-400 font-bold text-sm w-20">Username</span>
                   {isEditingUsername ? (
                     <input
                       type="text"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder="Your name"
-                      className="flex-1 bg-gray-100 border border-gray-300 rounded px-2 py-1 text-sm font-bold outline-none"
+                      className="flex-1 bg-gray-100 dark:bg-[#2a2a2a] border border-gray-300 dark:border-[#444] rounded px-2 py-1 text-sm font-bold outline-none dark:text-white"
                     />
                   ) : (
-                    <span className="flex-1 text-black font-bold truncate">
+                    <span className="flex-1 text-black dark:text-white font-bold truncate">
                       {username || "Set a username"}
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
-                <button
+              <div className="bg-white dark:bg-[#1e1e1e] rounded-lg border border-gray-300 dark:border-[#333] overflow-hidden">
+                <div
                   onClick={() => toggleTheme()}
-                  className="w-full flex items-center justify-between px-4 py-3 border-b border-gray-200 active:bg-gray-100"
+                  className="w-full flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-[#333] active:bg-gray-100 dark:active:bg-[#2a2a2a] cursor-pointer"
                 >
                   <span className="flex items-center gap-2 font-bold"><Sun className="w-5 h-5"/> Theme Mode</span>
-                  <span className="text-gray-500">{theme === 'light' ? 'Light' : 'Dark'}</span>
-                </button>
+                  <div className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 shadow-inner border ${theme === 'dark' ? 'bg-[#4b77ad] border-[#2d4c75]' : 'bg-gray-300 border-gray-400 dark:bg-gray-600 dark:border-gray-500'}`}>
+                    <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform duration-300 ${theme === 'dark' ? 'translate-x-6' : ''}`} />
+                  </div>
+                </div>
 
-                <button
+                <div
                   onClick={() => handleSetStealthMode(!isStealthMode)}
-                  className="w-full flex items-center justify-between px-4 py-3 active:bg-gray-100"
+                  className="w-full flex items-center justify-between px-4 py-3 active:bg-gray-100 dark:active:bg-[#2a2a2a] cursor-pointer"
                 >
                   <span className="flex items-center gap-2 font-bold">
                     {isStealthMode ? <Eye className="w-5 h-5"/> : <EyeOff className="w-5 h-5"/>} 
                     Stealth Mode
                   </span>
-                  <span className={isStealthMode ? "text-blue-600 font-bold" : "text-gray-500"}>
-                    {isStealthMode ? 'ON' : 'OFF'}
-                  </span>
-                </button>
+                  <div className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 shadow-inner border ${isStealthMode ? 'bg-[#4b77ad] border-[#2d4c75]' : 'bg-gray-300 border-gray-400 dark:bg-gray-600 dark:border-gray-500'}`}>
+                    <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform duration-300 ${isStealthMode ? 'translate-x-6' : ''}`} />
+                  </div>
+                </div>
               </div>
 
               {/* Active Sessions */}
-              <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
-                <div className="bg-gray-100 px-4 py-1 border-b border-gray-300">
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Active Sessions</span>
+              <div className="bg-white dark:bg-[#1e1e1e] rounded-lg border border-gray-300 dark:border-[#333] overflow-hidden">
+                <div className="bg-gray-100 dark:bg-[#2a2a2a] px-4 py-1 border-b border-gray-300 dark:border-[#444]">
+                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active Sessions</span>
                 </div>
                 {devices.map((device, idx) => (
-                  <div key={idx} className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+                  <div key={idx} className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-[#333]">
                     <div className="flex items-center gap-3">
                       <Smartphone className="w-5 h-5 text-gray-400" />
                       <div className="flex flex-col">
                         <span className="font-bold text-sm">
                           {device === currentDeviceId ? "This Device" : "Linked Device"}
                         </span>
-                        <span className="text-xs text-gray-500 font-mono">{device}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">{device}</span>
                       </div>
                     </div>
                     {device !== currentDeviceId && (
@@ -459,15 +461,13 @@ export default function Inbox() {
                   </div>
                 ))}
               </div>
+            </div>
 
-              <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
-                 <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center justify-between px-4 py-3 active:bg-gray-100 text-red-600 font-bold"
-                >
-                  <span className="flex items-center gap-2"><LogOut className="w-5 h-5"/> Sign Out</span>
-                </button>
-              </div>
+            {/* Fixed Bottom Sign Out Button */}
+            <div className="p-4 bg-[#cbd5e1] dark:bg-[#1a1a1a] border-t border-[#86a7cc] dark:border-[#333] shrink-0">
+               <button onClick={handleLogout} className="retro-btn w-full py-2 text-white font-bold text-lg flex items-center justify-center gap-2">
+                 <LogOut className="w-5 h-5" /> Sign Out
+               </button>
             </div>
           </div>
         </div>
