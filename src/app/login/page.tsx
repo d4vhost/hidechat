@@ -537,7 +537,7 @@ export default function LoginPage() {
                 }}
                 className="w-full retro-btn text-white font-bold text-lg py-3 rounded-lg shadow-md active:opacity-70 transition-opacity flex items-center justify-center gap-2"
               >
-                <QrCode className="w-5 h-5" /> Scan with QR
+                <QrCode className="w-5 h-5" /> Show QR to Scan
               </button>
             </div>
           )}
@@ -571,6 +571,15 @@ export default function LoginPage() {
                   Already have an account? Log in
                 </button>
               )}
+            </div>
+          )}
+
+          {step === "MAIN" && (
+            <div className="mt-8 pt-6 border-t border-gray-300 dark:border-[#444] text-center">
+              <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-2 uppercase tracking-wide">About POP Chat</h3>
+              <p className="text-xs text-gray-600 dark:text-gray-400 font-medium leading-relaxed max-w-sm mx-auto">
+                POP (Private Open Protocol) Chat is a secure, decentralized messaging client. It allows you to connect with others using aliases or phone numbers while enforcing strict end-to-end encryption and device-level authentication to keep your network spam-free and entirely private.
+              </p>
             </div>
           )}
         </form>
