@@ -35,7 +35,9 @@ export default function Inbox() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordChangeError, setPasswordChangeError] = useState("");
   const [newRecoveryKey, setNewRecoveryKey] = useState("");
-  const [showChangePasswordValues, setShowChangePasswordValues] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   // Friend Request States
   const [showAddFriend, setShowAddFriend] = useState(false);
@@ -625,7 +627,7 @@ export default function Inbox() {
                       {passwordChangeError && <p className="text-red-500 text-xs font-bold">{passwordChangeError}</p>}
                       <div className="relative">
                         <input 
-                          type={showChangePasswordValues ? "text" : "password"}
+                          type={showCurrentPassword ? "text" : "password"}
                           placeholder="Current Password"
                           value={currentPassword}
                           onChange={(e) => setCurrentPassword(e.target.value)}
@@ -634,15 +636,15 @@ export default function Inbox() {
                         />
                         <button 
                           type="button"
-                          onClick={() => setShowChangePasswordValues(!showChangePasswordValues)}
+                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                           className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                         >
-                          {showChangePasswordValues ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                       <div className="relative">
                         <input 
-                          type={showChangePasswordValues ? "text" : "password"}
+                          type={showNewPassword ? "text" : "password"}
                           placeholder="New Password"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
@@ -651,15 +653,15 @@ export default function Inbox() {
                         />
                         <button 
                           type="button"
-                          onClick={() => setShowChangePasswordValues(!showChangePasswordValues)}
+                          onClick={() => setShowNewPassword(!showNewPassword)}
                           className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                         >
-                          {showChangePasswordValues ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                       <div className="relative">
                         <input 
-                          type={showChangePasswordValues ? "text" : "password"}
+                          type={showConfirmPassword ? "text" : "password"}
                           placeholder="Confirm New Password"
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
@@ -668,10 +670,10 @@ export default function Inbox() {
                         />
                         <button 
                           type="button"
-                          onClick={() => setShowChangePasswordValues(!showChangePasswordValues)}
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                           className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                         >
-                          {showChangePasswordValues ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                       <div className="flex gap-2 pt-2">
@@ -683,7 +685,9 @@ export default function Inbox() {
                             setCurrentPassword("");
                             setNewPassword("");
                             setConfirmPassword("");
-                            setShowChangePasswordValues(false);
+                            setShowCurrentPassword(false);
+                            setShowNewPassword(false);
+                            setShowConfirmPassword(false);
                           }}
                           className="flex-1 py-2 bg-gray-200 dark:bg-[#333] border border-gray-300 dark:border-[#555] text-gray-800 dark:text-white font-bold text-sm rounded-lg active:bg-gray-300 dark:active:bg-[#444]"
                         >
