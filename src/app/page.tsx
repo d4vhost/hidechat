@@ -25,6 +25,7 @@ export default function Inbox() {
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [scanStatus, setScanStatus] = useState<"IDLE" | "SUCCESS" | "ERROR">("IDLE");
+  const [deviceToRemove, setDeviceToRemove] = useState<any>(null);
   
   // Friend Request States
   const [showAddFriend, setShowAddFriend] = useState(false);
@@ -568,7 +569,7 @@ export default function Inbox() {
                     </div>
                     {devId !== currentDeviceId && (
                       <button 
-                        onClick={() => handleRemoveDevice(device)}
+                        onClick={() => setDeviceToRemove(device)}
                         className="p-1 active:opacity-50"
                       >
                         <XCircle className="w-5 h-5 text-red-500" />
@@ -624,6 +625,41 @@ export default function Inbox() {
             <p className="text-gray-300 font-bold text-sm text-center mt-6 max-w-xs">
               Point your camera at the QR code displayed on the login screen of your other device.
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Remove Device Confirmation Modal */}
+      {deviceToRemove && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#1e1e1e] rounded-xl shadow-2xl border border-gray-300 dark:border-[#333] w-full max-w-sm overflow-hidden scale-in">
+            <div className="bg-[#cbd5e1] dark:bg-[#2a2a2a] px-4 py-3 border-b border-[#86a7cc] dark:border-[#444]">
+              <h3 className="font-bold text-lg text-[#1e293b] dark:text-gray-100 flex items-center gap-2">
+                <XCircle className="w-5 h-5 text-red-500" /> Remove Device
+              </h3>
+            </div>
+            <div className="p-5">
+              <p className="text-[#334155] dark:text-gray-300 mb-6 font-medium">
+                Are you sure you want to remove this device? The session on that device will be closed immediately.
+              </p>
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => setDeviceToRemove(null)}
+                  className="flex-1 px-4 py-2 bg-gray-200 dark:bg-[#333] text-gray-800 dark:text-white rounded-lg font-bold hover:bg-gray-300 dark:hover:bg-[#444] transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={() => {
+                    handleRemoveDevice(deviceToRemove);
+                    setDeviceToRemove(null);
+                  }}
+                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-colors shadow-md border-b-4 border-red-700 active:border-b-0 active:translate-y-1"
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

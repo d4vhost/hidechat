@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { onSnapshot, doc, getDoc } from "firebase/firestore";
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let docUnsub: any = null;
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         // Validate POP Protocol Device Auth
@@ -21,34 +23,46 @@ export function useAuth() {
 
         try {
           const docRef = doc(db, "users", currentUser.uid);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            const devicesArray = docSnap.data().devices || [];
-            const isAuthorized = devicesArray.some((device: any) => {
-              if (typeof device === 'object' && device !== null) {
-                return device.id === deviceId;
-              }
-              return device === deviceId;
-            });
+          docUnsub = onSnapshot(docRef, (docSnap) => {
+            if (docSnap.exists()) {
+              const devicesArray = docSnap.data().devices || [];
+              const isAuthorized = devicesArray.some((device: any) => {
+                if (typeof device === 'object' && device !== null) {
+                  return device.id === deviceId;
+                }
+                return device === deviceId;
+              });
 
-            if (isAuthorized) {
-              setUser(currentUser);
+              if (isAuthorized) {
+                setUser(currentUser);
+              } else {
+                setUser(null); // Device not authorized anymore
+                auth.signOut();
+              }
             } else {
-              setUser(null); // Device not authorized yet
+              setUser(null);
+              auth.signOut();
             }
-          } else {
-            setUser(null);
-          }
+            setLoading(false);
+          });
         } catch (error) {
           setUser(null);
+          setLoading(false);
         }
       } else {
         setUser(null);
+        setLoading(false);
+        if (docUnsub) {
+          docUnsub();
+          docUnsub = null;
+        }
       }
-      setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      if (docUnsub) docUnsub();
+    };
   }, []);
 
   return { user, loading };
