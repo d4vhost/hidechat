@@ -224,7 +224,7 @@ export default function Inbox() {
             <button onClick={() => {setShowAddFriend(false); setAddFriendError(""); setAddFriendSuccess(""); setAddFriendAlias("");}} className="retro-btn px-3 py-1 text-white text-sm font-bold">Close</button>
           </div>
           
-          <div className="flex-1 overflow-y-auto pb-6">
+          <div className="flex-1 overflow-hidden pb-2 sm:pb-6">
             <div className="w-full sm:max-w-md sm:mx-auto sm:mt-6 bg-white sm:border sm:border-gray-300 sm:rounded-xl shadow-md overflow-hidden flex flex-col min-h-[calc(100vh-50px)] sm:min-h-0">
               {/* Toggle Switch */}
               <div className="p-3 bg-gray-100 border-b border-gray-300 flex justify-center shrink-0">
@@ -361,7 +361,7 @@ export default function Inbox() {
                       Adding a contact by <span className="font-bold">Alias</span> allows you to safely connect with new friends without ever having to share your personal phone number or your real-world identity. This approach guarantees 100% privacy and anonymity from the start.
                     </p>
                     <p className="text-sm font-medium text-justify leading-relaxed">
-                      Engage with users globally using just a unique username. Pop Chat's open protocol securely routes the alias request directly to the intended recipient's device, ensuring that metadata is stripped away and protected against unknown sources.
+                      Engage with users globally using just a unique username. Pop Chat's open protocol securely routes the alias request directly to the intended recipient's device, ensuring that metadata is stripped away and protected against unknown sources. This guarantees your digital presence remains entirely disconnected from your personal phone number, maximizing your daily communication security.
                     </p>
                   </div>
                 )}
