@@ -373,14 +373,14 @@ export default function Inbox() {
 
       {/* Settings Modal (Retro Style) */}
       {showSettings && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-[#cbd5e1] border border-[#86a7cc] w-11/12 max-w-sm rounded-xl overflow-hidden shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4">
+          <div className="bg-[#cbd5e1] sm:border sm:border-[#86a7cc] w-full h-full sm:h-auto sm:max-h-[90vh] sm:max-w-md sm:rounded-xl overflow-hidden shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200">
             <div className="retro-nav px-4 py-3 flex items-center justify-between">
               <h2 className="text-white font-bold text-lg text-shadow-sm">Settings</h2>
               <button onClick={() => setShowSettings(false)} className="retro-btn px-3 py-1 text-white text-sm font-bold">Done</button>
             </div>
             
-            <div className="p-4 space-y-4 text-black overflow-y-auto max-h-[80vh]">
+            <div className="flex-1 p-4 space-y-4 text-black overflow-y-auto pb-6">
               {/* Profile Section */}
               <div className="bg-white rounded-lg border border-gray-300 overflow-hidden p-4">
                 <div className="flex justify-between items-center mb-2">
