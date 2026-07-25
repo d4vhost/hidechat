@@ -39,6 +39,12 @@ export default function Inbox() {
   const currentDeviceId = typeof window !== 'undefined' ? localStorage.getItem('pop-device-id') : null;
 
   useEffect(() => {
+    if (typeof window !== "undefined" && "Notification" in window) {
+      if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+        Notification.requestPermission();
+      }
+    }
+    
     if (!loading && !user) {
       router.push("/login");
     }
@@ -76,7 +82,14 @@ export default function Inbox() {
               const loc = isObj ? newDev.location : 'Unknown location';
               
               if (devId !== currentDeviceId) {
-                alert(`Security Alert: A new device just signed in to your account from ${loc}.`);
+                const title = "Security Alert";
+                const body = `A new device just signed in to your account from ${loc}.`;
+                
+                if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+                  new Notification(title, { body });
+                } else {
+                  alert(`${title}: ${body}`);
+                }
               }
               return currentDevices.length;
             }
@@ -601,7 +614,7 @@ export default function Inbox() {
                 }}
               />
               {scanStatus === "SUCCESS" && (
-                <div className="absolute inset-0 bg-green-500/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 animate-in fade-in duration-300">
+                <div className="absolute inset-0 bg-[#4b77ad]/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 animate-in fade-in duration-300">
                   <Check className="w-16 h-16 text-white mb-2" />
                   <p className="text-white font-bold text-xl drop-shadow-md">Device Synced!</p>
                 </div>
