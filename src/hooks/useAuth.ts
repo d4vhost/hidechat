@@ -22,10 +22,22 @@ export function useAuth() {
         try {
           const docRef = doc(db, "users", currentUser.uid);
           const docSnap = await getDoc(docRef);
-          if (docSnap.exists() && docSnap.data().devices?.includes(deviceId)) {
-            setUser(currentUser);
+          if (docSnap.exists()) {
+            const devicesArray = docSnap.data().devices || [];
+            const isAuthorized = devicesArray.some((device: any) => {
+              if (typeof device === 'object' && device !== null) {
+                return device.id === deviceId;
+              }
+              return device === deviceId;
+            });
+
+            if (isAuthorized) {
+              setUser(currentUser);
+            } else {
+              setUser(null); // Device not authorized yet
+            }
           } else {
-            setUser(null); // Device not authorized yet
+            setUser(null);
           }
         } catch (error) {
           setUser(null);
