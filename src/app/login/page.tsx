@@ -546,7 +546,7 @@ export default function LoginPage() {
           )}
 
           {step === "MAIN" && authMode === "LOGIN" && (
-            <div className="space-y-3 mt-4">
+            <div className="mb-4 mt-4">
               <button 
                 type="button"
                 onClick={() => {
