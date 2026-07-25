@@ -16,9 +16,7 @@ import { db } from "@/lib/firebase";
 import { Message } from "@/types/message";
 import { useAuth } from "./useAuth";
 
-const CONVERSATION_ID = "private_chat_1"; // Since there is only one chat, we hardcode an ID
-
-export function useMessages() {
+export function useMessages(conversationId?: string, receiverId?: string) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
 
@@ -29,7 +27,7 @@ export function useMessages() {
     const messagesRef = collection(db, "messages");
     const q = query(
       messagesRef,
-      where("conversationId", "==", CONVERSATION_ID)
+      where("conversationId", "==", conversationId)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -78,21 +76,17 @@ export function useMessages() {
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user, conversationId]);
 
   const sendMessage = async (text: string, replyTo?: Message['replyTo']) => {
-    if (!user || !text.trim()) return;
-
-    const receiverId = user.uid === "HUrCHrXT4rhKTGWnQNyGufv15VJ2" 
-      ? "yGaR1wXf5BShtDWLB7dQ21P9CF83" 
-      : "HUrCHrXT4rhKTGWnQNyGufv15VJ2";
+    if (!user || !text.trim() || !conversationId || !receiverId) return;
 
     // 24 hours from now
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 24);
 
     const messageData: any = {
-      conversationId: CONVERSATION_ID,
+      conversationId: conversationId,
       senderId: user.uid,
       receiverId,
       text: text.trim(),
@@ -135,7 +129,7 @@ export function useMessages() {
     if (!user) return;
     try {
       const messagesRef = collection(db, "messages");
-      const q = query(messagesRef, where("conversationId", "==", CONVERSATION_ID));
+      const q = query(messagesRef, where("conversationId", "==", conversationId));
       const snapshot = await getDocs(q);
       
       const batch = writeBatch(db);

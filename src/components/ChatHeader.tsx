@@ -13,14 +13,16 @@ import { useMessages } from "@/hooks/useMessages";
 interface ChatHeaderProps {
   isStealthMode?: boolean;
   setIsStealthMode?: (val: boolean) => void;
+  contactName: string;
+  otherUid: string;
+  conversationId: string;
 }
 
-export default function ChatHeader({ isStealthMode }: ChatHeaderProps) {
+export default function ChatHeader({ isStealthMode, contactName, otherUid, conversationId }: ChatHeaderProps) {
   const { user } = useAuth();
-  const { otherUserOnline } = usePresence();
-  const { clearAllMessages } = useMessages();
+  const { otherUserOnline } = usePresence(otherUid);
+  const { clearAllMessages } = useMessages(conversationId, otherUid);
   
-  const contactName = user?.uid === "HUrCHrXT4rhKTGWnQNyGufv15VJ2" ? "David" : "Majito";
 
   const handleLogout = async () => {
     try {

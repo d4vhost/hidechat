@@ -10,14 +10,16 @@ interface MessageInputProps {
   replyTo?: any;
   onCancelReply?: () => void;
   isStealthMode?: boolean;
+  conversationId: string;
+  receiverId: string;
 }
 
-export default function MessageInput({ replyTo, onCancelReply, isStealthMode }: MessageInputProps) {
+export default function MessageInput({ replyTo, onCancelReply, isStealthMode, conversationId, receiverId }: MessageInputProps) {
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const { sendMessage } = useMessages();
-  const { setTyping } = useTyping();
+  const { sendMessage } = useMessages(conversationId, receiverId);
+  const { setTyping } = useTyping(receiverId);
   const pickerRef = useRef<HTMLDivElement>(null);
 
   // Debounce typing status

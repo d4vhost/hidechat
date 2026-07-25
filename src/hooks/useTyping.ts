@@ -3,17 +3,14 @@ import { doc, onSnapshot, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "./useAuth";
 
-export function useTyping() {
+export function useTyping(otherUid?: string) {
   const { user } = useAuth();
   const [isOtherTyping, setIsOtherTyping] = useState(false);
 
   useEffect(() => {
     if (!user) return;
 
-    const otherUid = user.uid === "HUrCHrXT4rhKTGWnQNyGufv15VJ2" 
-      ? "yGaR1wXf5BShtDWLB7dQ21P9CF83" 
-      : "HUrCHrXT4rhKTGWnQNyGufv15VJ2";
-    
+    if (!otherUid) return;
     const otherTypingRef = doc(db, "typing", otherUid);
 
     const unsubscribe = onSnapshot(otherTypingRef, (docSnap) => {
@@ -24,7 +21,7 @@ export function useTyping() {
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user, otherUid]);
 
   const setTyping = async (typing: boolean) => {
     if (!user) return;

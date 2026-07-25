@@ -10,6 +10,9 @@ import { Reply } from "lucide-react";
 interface MessageListProps {
   onReply: (msg: any) => void;
   isStealthMode?: boolean;
+  conversationId: string;
+  receiverId: string;
+  contactName: string;
 }
 
 const SwipeableMessage = ({ msg, isMine, color, dateObj, onReply, contactName, isStealthMode }: any) => {
@@ -92,14 +95,13 @@ const SwipeableMessage = ({ msg, isMine, color, dateObj, onReply, contactName, i
   );
 };
 
-export default function MessageList({ onReply, isStealthMode }: MessageListProps) {
+export default function MessageList({ onReply, isStealthMode, conversationId, receiverId, contactName }: MessageListProps) {
   const { user } = useAuth();
-  const { messages, markAsRead } = useMessages();
-  const { isOtherTyping } = useTyping();
+  const { messages, markAsRead } = useMessages(conversationId, receiverId);
+  const { isOtherTyping } = useTyping(receiverId);
   const { color } = useChatColor();
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const contactName = user?.uid === "HUrCHrXT4rhKTGWnQNyGufv15VJ2" ? "David" : "Majito";
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });

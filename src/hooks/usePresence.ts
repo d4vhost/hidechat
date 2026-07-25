@@ -7,7 +7,7 @@ import { doc, onSnapshot, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "./useAuth";
 
-export function usePresence() {
+export function usePresence(otherUid?: string) {
   const { user } = useAuth();
   const [otherUserOnline, setOtherUserOnline] = useState(false);
   const [lastSeen, setLastSeen] = useState<Date | null>(null);
@@ -16,9 +16,7 @@ export function usePresence() {
     if (!user) return;
 
     const myPresenceRef = doc(db, "presence", user.uid);
-    const otherUid = user.uid === "HUrCHrXT4rhKTGWnQNyGufv15VJ2" 
-      ? "yGaR1wXf5BShtDWLB7dQ21P9CF83" 
-      : "HUrCHrXT4rhKTGWnQNyGufv15VJ2";
+    if (!otherUid) return;
     const otherPresenceRef = doc(db, "presence", otherUid);
 
     // Set me as online
@@ -66,7 +64,7 @@ export function usePresence() {
       handleUnload();
       unsubscribe();
     };
-  }, [user]);
+  }, [user, otherUid]);
 
   return { otherUserOnline, lastSeen };
 }
