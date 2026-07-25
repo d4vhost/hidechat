@@ -13,8 +13,10 @@ import { useFriendRequests } from "@/hooks/useFriendRequests";
 import { UserPlus, Check, X } from "lucide-react";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import { hashString, generateRecoveryKey } from "@/lib/crypto";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function Inbox() {
+  const { t, language } = useLanguage();
   const { user, loading } = useAuth();
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
@@ -314,7 +316,7 @@ export default function Inbox() {
       
       {pendingRequests.length > 0 && (
         <div className="p-3 bg-blue-50 dark:bg-[#1e2a3a] border-b border-blue-200 dark:border-[#2d4c75]">
-          <h3 className="text-xs font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wider mb-2">Friend Requests</h3>
+          <h3 className="text-xs font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wider mb-2">{t('friendRequests')}</h3>
           <div className="space-y-2">
             {pendingRequests.map(req => (
               <div key={req.id} className="bg-white dark:bg-[#2a2a2a] rounded-lg shadow-sm border border-gray-200 dark:border-[#333] p-3 flex justify-between items-center">
@@ -345,7 +347,7 @@ export default function Inbox() {
       <div className="flex-1 flex flex-col contacts-bg dark:!bg-[#121212] shadow-inner">
         {contacts.length === 0 ? (
           <div className="p-8 text-center text-gray-500 dark:text-gray-400 font-bold bg-white/90 dark:bg-[#1e1e1e]/90 backdrop-blur-sm border-b border-gray-200 dark:border-[#333] shadow-sm relative z-10">
-            No contacts yet. Tap the + icon to add a friend.
+            {t('noContacts')}
           </div>
         ) : (
           contacts.map((contact) => {
@@ -364,7 +366,7 @@ export default function Inbox() {
                     <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-600 group-active:text-white opacity-80" />
                   </div>
                   <p className="text-[14px] text-gray-500 dark:text-gray-400 group-active:text-white truncate">
-                    Tap to view conversation...
+                    {t('tapToViewConversation')}
                   </p>
                 </div>
               </Link>
@@ -377,8 +379,8 @@ export default function Inbox() {
       {showAddFriend && (
         <div className="fixed inset-0 z-50 flex flex-col retro-bg dark:bg-[#121212]">
           <div className="retro-nav px-4 py-3 flex items-center justify-between shadow-md shrink-0">
-            <h2 className="text-white font-bold text-lg text-shadow-sm">Add Friend</h2>
-            <button onClick={() => {setShowAddFriend(false); setAddFriendError(""); setAddFriendSuccess(""); setAddFriendAlias("");}} className="retro-btn px-3 py-1 text-white text-sm font-bold">Close</button>
+            <h2 className="text-white font-bold text-lg text-shadow-sm">{t('addFriend')}</h2>
+            <button onClick={() => {setShowAddFriend(false); setAddFriendError(""); setAddFriendSuccess(""); setAddFriendAlias("");}} className="retro-btn px-3 py-1 text-white text-sm font-bold">{t('close')}</button>
           </div>
           
           <div className="flex-1 overflow-hidden pb-2 sm:pb-6">
@@ -390,13 +392,13 @@ export default function Inbox() {
                     onClick={() => setAddMethod('phone')}
                     className={`retro-segmented-btn ${addMethod === 'phone' ? 'retro-segmented-btn-active' : ''}`}
                   >
-                    By Phone
+                    {t('phoneNumber')}
                   </button>
                   <button 
                     onClick={() => setAddMethod('alias')}
                     className={`retro-segmented-btn ${addMethod === 'alias' ? 'retro-segmented-btn-active' : ''}`}
                   >
-                    By Alias
+                    {t('alias')}
                   </button>
                 </div>
               </div>
@@ -405,7 +407,7 @@ export default function Inbox() {
               <div className="p-4 sm:p-5 text-black dark:text-white shrink-0">
                 {addMethod === 'phone' ? (
                   <div>
-                    <p className="text-sm font-bold text-gray-600 dark:text-gray-400 mb-4 text-center">Enter a phone number to send a friend request.</p>
+                    <p className="text-sm font-bold text-gray-600 dark:text-gray-400 mb-4 text-center">{t('enterPhoneToAdd')}</p>
                     <form onSubmit={handleAddFriend} className="space-y-4">
                       
                       <div className="flex flex-col gap-3 my-5 max-w-sm mx-auto">
@@ -475,13 +477,13 @@ export default function Inbox() {
                       {addFriendSuccess && <p className="text-green-500 text-xs font-bold text-center">{addFriendSuccess}</p>}
                       
                       <button type="submit" className="w-full retro-btn text-white font-bold py-3 sm:py-2 rounded-md shadow-sm active:opacity-70 flex justify-center items-center text-base">
-                        Send Request
+                        {t('sendRequest')}
                       </button>
                     </form>
                   </div>
                 ) : (
                   <div>
-                    <p className="text-sm font-bold text-gray-600 dark:text-gray-400 mb-4 text-center">Add a friend using their unique Pop Chat alias.</p>
+                    <p className="text-sm font-bold text-gray-600 dark:text-gray-400 mb-4 text-center">{t('enterAliasToAdd')}</p>
                     <form onSubmit={(e) => { e.preventDefault(); alert("Alias functionality coming soon!"); }} className="space-y-4">
                       <input
                         type="text"
@@ -492,7 +494,7 @@ export default function Inbox() {
                       />
                       
                       <button type="submit" className="w-full retro-btn text-white font-bold py-3 sm:py-2 rounded-md shadow-sm active:opacity-70 flex justify-center items-center text-base">
-                        Search & Add
+                        {t('sendRequest')}
                       </button>
                     </form>
                   </div>
@@ -506,19 +508,19 @@ export default function Inbox() {
                 {addMethod === 'phone' ? (
                   <div className="space-y-4">
                     <p className="text-sm font-medium text-justify leading-relaxed">
-                      Adding a contact by <span className="font-bold">phone number</span> ensures you connect directly with individuals already in your address book. Pop Chat utilizes a secure peer-to-peer encryption protocol to strictly authenticate and initiate the connection.
+                      {t('addContactByPhone')}
                     </p>
                     <p className="text-sm font-medium text-justify leading-relaxed">
-                      The friend request is sent instantly and safely wrapped in our private open protocol architecture. The recipient will be notified seamlessly in their Inbox, preventing spam from unknown sources. This ensures your network stays completely clean and secure at all times.
+                      {t('addContactByPhone2')}
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     <p className="text-sm font-medium text-justify leading-relaxed">
-                      Adding a contact by <span className="font-bold">Alias</span> allows you to safely connect without ever sharing your personal phone number. This approach guarantees 100% privacy and anonymity from the start.
+                      {t('addContactByAlias')}
                     </p>
                     <p className="text-sm font-medium text-justify leading-relaxed">
-                      Engage globally using a unique username. Pop Chat's open protocol routes requests directly to the recipient, ensuring metadata is stripped away and protected. This keeps your digital presence disconnected from your phone number, maximizing security.
+                      {t('addContactByAlias2')}
                     </p>
                   </div>
                 )}
@@ -533,23 +535,23 @@ export default function Inbox() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4">
           <div className="bg-[#cbd5e1] dark:bg-[#1a1a1a] sm:border sm:border-[#86a7cc] dark:sm:border-[#333] w-full h-full sm:h-auto sm:max-h-[90vh] sm:max-w-md sm:rounded-xl overflow-hidden shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200">
             <div className="retro-nav px-4 py-3 flex items-center justify-between shrink-0">
-              <h2 className="text-white font-bold text-lg text-shadow-sm">Settings</h2>
-              <button onClick={() => setShowSettings(false)} className="retro-btn px-3 py-1 text-white text-sm font-bold">Done</button>
+              <h2 className="text-white font-bold text-lg text-shadow-sm">{t('settings')}</h2>
+              <button onClick={() => setShowSettings(false)} className="retro-btn px-3 py-1 text-white text-sm font-bold">{t('done')}</button>
             </div>
             
             <div className="flex-1 p-4 space-y-4 text-black dark:text-white overflow-y-auto pb-6">
               {/* Profile Section */}
               <div className="bg-white dark:bg-[#1e1e1e] rounded-lg border border-gray-300 dark:border-[#333] overflow-hidden p-4">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Profile</span>
+                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('profile')}</span>
                   {!isEditingUsername ? (
-                    <button onClick={() => setIsEditingUsername(true)} className="text-[#4b77ad] font-bold text-sm">Edit</button>
+                    <button onClick={() => setIsEditingUsername(true)} className="text-[#4b77ad] font-bold text-sm">{t('edit')}</button>
                   ) : (
-                    <button onClick={handleSaveUsername} className="text-[#4b77ad] font-bold text-sm">Save</button>
+                    <button onClick={handleSaveUsername} className="text-[#4b77ad] font-bold text-sm">{t('save')}</button>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-500 dark:text-gray-400 font-bold text-sm w-20">Username</span>
+                  <span className="text-gray-500 dark:text-gray-400 font-bold text-sm w-20">{t('username')}</span>
                   {isEditingUsername ? (
                     <input
                       type="text"
@@ -560,7 +562,7 @@ export default function Inbox() {
                     />
                   ) : (
                     <span className="flex-1 text-black dark:text-white font-bold truncate">
-                      {username || "Set a username"}
+                      {username || t('setAUsername')}
                     </span>
                   )}
                 </div>
@@ -571,7 +573,7 @@ export default function Inbox() {
                   onClick={() => toggleTheme()}
                   className="w-full flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-[#333] active:bg-gray-100 dark:active:bg-[#2a2a2a] cursor-pointer"
                 >
-                  <span className="flex items-center gap-2 font-bold"><Sun className="w-5 h-5"/> Theme Mode</span>
+                  <span className="flex items-center gap-2 font-bold"><Sun className="w-5 h-5"/> {t('themeMode')}</span>
                   <div className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 shadow-inner border ${theme === 'dark' ? 'bg-[#4b77ad] border-[#2d4c75]' : 'bg-gray-300 border-gray-400 dark:bg-gray-600 dark:border-gray-500'}`}>
                     <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform duration-300 ${theme === 'dark' ? 'translate-x-6' : ''}`} />
                   </div>
@@ -583,7 +585,7 @@ export default function Inbox() {
                 >
                   <span className="flex items-center gap-2 font-bold">
                     {isStealthMode ? <Eye className="w-5 h-5"/> : <EyeOff className="w-5 h-5"/>} 
-                    Stealth Mode
+                    {t('stealthMode')}
                   </span>
                   <div className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 shadow-inner border ${isStealthMode ? 'bg-[#4b77ad] border-[#2d4c75]' : 'bg-gray-300 border-gray-400 dark:bg-gray-600 dark:border-gray-500'}`}>
                     <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform duration-300 ${isStealthMode ? 'translate-x-6' : ''}`} />
@@ -594,7 +596,7 @@ export default function Inbox() {
               {/* Security / Password Section */}
               <div className="bg-white dark:bg-[#1e1e1e] rounded-lg border border-gray-300 dark:border-[#333] overflow-hidden">
                 <div className="bg-gray-100 dark:bg-[#2a2a2a] px-4 py-1 border-b border-gray-300 dark:border-[#444]">
-                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Security</span>
+                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('security')}</span>
                 </div>
                 <div className="p-4">
                   {!isChangingPassword && !newRecoveryKey ? (
@@ -602,12 +604,12 @@ export default function Inbox() {
                       onClick={() => setIsChangingPassword(true)}
                       className="text-[#4b77ad] font-bold text-sm w-full text-left active:opacity-50"
                     >
-                      Change Password
+                      {t('changePassword')}
                     </button>
                   ) : newRecoveryKey ? (
                     <div className="text-center animate-in fade-in zoom-in duration-300">
-                      <h4 className="font-bold text-green-600 mb-2">Password Changed!</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 leading-tight">Please save your new recovery key securely. Your old key is no longer valid.</p>
+                      <h4 className="font-bold text-green-600 mb-2">{t('passwordChanged')}</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 leading-tight">{t('newRecoveryKeyMsg')}</p>
                       <div className="bg-gray-100 dark:bg-[#2a2a2a] p-3 rounded-lg border border-gray-300 dark:border-[#444] mb-3 select-all">
                         <span className="font-mono text-lg text-black dark:text-white font-bold">{newRecoveryKey}</span>
                       </div>
@@ -618,17 +620,17 @@ export default function Inbox() {
                         }}
                         className="retro-btn px-4 py-2 w-full text-white font-bold text-sm"
                       >
-                        I have saved it
+                        {t('iHaveSavedIt')}
                       </button>
                     </div>
                   ) : (
                     <form onSubmit={handleChangePassword} className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">To change your password, first enter your current password.</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t('toChangePassword')}</p>
                       {passwordChangeError && <p className="text-red-500 text-xs font-bold">{passwordChangeError}</p>}
                       <div className="relative">
                         <input 
                           type={showCurrentPassword ? "text" : "password"}
-                          placeholder="Current Password"
+                          placeholder={t('currentPassword')}
                           value={currentPassword}
                           onChange={(e) => setCurrentPassword(e.target.value)}
                           className="w-full px-3 py-2 pr-10 bg-gray-100 dark:bg-[#2a2a2a] border border-gray-300 dark:border-[#444] rounded-lg text-sm focus:ring-2 focus:ring-[#4b77ad] outline-none"
@@ -645,7 +647,7 @@ export default function Inbox() {
                       <div className="relative">
                         <input 
                           type={showNewPassword ? "text" : "password"}
-                          placeholder="New Password"
+                          placeholder={t('newPassword')}
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
                           className="w-full px-3 py-2 pr-10 bg-gray-100 dark:bg-[#2a2a2a] border border-gray-300 dark:border-[#444] rounded-lg text-sm focus:ring-2 focus:ring-[#4b77ad] outline-none"
@@ -662,7 +664,7 @@ export default function Inbox() {
                       <div className="relative">
                         <input 
                           type={showConfirmPassword ? "text" : "password"}
-                          placeholder="Confirm New Password"
+                          placeholder={t('confirmPassword')}
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           className="w-full px-3 py-2 pr-10 bg-gray-100 dark:bg-[#2a2a2a] border border-gray-300 dark:border-[#444] rounded-lg text-sm focus:ring-2 focus:ring-[#4b77ad] outline-none"
@@ -691,13 +693,13 @@ export default function Inbox() {
                           }}
                           className="flex-1 py-2 bg-gray-200 dark:bg-[#333] border border-gray-300 dark:border-[#555] text-gray-800 dark:text-white font-bold text-sm rounded-lg active:bg-gray-300 dark:active:bg-[#444]"
                         >
-                          Cancel
+                          {t('cancel')}
                         </button>
                         <button 
                           type="submit"
                           className="flex-1 py-2 bg-[#4b77ad] text-white font-bold text-sm rounded-lg shadow-md active:bg-[#3a5c88]"
                         >
-                          Update
+                          {t('update')}
                         </button>
                       </div>
                     </form>
@@ -708,7 +710,7 @@ export default function Inbox() {
               {/* Active Sessions */}
               <div className="bg-white dark:bg-[#1e1e1e] rounded-lg border border-gray-300 dark:border-[#333] overflow-hidden">
                 <div className="bg-gray-100 dark:bg-[#2a2a2a] px-4 py-1 border-b border-gray-300 dark:border-[#444]">
-                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active Sessions</span>
+                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('activeSessions')}</span>
                 </div>
                 {(() => {
                   const deduped = [];
@@ -734,7 +736,7 @@ export default function Inbox() {
                       <Smartphone className="w-5 h-5 text-gray-400" />
                       <div className="flex flex-col">
                         <span className="font-bold text-sm">
-                          {devId === currentDeviceId ? "This Device" : devName}
+                          {devId === currentDeviceId ? t('thisDevice') : devName}
                         </span>
                         <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
                           {isObject && devLoc ? devLoc : devId}
@@ -756,7 +758,7 @@ export default function Inbox() {
                   onClick={() => setShowScanner(true)}
                   className="w-full flex items-center justify-between px-4 py-3 active:bg-gray-100 dark:active:bg-[#2a2a2a]"
                 >
-                  <span className="flex items-center gap-2 font-bold"><QrCode className="w-5 h-5 text-[#4b77ad]"/> Sync New Device via QR</span>
+                  <span className="flex items-center gap-2 font-bold"><QrCode className="w-5 h-5 text-[#4b77ad]"/> {t('syncNewDevice')}</span>
                   <ChevronRight className="w-5 h-5 text-gray-400" />
                 </button>
               </div>
@@ -765,7 +767,7 @@ export default function Inbox() {
             {/* Fixed Bottom Sign Out Button */}
             <div className="p-4 bg-[#cbd5e1] dark:bg-[#1a1a1a] border-t border-[#86a7cc] dark:border-[#333] shrink-0">
                <button onClick={handleLogout} className="retro-btn w-full py-2 text-white font-bold text-lg flex items-center justify-center gap-2">
-                 <LogOut className="w-5 h-5" /> Sign Out
+                 <LogOut className="w-5 h-5" /> {t('logOut')}
                </button>
             </div>
           </div>
@@ -775,8 +777,8 @@ export default function Inbox() {
       {showScanner && (
         <div className="fixed inset-0 z-50 flex flex-col retro-bg dark:bg-[#121212]">
           <div className="retro-nav px-4 py-3 flex items-center justify-between shadow-md shrink-0">
-            <h2 className="text-white font-bold text-lg text-shadow-sm">Scan QR to Sync</h2>
-            <button onClick={() => { setShowScanner(false); setScanStatus("IDLE"); }} className="retro-btn px-3 py-1 text-white text-sm font-bold">Cancel</button>
+            <h2 className="text-white font-bold text-lg text-shadow-sm">{t('scanQrToSync')}</h2>
+            <button onClick={() => { setShowScanner(false); setScanStatus("IDLE"); }} className="retro-btn px-3 py-1 text-white text-sm font-bold">{t('cancel')}</button>
           </div>
           
           <div className="flex-1 flex flex-col items-center justify-center p-4 bg-black">
@@ -791,13 +793,13 @@ export default function Inbox() {
               {scanStatus === "SUCCESS" && (
                 <div className="absolute inset-0 bg-[#4b77ad]/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 animate-in fade-in duration-300">
                   <Check className="w-16 h-16 text-white mb-2" />
-                  <p className="text-white font-bold text-xl drop-shadow-md">Device Synced!</p>
+                  <p className="text-white font-bold text-xl drop-shadow-md">{t('deviceSynced')}</p>
                 </div>
               )}
             </div>
             
             <p className="text-gray-300 font-bold text-sm text-center mt-6 max-w-xs">
-              Point your camera at the QR code displayed on the login screen of your other device.
+              {t('pointCameraAtQr')}
             </p>
           </div>
         </div>
@@ -808,12 +810,12 @@ export default function Inbox() {
         <div className="fixed inset-0 z-50 flex flex-col retro-bg dark:bg-[#121212] animate-in slide-in-from-bottom-4 duration-300">
           {/* Top Nav */}
           <div className="retro-nav px-4 py-3 flex items-center justify-between shadow-md shrink-0">
-            <h2 className="text-white font-bold text-lg text-shadow-sm">Remove Session</h2>
+            <h2 className="text-white font-bold text-lg text-shadow-sm">{t('removeSession')}</h2>
             <button 
               onClick={() => setDeviceToRemove(null)} 
               className="retro-btn px-3 py-1 text-white text-sm font-bold"
             >
-              Cancel
+              {t('cancel')}
             </button>
           </div>
           
@@ -822,9 +824,9 @@ export default function Inbox() {
             <div className="w-24 h-24 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-6 shadow-inner border-4 border-red-200 dark:border-red-800">
               <Trash2 className="w-12 h-12 text-red-600 dark:text-red-500" />
             </div>
-            <h3 className="text-2xl font-bold text-[#1e293b] dark:text-gray-100 mb-4">Disconnect Device</h3>
+            <h3 className="text-2xl font-bold text-[#1e293b] dark:text-gray-100 mb-4">{t('disconnectDevice')}</h3>
             <p className="text-[#334155] dark:text-gray-300 text-lg max-w-xs leading-relaxed">
-              Are you sure you want to remove this device? The session on that device will be closed immediately and require a new QR scan to access.
+              {t('removeDeviceDesc')}
             </p>
           </div>
           
@@ -837,7 +839,7 @@ export default function Inbox() {
               }} 
               className="retro-btn w-full py-3 text-white font-bold text-lg flex items-center justify-center gap-2"
             >
-              <Trash2 className="w-5 h-5" /> Confirm Removal
+              <Trash2 className="w-5 h-5" /> {t('confirmRemoval')}
             </button>
           </div>
         </div>

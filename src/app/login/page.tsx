@@ -160,7 +160,7 @@ export default function LoginPage() {
     if (!phoneNumber) return;
     
     if (authMode === "LOGIN" && !loginPassword) {
-      setError("Password is required to log in.");
+      setError(t('passwordRequired'));
       return;
     }
     
@@ -178,9 +178,9 @@ export default function LoginPage() {
     } catch (err: any) {
       console.error(err);
       if (err.code === 'auth/unauthorized-domain') {
-        setError("Domain not authorized in Firebase Console.");
+        setError(t('domainNotAuthorized'));
       } else {
-        setError(err.message || "Error sending SMS.");
+        setError(err.message || t('errorSendingSms'));
       }
     } finally {
       setLoading(false);
@@ -203,7 +203,7 @@ export default function LoginPage() {
       
       if (authMode === "LOGIN") {
         if (!userDoc.exists()) {
-          setError("Account not found. Please register.");
+          setError(t('accountNotFound'));
           setStep("MAIN");
           setLoading(false);
           return;
@@ -212,7 +212,7 @@ export default function LoginPage() {
         // Verify login credentials
         const pwdHash = await hashString(loginPassword);
         if (userData?.passwordHash !== pwdHash) {
-          setError("Incorrect password.");
+          setError(t('incorrectPassword'));
           setStep("MAIN");
           setLoading(false);
           return;
@@ -223,7 +223,7 @@ export default function LoginPage() {
       } else {
         // REGISTER MODE
         if (userDoc.exists()) {
-          setError("Account already exists. Please log in.");
+          setError(t('accountExists'));
           setAuthMode("LOGIN");
           setStep("MAIN");
         } else {
@@ -232,7 +232,7 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       console.error(err);
-      setError("Invalid OTP code.");
+      setError(t('invalidOtp'));
     } finally {
       setLoading(false);
     }
@@ -260,9 +260,9 @@ export default function LoginPage() {
       
       setNewRecoveryKey(generatedKey);
       setStep("SHOW_NEW_KEY");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError("Error creating account.");
+      setError(t('errorCreatingAccount'));
     } finally {
       setLoading(false);
     }
@@ -281,7 +281,7 @@ export default function LoginPage() {
       const userData = userDoc.data();
 
       if (userData?.recoveryKeyHash !== keyHash) {
-        setError("Invalid Token.");
+        setError(t('invalidToken'));
         setLoading(false);
         return;
       }
@@ -292,9 +292,9 @@ export default function LoginPage() {
       });
       
       router.push("/");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError("Error validating key.");
+      setError(t('errorValidatingKey'));
     } finally {
       setLoading(false);
     }
