@@ -349,19 +349,19 @@ export default function Inbox() {
                 {addMethod === 'phone' ? (
                   <div className="space-y-4">
                     <p className="text-sm font-medium text-justify leading-relaxed">
-                      Adding a contact by <span className="font-bold">phone number</span> ensures you connect directly with individuals already in your address book or those whose trusted contact details you currently possess. By linking through a phone number, Pop Chat utilizes a highly secure peer-to-peer encryption protocol to strictly authenticate and initiate the connection.
+                      Adding a contact by <span className="font-bold">phone number</span> ensures you connect directly with individuals already in your address book. Pop Chat utilizes a secure peer-to-peer encryption protocol to strictly authenticate and initiate the connection.
                     </p>
                     <p className="text-sm font-medium text-justify leading-relaxed">
-                      The friend request is sent instantly and safely wrapped in our private open protocol architecture. The recipient will be notified seamlessly in their Inbox, preventing any kind of unauthorized spam or phishing attempts from unknown sources.
+                      The friend request is sent instantly and safely wrapped in our private open protocol architecture. The recipient will be notified seamlessly in their Inbox, preventing spam from unknown sources.
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     <p className="text-sm font-medium text-justify leading-relaxed">
-                      Adding a contact by <span className="font-bold">Alias</span> allows you to safely connect with new friends without ever having to share your personal phone number or your real-world identity. This approach guarantees 100% privacy and anonymity from the start.
+                      Adding a contact by <span className="font-bold">Alias</span> allows you to safely connect without ever sharing your personal phone number. This approach guarantees 100% privacy and anonymity from the start.
                     </p>
                     <p className="text-sm font-medium text-justify leading-relaxed">
-                      Engage with users globally using just a unique username. Pop Chat's open protocol securely routes the alias request directly to the intended recipient's device, ensuring that metadata is stripped away and protected against unknown sources. This guarantees your digital presence remains entirely disconnected from your personal phone number, maximizing your daily communication security.
+                      Engage globally using a unique username. Pop Chat's open protocol routes requests directly to the recipient, ensuring metadata is stripped away and protected. This keeps your digital presence disconnected from your phone number, maximizing security.
                     </p>
                   </div>
                 )}
