@@ -106,18 +106,23 @@ export default function Inbox() {
       if (qrValue) {
         setScanStatus("SUCCESS");
         try {
-          await setDoc(doc(db, "qr_sessions", qrValue), {
-            authorized: true,
-            authorizingUid: user?.uid,
-            timestamp: new Date()
-          }, { merge: true });
+          const idToken = await user?.getIdToken();
+          const res = await fetch('/api/auth/qr-sync', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ qrValue, idToken })
+          });
+          
+          if (!res.ok) throw new Error('API Error');
           
           setTimeout(() => {
             setShowScanner(false);
             setScanStatus("IDLE");
           }, 2000);
         } catch (error) {
-          console.error("Error writing to QR session", error);
+          console.error("Error syncing via QR API", error);
           setScanStatus("ERROR");
           setTimeout(() => setScanStatus("IDLE"), 2000);
         }
@@ -520,6 +525,7 @@ export default function Inbox() {
             <div className="w-full max-w-sm overflow-hidden rounded-xl border-2 border-white shadow-2xl relative">
               <Scanner 
                 onScan={handleScanQR}
+                sound={false}
                 components={{
                   finder: true,
                 }}

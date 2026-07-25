@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
+import { RecaptchaVerifier, signInWithPhoneNumber, signInWithCustomToken, ConfirmationResult } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
@@ -72,21 +72,38 @@ export default function LoginPage() {
   useEffect(() => {
     if (!showQR || !qrValue) return;
     
-    // Listen to the session document
-    const unsubscribe = onSnapshot(doc(db, "qr_sessions", qrValue), (docSnap) => {
+    const unsubscribe = onSnapshot(doc(db, "qr_sessions", qrValue), async (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-        if (data.authorized) {
+        if (data.authorized && data.token) {
           setShowQR(false);
-          // In a production environment with a backend, we would retrieve a custom token here and sign in.
-          // For now, we mock the success.
-          alert("Device Synced Successfully! (Note: Firebase Custom Token required to complete authentication.)");
+          try {
+            // Log in natively with the custom token
+            await signInWithCustomToken(auth, data.token);
+            // Ensure device is "authorized" locally
+            let deviceId = localStorage.getItem('pop-device-id');
+            if (!deviceId) {
+              deviceId = 'DEV-' + Math.random().toString(36).substring(2, 15);
+              localStorage.setItem('pop-device-id', deviceId);
+            }
+            
+            // Wait for DB to update devices list
+            await updateDoc(doc(db, "users", data.authorizingUid), {
+              devices: arrayUnion(deviceId)
+            });
+            
+            // Redirect to Inbox
+            router.push("/");
+          } catch (error) {
+            console.error("QR Auth Error:", error);
+            setError("Failed to sync device.");
+          }
         }
       }
     });
 
     return () => unsubscribe();
-  }, [showQR, qrValue]);
+  }, [showQR, qrValue, router]);
 
   const getDeviceId = () => {
     let deviceId = localStorage.getItem('pop-device-id');
