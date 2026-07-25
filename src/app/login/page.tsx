@@ -419,7 +419,7 @@ export default function LoginPage() {
                     onChange={(e) => handleTokenChange(i, e.target.value)}
                     onKeyDown={(e) => handleTokenKeyDown(i, e)}
                     onPaste={handleTokenPaste}
-                    className="w-8 h-10 sm:w-10 text-center font-bold text-lg border border-gray-300 rounded-lg bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all shadow-sm"
+                    className="w-6 h-8 sm:w-8 sm:h-10 md:w-9 md:h-10 text-center font-bold text-sm sm:text-base border border-gray-300 rounded-md sm:rounded-lg bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all shadow-sm"
                     maxLength={2}
                   />
                 ))}
@@ -436,7 +436,7 @@ export default function LoginPage() {
                     onChange={(e) => handleTokenChange(i + 3, e.target.value)}
                     onKeyDown={(e) => handleTokenKeyDown(i + 3, e)}
                     onPaste={handleTokenPaste}
-                    className="w-8 h-10 sm:w-10 text-center font-bold text-lg border border-gray-300 rounded-lg bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all shadow-sm"
+                    className="w-6 h-8 sm:w-8 sm:h-10 md:w-9 md:h-10 text-center font-bold text-sm sm:text-base border border-gray-300 rounded-md sm:rounded-lg bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all shadow-sm"
                     maxLength={2}
                   />
                 ))}
@@ -453,7 +453,7 @@ export default function LoginPage() {
                     onChange={(e) => handleTokenChange(i + 7, e.target.value)}
                     onKeyDown={(e) => handleTokenKeyDown(i + 7, e)}
                     onPaste={handleTokenPaste}
-                    className="w-8 h-10 sm:w-10 text-center font-bold text-lg border border-gray-300 rounded-lg bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all shadow-sm"
+                    className="w-6 h-8 sm:w-8 sm:h-10 md:w-9 md:h-10 text-center font-bold text-sm sm:text-base border border-gray-300 rounded-md sm:rounded-lg bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all shadow-sm"
                     maxLength={2}
                   />
                 ))}
