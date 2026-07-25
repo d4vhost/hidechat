@@ -35,6 +35,7 @@ export default function Inbox() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordChangeError, setPasswordChangeError] = useState("");
   const [newRecoveryKey, setNewRecoveryKey] = useState("");
+  const [showChangePasswordValues, setShowChangePasswordValues] = useState(false);
   
   // Friend Request States
   const [showAddFriend, setShowAddFriend] = useState(false);
@@ -622,30 +623,57 @@ export default function Inbox() {
                     <form onSubmit={handleChangePassword} className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">To change your password, first enter your current password.</p>
                       {passwordChangeError && <p className="text-red-500 text-xs font-bold">{passwordChangeError}</p>}
-                      <input 
-                        type="password"
-                        placeholder="Current Password"
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                        className="w-full px-3 py-2 bg-gray-100 dark:bg-[#2a2a2a] border border-gray-300 dark:border-[#444] rounded-lg text-sm focus:ring-2 focus:ring-[#4b77ad] outline-none"
-                        required
-                      />
-                      <input 
-                        type="password"
-                        placeholder="New Password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full px-3 py-2 bg-gray-100 dark:bg-[#2a2a2a] border border-gray-300 dark:border-[#444] rounded-lg text-sm focus:ring-2 focus:ring-[#4b77ad] outline-none"
-                        required
-                      />
-                      <input 
-                        type="password"
-                        placeholder="Confirm New Password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="w-full px-3 py-2 bg-gray-100 dark:bg-[#2a2a2a] border border-gray-300 dark:border-[#444] rounded-lg text-sm focus:ring-2 focus:ring-[#4b77ad] outline-none"
-                        required
-                      />
+                      <div className="relative">
+                        <input 
+                          type={showChangePasswordValues ? "text" : "password"}
+                          placeholder="Current Password"
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          className="w-full px-3 py-2 pr-10 bg-gray-100 dark:bg-[#2a2a2a] border border-gray-300 dark:border-[#444] rounded-lg text-sm focus:ring-2 focus:ring-[#4b77ad] outline-none"
+                          required
+                        />
+                        <button 
+                          type="button"
+                          onClick={() => setShowChangePasswordValues(!showChangePasswordValues)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        >
+                          {showChangePasswordValues ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <input 
+                          type={showChangePasswordValues ? "text" : "password"}
+                          placeholder="New Password"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          className="w-full px-3 py-2 pr-10 bg-gray-100 dark:bg-[#2a2a2a] border border-gray-300 dark:border-[#444] rounded-lg text-sm focus:ring-2 focus:ring-[#4b77ad] outline-none"
+                          required
+                        />
+                        <button 
+                          type="button"
+                          onClick={() => setShowChangePasswordValues(!showChangePasswordValues)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        >
+                          {showChangePasswordValues ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <input 
+                          type={showChangePasswordValues ? "text" : "password"}
+                          placeholder="Confirm New Password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          className="w-full px-3 py-2 pr-10 bg-gray-100 dark:bg-[#2a2a2a] border border-gray-300 dark:border-[#444] rounded-lg text-sm focus:ring-2 focus:ring-[#4b77ad] outline-none"
+                          required
+                        />
+                        <button 
+                          type="button"
+                          onClick={() => setShowChangePasswordValues(!showChangePasswordValues)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        >
+                          {showChangePasswordValues ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
                       <div className="flex gap-2 pt-2">
                         <button 
                           type="button"
@@ -655,6 +683,7 @@ export default function Inbox() {
                             setCurrentPassword("");
                             setNewPassword("");
                             setConfirmPassword("");
+                            setShowChangePasswordValues(false);
                           }}
                           className="flex-1 py-2 bg-gray-200 dark:bg-[#333] border border-gray-300 dark:border-[#555] text-gray-800 dark:text-white font-bold text-sm rounded-lg active:bg-gray-300 dark:active:bg-[#444]"
                         >
