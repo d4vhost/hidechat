@@ -12,6 +12,7 @@ import { doc, getDoc, updateDoc, setDoc, onSnapshot } from "firebase/firestore";
 import { useFriendRequests } from "@/hooks/useFriendRequests";
 import { UserPlus, Check, X } from "lucide-react";
 import { Scanner } from "@yudiel/react-qr-scanner";
+import { hashString, generateRecoveryKey } from "@/lib/crypto";
 
 export default function Inbox() {
   const { user, loading } = useAuth();
@@ -26,6 +27,14 @@ export default function Inbox() {
   const [showScanner, setShowScanner] = useState(false);
   const [scanStatus, setScanStatus] = useState<"IDLE" | "SUCCESS" | "ERROR">("IDLE");
   const [deviceToRemove, setDeviceToRemove] = useState<any>(null);
+  
+  // Password Change States
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordChangeError, setPasswordChangeError] = useState("");
+  const [newRecoveryKey, setNewRecoveryKey] = useState("");
   
   // Friend Request States
   const [showAddFriend, setShowAddFriend] = useState(false);
@@ -146,6 +155,54 @@ export default function Inbox() {
       username: username
     });
     setIsEditingUsername(false);
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordChangeError("");
+    
+    if (newPassword !== confirmPassword) {
+      setPasswordChangeError("New passwords do not match.");
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      setPasswordChangeError("New password must be at least 6 characters.");
+      return;
+    }
+  
+    if (!user) return;
+  
+    try {
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+      if (!docSnap.exists()) return;
+      
+      const data = docSnap.data();
+      const currentHash = await hashString(currentPassword);
+      
+      if (data.passwordHash !== currentHash) {
+        setPasswordChangeError("Incorrect current password.");
+        return;
+      }
+      
+      const newHash = await hashString(newPassword);
+      const newKey = generateRecoveryKey();
+      const newKeyHash = await hashString(newKey);
+      
+      await updateDoc(docRef, {
+        passwordHash: newHash,
+        recoveryKeyHash: newKeyHash
+      });
+      
+      setNewRecoveryKey(newKey);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      console.error(error);
+      setPasswordChangeError("Failed to change password.");
+    }
   };
 
   const handleScanQR = async (detectedCodes: any[]) => {
@@ -531,6 +588,90 @@ export default function Inbox() {
                 </div>
               </div>
 
+              {/* Security / Password Section */}
+              <div className="bg-white dark:bg-[#1e1e1e] rounded-lg border border-gray-300 dark:border-[#333] overflow-hidden">
+                <div className="bg-gray-100 dark:bg-[#2a2a2a] px-4 py-1 border-b border-gray-300 dark:border-[#444]">
+                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Security</span>
+                </div>
+                <div className="p-4">
+                  {!isChangingPassword && !newRecoveryKey ? (
+                    <button 
+                      onClick={() => setIsChangingPassword(true)}
+                      className="text-[#4b77ad] font-bold text-sm w-full text-left active:opacity-50"
+                    >
+                      Change Password
+                    </button>
+                  ) : newRecoveryKey ? (
+                    <div className="text-center animate-in fade-in zoom-in duration-300">
+                      <h4 className="font-bold text-green-600 mb-2">Password Changed!</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 leading-tight">Please save your new recovery key securely. Your old key is no longer valid.</p>
+                      <div className="bg-gray-100 dark:bg-[#2a2a2a] p-3 rounded-lg border border-gray-300 dark:border-[#444] mb-3 select-all">
+                        <span className="font-mono text-lg text-black dark:text-white font-bold">{newRecoveryKey}</span>
+                      </div>
+                      <button 
+                        onClick={() => {
+                          setNewRecoveryKey("");
+                          setIsChangingPassword(false);
+                        }}
+                        className="retro-btn px-4 py-2 w-full text-white font-bold text-sm"
+                      >
+                        I have saved it
+                      </button>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleChangePassword} className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">To change your password, first enter your current password.</p>
+                      {passwordChangeError && <p className="text-red-500 text-xs font-bold">{passwordChangeError}</p>}
+                      <input 
+                        type="password"
+                        placeholder="Current Password"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        className="w-full px-3 py-2 bg-gray-100 dark:bg-[#2a2a2a] border border-gray-300 dark:border-[#444] rounded-lg text-sm focus:ring-2 focus:ring-[#4b77ad] outline-none"
+                        required
+                      />
+                      <input 
+                        type="password"
+                        placeholder="New Password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full px-3 py-2 bg-gray-100 dark:bg-[#2a2a2a] border border-gray-300 dark:border-[#444] rounded-lg text-sm focus:ring-2 focus:ring-[#4b77ad] outline-none"
+                        required
+                      />
+                      <input 
+                        type="password"
+                        placeholder="Confirm New Password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="w-full px-3 py-2 bg-gray-100 dark:bg-[#2a2a2a] border border-gray-300 dark:border-[#444] rounded-lg text-sm focus:ring-2 focus:ring-[#4b77ad] outline-none"
+                        required
+                      />
+                      <div className="flex gap-2 pt-2">
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            setIsChangingPassword(false);
+                            setPasswordChangeError("");
+                            setCurrentPassword("");
+                            setNewPassword("");
+                            setConfirmPassword("");
+                          }}
+                          className="flex-1 py-2 bg-gray-200 dark:bg-[#333] border border-gray-300 dark:border-[#555] text-gray-800 dark:text-white font-bold text-sm rounded-lg active:bg-gray-300 dark:active:bg-[#444]"
+                        >
+                          Cancel
+                        </button>
+                        <button 
+                          type="submit"
+                          className="flex-1 py-2 bg-[#4b77ad] text-white font-bold text-sm rounded-lg shadow-md active:bg-[#3a5c88]"
+                        >
+                          Update
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              </div>
+
               {/* Active Sessions */}
               <div className="bg-white dark:bg-[#1e1e1e] rounded-lg border border-gray-300 dark:border-[#333] overflow-hidden">
                 <div className="bg-gray-100 dark:bg-[#2a2a2a] px-4 py-1 border-b border-gray-300 dark:border-[#444]">
@@ -661,7 +802,7 @@ export default function Inbox() {
                 handleRemoveDevice(deviceToRemove);
                 setDeviceToRemove(null);
               }} 
-              className="w-full py-3 bg-red-600 dark:bg-red-700 text-white font-bold text-lg rounded-xl shadow-[0_4px_0_#991b1b] dark:shadow-[0_4px_0_#7f1d1d] active:shadow-none active:translate-y-1 transition-all flex items-center justify-center gap-2"
+              className="retro-btn w-full py-3 text-white font-bold text-lg flex items-center justify-center gap-2"
             >
               <Trash2 className="w-5 h-5" /> Confirm Removal
             </button>
