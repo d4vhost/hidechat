@@ -25,7 +25,7 @@ export default function Inbox() {
   // Friend Request States
   const [showAddFriend, setShowAddFriend] = useState(false);
   const [addMethod, setAddMethod] = useState<'phone' | 'alias'>('phone');
-  const [addFriendPhone, setAddFriendPhone] = useState("");
+  const [phoneDigits, setPhoneDigits] = useState<string[]>(Array(9).fill(''));
   const [addFriendAlias, setAddFriendAlias] = useState("");
   const [addFriendError, setAddFriendError] = useState("");
   const [addFriendSuccess, setAddFriendSuccess] = useState("");
@@ -86,7 +86,7 @@ export default function Inbox() {
 
   const handleSetStealthMode = (value: boolean) => {
     setIsStealthMode(value);
-    localStorage.setItem('hidechat-stealth-mode', value.toString());
+    localStorage.setItem('popchat-stealth-mode', value.toString());
   };
 
   const handleSaveUsername = async () => {
@@ -101,12 +101,25 @@ export default function Inbox() {
     e.preventDefault();
     setAddFriendError("");
     setAddFriendSuccess("");
-    if (!addFriendPhone) return;
+    
+    let targetPhone = "";
+    if (addMethod === 'phone') {
+      const fullNumber = phoneDigits.join("");
+      if (fullNumber.length !== 9) {
+        setAddFriendError("Please complete the 9-digit phone number.");
+        return;
+      }
+      targetPhone = `+593${fullNumber}`;
+    } else {
+      targetPhone = addFriendAlias;
+      if (!targetPhone) return;
+    }
     
     try {
-      await sendRequest(addFriendPhone, user?.phoneNumber || "");
+      await sendRequest(targetPhone, user?.phoneNumber || "");
       setAddFriendSuccess("Friend request sent!");
-      setAddFriendPhone("");
+      setPhoneDigits(Array(9).fill(''));
+      setAddFriendAlias("");
     } catch (err: any) {
       setAddFriendError(err.message);
     }
@@ -235,18 +248,71 @@ export default function Inbox() {
               <div className="p-5 text-black">
                 {addMethod === 'phone' ? (
                   <div>
-                    <p className="text-sm font-bold text-gray-600 mb-4">Enter a phone number to send a friend request.</p>
+                    <p className="text-sm font-bold text-gray-600 mb-4 text-center">Enter a phone number to send a friend request.</p>
                     <form onSubmit={handleAddFriend} className="space-y-4">
-                      <input
-                        type="tel"
-                        placeholder="+1234567890"
-                        value={addFriendPhone}
-                        onChange={(e) => setAddFriendPhone(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 font-bold outline-none focus:border-blue-500 retro-input-field"
-                      />
                       
-                      {addFriendError && <p className="text-red-500 text-xs font-bold">{addFriendError}</p>}
-                      {addFriendSuccess && <p className="text-green-500 text-xs font-bold">{addFriendSuccess}</p>}
+                      <div className="flex items-center gap-1 sm:gap-2 justify-center my-4">
+                        <div className="font-bold text-gray-700 mr-1 text-sm sm:text-lg">+593</div>
+                        
+                        <div className="flex gap-1">
+                          {[0, 1, 2].map((i) => (
+                            <input key={i} id={`phone-digit-${i}`} type="tel" maxLength={1}
+                              value={phoneDigits[i]}
+                              onChange={(e) => {
+                                const val = e.target.value.replace(/\D/g, '').slice(-1);
+                                const newDigits = [...phoneDigits];
+                                newDigits[i] = val;
+                                setPhoneDigits(newDigits);
+                                if (val && i < 8) document.getElementById(`phone-digit-${i + 1}`)?.focus();
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
+                              }}
+                              className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                          ))}
+                        </div>
+                        <div className="text-gray-500 font-bold">-</div>
+                        
+                        <div className="flex gap-1">
+                          {[3, 4, 5].map((i) => (
+                            <input key={i} id={`phone-digit-${i}`} type="tel" maxLength={1}
+                              value={phoneDigits[i]}
+                              onChange={(e) => {
+                                const val = e.target.value.replace(/\D/g, '').slice(-1);
+                                const newDigits = [...phoneDigits];
+                                newDigits[i] = val;
+                                setPhoneDigits(newDigits);
+                                if (val && i < 8) document.getElementById(`phone-digit-${i + 1}`)?.focus();
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
+                              }}
+                              className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                          ))}
+                        </div>
+                        <div className="text-gray-500 font-bold">-</div>
+                        
+                        <div className="flex gap-1">
+                          {[6, 7, 8].map((i) => (
+                            <input key={i} id={`phone-digit-${i}`} type="tel" maxLength={1}
+                              value={phoneDigits[i]}
+                              onChange={(e) => {
+                                const val = e.target.value.replace(/\D/g, '').slice(-1);
+                                const newDigits = [...phoneDigits];
+                                newDigits[i] = val;
+                                setPhoneDigits(newDigits);
+                                if (val && i < 8) document.getElementById(`phone-digit-${i + 1}`)?.focus();
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
+                              }}
+                              className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {addFriendError && <p className="text-red-500 text-xs font-bold text-center">{addFriendError}</p>}
+                      {addFriendSuccess && <p className="text-green-500 text-xs font-bold text-center">{addFriendSuccess}</p>}
                       
                       <button type="submit" className="w-full retro-btn text-white font-bold py-2 rounded-md shadow-sm active:opacity-70 flex justify-center items-center">
                         Send Request
@@ -255,7 +321,7 @@ export default function Inbox() {
                   </div>
                 ) : (
                   <div>
-                    <p className="text-sm font-bold text-gray-600 mb-4">Add a friend using their unique HideChat alias.</p>
+                    <p className="text-sm font-bold text-gray-600 mb-4 text-center">Add a friend using their unique Pop Chat alias.</p>
                     <form onSubmit={(e) => { e.preventDefault(); alert("Alias functionality coming soon!"); }} className="space-y-4">
                       <input
                         type="text"
@@ -275,10 +341,32 @@ export default function Inbox() {
             </div>
 
             {/* Informational Text */}
-            <div className="max-w-md mx-auto w-full mt-6 text-center text-gray-700 bg-white/50 backdrop-blur-sm rounded-lg p-4 border border-gray-300/50 shadow-sm">
-              <h3 className="text-sm font-bold mb-2">Secure Connections</h3>
-              <p className="text-xs mb-2">HideChat uses a secure peer-to-peer approach to connect you with your friends. Your requests are handled privately and only the recipient can see your invitation.</p>
-              <p className="text-xs">You will be notified in your Inbox as soon as they accept.</p>
+            <div className="max-w-md mx-auto w-full mt-6 text-gray-800 bg-white/70 backdrop-blur-sm rounded-lg p-5 border border-gray-300 shadow-sm">
+              <h3 className="text-sm font-bold mb-3 text-center">Pop Chat (Private Open Protocol)</h3>
+              
+              {addMethod === 'phone' ? (
+                <>
+                  <p className="text-xs mb-3 font-medium">
+                    Adding a contact by <span className="font-bold">phone number</span> ensures you connect directly with individuals already in your address book or those whose trusted contact details you possess.
+                  </p>
+                  <ul className="text-xs space-y-2 list-disc pl-4">
+                    <li>Send encrypted peer-to-peer friend requests instantly.</li>
+                    <li>They will get a notification in their Inbox safely.</li>
+                    <li>Requests remain private until they accept them.</li>
+                  </ul>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs mb-3 font-medium">
+                    Adding a contact by <span className="font-bold">Alias</span> allows you to connect with new friends without sharing your personal phone number.
+                  </p>
+                  <ul className="text-xs space-y-2 list-disc pl-4">
+                    <li>Maintain 100% privacy and anonymity.</li>
+                    <li>Connect with users worldwide using just a unique username.</li>
+                    <li>Great for online communities and public networking.</li>
+                  </ul>
+                </>
+              )}
             </div>
           </div>
         </div>
