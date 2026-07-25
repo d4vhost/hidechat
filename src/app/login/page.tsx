@@ -9,6 +9,7 @@ import { Key, AlertTriangle, QrCode } from "lucide-react";
 import QRCode from "react-qr-code";
 import { hashString, generateRecoveryKey, evaluatePasswordStrength } from "@/lib/crypto";
 import { useLanguage } from "@/context/LanguageContext";
+import LanguageToggle from "@/components/LanguageToggle";
 
 declare global {
   interface Window {
@@ -20,7 +21,7 @@ type AuthMode = "LOGIN" | "REGISTER";
 type AuthStep = "MAIN" | "OTP" | "PASSWORD_SETUP" | "SHOW_NEW_KEY" | "RECOVERY_KEY";
 
 export default function LoginPage() {
-  const { t, language, toggleLanguage } = useLanguage();
+  const { t } = useLanguage();
   const [authMode, setAuthMode] = useState<AuthMode>("LOGIN");
   const [step, setStep] = useState<AuthStep>("MAIN");
   
@@ -344,16 +345,15 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen retro-bg text-black">
-      <header className="retro-nav px-3 py-2 flex justify-between items-center shadow-md relative">
-        <div className="w-16"></div> {/* Spacer for centering */}
-        <h1 className="text-xl font-bold text-white drop-shadow-md text-shadow-sm">{t('loginTitle')}</h1>
-        <div className="w-16 flex justify-end">
-          <button 
-            onClick={toggleLanguage}
-            className="bg-white/20 hover:bg-white/30 transition-colors rounded-full px-3 py-1 text-xs font-bold text-white shadow-sm border border-white/30 backdrop-blur-sm"
-          >
-            {language === 'es' ? 'ESP' : 'ENG'}
-          </button>
+      <header className="retro-nav p-4 flex items-center justify-between shadow-md z-10 shrink-0">
+        <div className="w-20" /> {/* Spacer for balance */}
+        
+        <h1 className="text-xl sm:text-2xl font-bold text-white text-center flex-1 drop-shadow-md text-shadow-sm truncate">
+          {t('loginTitle')}
+        </h1>
+        
+        <div className="w-20 flex justify-end">
+          <LanguageToggle />
         </div>
       </header>
 
@@ -593,7 +593,7 @@ export default function LoginPage() {
           )}
 
           {step === "MAIN" && (
-            <div className="mt-8 pt-6 border-t border-gray-300 dark:border-[#444] text-center">
+            <div className="mt-6 text-center">
               <div className="bg-white dark:bg-[#1a1a1a] rounded-xl p-4 shadow-sm border border-gray-200 dark:border-[#333]">
                 <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-2 uppercase tracking-wide">{t('aboutTitle')}</h3>
                 <p className="text-xs text-gray-600 dark:text-gray-400 font-medium leading-relaxed max-w-sm mx-auto">
