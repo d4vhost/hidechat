@@ -19,7 +19,8 @@ export default function Inbox() {
   const { theme, toggleTheme } = useTheme();
   const [showSettings, setShowSettings] = useState(false);
   const [isStealthMode, setIsStealthMode] = useState(false);
-  const [devices, setDevices] = useState<string[]>([]);
+  const [devices, setDevices] = useState<any[]>([]);
+  const [initialDevicesCount, setInitialDevicesCount] = useState(-1);
   const [username, setUsername] = useState("");
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
@@ -47,10 +48,9 @@ export default function Inbox() {
     }
 
     if (user && showSettings) {
-      // Fetch user data
+      // Fetch username (devices are handled by the real-time listener)
       getDoc(doc(db, "users", user.uid)).then((docSnap) => {
         if (docSnap.exists()) {
-          setDevices(docSnap.data().devices || []);
           setUsername(docSnap.data().username || "");
         }
       });
@@ -59,7 +59,32 @@ export default function Inbox() {
     if (user) {
       const unsubscribe = onSnapshot(doc(db, "users", user.uid), async (docSnap) => {
         if (docSnap.exists()) {
-          const contactUids = docSnap.data().contacts || [];
+          const data = docSnap.data();
+          
+          // Handle devices & security alerts
+          const currentDevices = data.devices || [];
+          setDevices(currentDevices);
+          
+          setInitialDevicesCount((prev) => {
+            if (prev === -1) {
+              return currentDevices.length;
+            } else if (currentDevices.length > prev) {
+              // A new device was added!
+              const newDev = currentDevices[currentDevices.length - 1];
+              const isObj = typeof newDev === 'object' && newDev !== null;
+              const devId = isObj ? newDev.id : newDev;
+              const loc = isObj ? newDev.location : 'Unknown location';
+              
+              if (devId !== currentDeviceId) {
+                alert(`Security Alert: A new device just signed in to your account from ${loc}.`);
+              }
+              return currentDevices.length;
+            }
+            return prev;
+          });
+
+          // Handle contacts
+          const contactUids = data.contacts || [];
           
           const fetchedContacts = [];
           for (const cUid of contactUids) {
@@ -75,14 +100,23 @@ export default function Inbox() {
     }
   }, [user, loading, router, showSettings]);
 
-  const handleRemoveDevice = async (deviceId: string) => {
+  const handleRemoveDevice = async (deviceOrId: any) => {
     if (!user) return;
-    const newDevices = devices.filter(d => d !== deviceId);
+    const isObject = typeof deviceOrId === 'object' && deviceOrId !== null;
+    const targetId = isObject ? deviceOrId.id : deviceOrId;
+    
+    // We must filter using deep comparison or by ID if they are objects
+    const newDevices = devices.filter(d => {
+      const dId = (typeof d === 'object' && d !== null) ? d.id : d;
+      return dId !== targetId;
+    });
+    
     await updateDoc(doc(db, "users", user.uid), {
       devices: newDevices
     });
     setDevices(newDevices);
-    if (deviceId === currentDeviceId) {
+    
+    if (targetId === currentDeviceId) {
       handleLogout();
     }
   };
@@ -476,18 +510,26 @@ export default function Inbox() {
                 <div className="bg-gray-100 dark:bg-[#2a2a2a] px-4 py-1 border-b border-gray-300 dark:border-[#444]">
                   <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active Sessions</span>
                 </div>
-                {devices.map((device, idx) => (
+                {devices.map((device, idx) => {
+                  const isObject = typeof device === 'object' && device !== null;
+                  const devId = isObject ? device.id : device;
+                  const devName = isObject ? device.name : "Linked Device";
+                  const devLoc = isObject ? device.location : "";
+
+                  return (
                   <div key={idx} className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-[#333]">
                     <div className="flex items-center gap-3">
                       <Smartphone className="w-5 h-5 text-gray-400" />
                       <div className="flex flex-col">
                         <span className="font-bold text-sm">
-                          {device === currentDeviceId ? "This Device" : "Linked Device"}
+                          {devId === currentDeviceId ? "This Device" : devName}
                         </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">{device}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+                          {isObject && devLoc ? devLoc : devId}
+                        </span>
                       </div>
                     </div>
-                    {device !== currentDeviceId && (
+                    {devId !== currentDeviceId && (
                       <button 
                         onClick={() => handleRemoveDevice(device)}
                         className="p-1 active:opacity-50"
@@ -496,7 +538,7 @@ export default function Inbox() {
                       </button>
                     )}
                   </div>
-                ))}
+                )})}
                 
                 <button
                   onClick={() => setShowScanner(true)}

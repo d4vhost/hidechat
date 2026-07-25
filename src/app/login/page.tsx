@@ -83,16 +83,12 @@ export default function LoginPage() {
             // Log in natively with the custom token
             await signInWithCustomToken(auth, data.token);
             console.log("Login successful!");
-            // Ensure device is "authorized" locally
-            let deviceId = localStorage.getItem('pop-device-id');
-            if (!deviceId) {
-              deviceId = 'DEV-' + Math.random().toString(36).substring(2, 15);
-              localStorage.setItem('pop-device-id', deviceId);
-            }
+            
+            const deviceInfo = await getDeviceInfo();
             
             // Wait for DB to update devices list
             await updateDoc(doc(db, "users", data.authorizingUid), {
-              devices: arrayUnion(deviceId)
+              devices: arrayUnion(deviceInfo)
             });
             console.log("Device registered, redirecting...");
             // Redirect to Inbox
@@ -119,6 +115,35 @@ export default function LoginPage() {
       localStorage.setItem('pop-device-id', deviceId);
     }
     return deviceId;
+  };
+
+  const getDeviceInfo = async () => {
+    const deviceId = getDeviceId();
+    let location = "Unknown Location";
+    try {
+      const res = await fetch("https://ipapi.co/json/");
+      const locData = await res.json();
+      if (locData.city && locData.country_name) {
+        location = `${locData.city}, ${locData.country_name}`;
+      }
+    } catch (e) {}
+
+    let deviceName = "Unknown Device";
+    if (navigator.userAgent) {
+      const ua = navigator.userAgent;
+      if (ua.includes("Windows")) deviceName = "Windows PC";
+      else if (ua.includes("Mac OS")) deviceName = "Mac";
+      else if (ua.includes("iPhone")) deviceName = "iPhone";
+      else if (ua.includes("Android")) deviceName = "Android";
+      else if (ua.includes("Linux")) deviceName = "Linux PC";
+    }
+
+    return {
+      id: deviceId,
+      name: deviceName,
+      location: location,
+      timestamp: new Date().toISOString()
+    };
   };
 
   const getFullPhoneNumber = () => {
@@ -218,7 +243,7 @@ export default function LoginPage() {
 
     try {
       const pwdHash = await hashString(registerPassword);
-      const deviceId = getDeviceId();
+      const deviceInfo = await getDeviceInfo();
       const generatedKey = generateRecoveryKey();
       const keyHash = await hashString(generatedKey);
 
@@ -226,7 +251,7 @@ export default function LoginPage() {
         phoneNumber: firebaseUser.phoneNumber,
         passwordHash: pwdHash,
         recoveryKeyHash: keyHash,
-        devices: [deviceId],
+        devices: [deviceInfo],
         createdAt: new Date(),
       });
       
@@ -258,9 +283,9 @@ export default function LoginPage() {
         return;
       }
 
-      const deviceId = getDeviceId();
+      const deviceInfo = await getDeviceInfo();
       await updateDoc(doc(db, "users", firebaseUser.uid), {
-        devices: arrayUnion(deviceId)
+        devices: arrayUnion(deviceInfo)
       });
       
       router.push("/");
