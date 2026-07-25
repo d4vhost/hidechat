@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { LanguageProvider } from "@/context/LanguageContext";
-import LanguageToggle from "@/components/LanguageToggle";
 
 export const viewport: Viewport = {
   themeColor: "#ffffff",
@@ -33,7 +32,6 @@ export default function RootLayout({
       <body className="antialiased bg-white text-black dark:bg-[#0a0a0a] dark:text-[#ededed] transition-colors duration-300">
         <ThemeProvider>
           <LanguageProvider>
-            <LanguageToggle />
             {children}
           </LanguageProvider>
         </ThemeProvider>

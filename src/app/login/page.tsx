@@ -345,14 +345,14 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen retro-bg text-black">
-      <header className="retro-nav p-4 flex items-center justify-between shadow-md z-10 shrink-0">
-        <div className="w-20" /> {/* Spacer for balance */}
+      <header className="retro-nav p-4 flex items-center shadow-md z-10 shrink-0">
+        <div className="flex-1" /> {/* Spacer for balance */}
         
-        <h1 className="text-xl sm:text-2xl font-bold text-white text-center flex-1 drop-shadow-md text-shadow-sm truncate">
+        <h1 className="text-xl sm:text-2xl font-bold text-white text-center drop-shadow-md text-shadow-sm truncate shrink-0">
           {t('loginTitle')}
         </h1>
         
-        <div className="w-20 flex justify-end">
+        <div className="flex-1 flex justify-end">
           <LanguageToggle />
         </div>
       </header>
