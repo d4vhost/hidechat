@@ -521,7 +521,6 @@ export default function Inbox() {
               <Scanner 
                 onScan={handleScanQR}
                 components={{
-                  audio: false,
                   finder: true,
                 }}
               />
