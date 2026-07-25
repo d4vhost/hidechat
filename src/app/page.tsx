@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronRight, Settings as SettingsIcon, LogOut, Moon, Sun, Eye, EyeOff, Edit, Edit3, Smartphone, XCircle, QrCode } from "lucide-react";
+import { ChevronRight, Settings as SettingsIcon, LogOut, Moon, Sun, Eye, EyeOff, Edit, Edit3, Smartphone, XCircle, QrCode, Trash2 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { auth, db } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
@@ -572,7 +572,7 @@ export default function Inbox() {
                         onClick={() => setDeviceToRemove(device)}
                         className="p-1 active:opacity-50"
                       >
-                        <XCircle className="w-5 h-5 text-red-500" />
+                        <Trash2 className="w-5 h-5 text-red-500" />
                       </button>
                     )}
                   </div>
@@ -631,35 +631,40 @@ export default function Inbox() {
 
       {/* Remove Device Confirmation Modal */}
       {deviceToRemove && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#1e1e1e] rounded-xl shadow-2xl border border-gray-300 dark:border-[#333] w-full max-w-sm overflow-hidden scale-in">
-            <div className="bg-[#cbd5e1] dark:bg-[#2a2a2a] px-4 py-3 border-b border-[#86a7cc] dark:border-[#444]">
-              <h3 className="font-bold text-lg text-[#1e293b] dark:text-gray-100 flex items-center gap-2">
-                <XCircle className="w-5 h-5 text-red-500" /> Remove Device
-              </h3>
+        <div className="fixed inset-0 z-50 flex flex-col retro-bg dark:bg-[#121212] animate-in slide-in-from-bottom-4 duration-300">
+          {/* Top Nav */}
+          <div className="retro-nav px-4 py-3 flex items-center justify-between shadow-md shrink-0">
+            <h2 className="text-white font-bold text-lg text-shadow-sm">Remove Session</h2>
+            <button 
+              onClick={() => setDeviceToRemove(null)} 
+              className="retro-btn px-3 py-1 text-white text-sm font-bold"
+            >
+              Cancel
+            </button>
+          </div>
+          
+          {/* Main Content Area */}
+          <div className="flex-1 p-6 flex flex-col items-center justify-center text-center">
+            <div className="w-24 h-24 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-6 shadow-inner border-4 border-red-200 dark:border-red-800">
+              <Trash2 className="w-12 h-12 text-red-600 dark:text-red-500" />
             </div>
-            <div className="p-5">
-              <p className="text-[#334155] dark:text-gray-300 mb-6 font-medium">
-                Are you sure you want to remove this device? The session on that device will be closed immediately.
-              </p>
-              <div className="flex gap-3">
-                <button 
-                  onClick={() => setDeviceToRemove(null)}
-                  className="flex-1 px-4 py-2 bg-gray-200 dark:bg-[#333] text-gray-800 dark:text-white rounded-lg font-bold hover:bg-gray-300 dark:hover:bg-[#444] transition-colors"
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={() => {
-                    handleRemoveDevice(deviceToRemove);
-                    setDeviceToRemove(null);
-                  }}
-                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-colors shadow-md border-b-4 border-red-700 active:border-b-0 active:translate-y-1"
-                >
-                  Confirm
-                </button>
-              </div>
-            </div>
+            <h3 className="text-2xl font-bold text-[#1e293b] dark:text-gray-100 mb-4">Disconnect Device</h3>
+            <p className="text-[#334155] dark:text-gray-300 text-lg max-w-xs leading-relaxed">
+              Are you sure you want to remove this device? The session on that device will be closed immediately and require a new QR scan to access.
+            </p>
+          </div>
+          
+          {/* Fixed Bottom Confirm Button */}
+          <div className="p-4 bg-[#cbd5e1] dark:bg-[#1a1a1a] border-t border-[#86a7cc] dark:border-[#333] shrink-0">
+            <button 
+              onClick={() => {
+                handleRemoveDevice(deviceToRemove);
+                setDeviceToRemove(null);
+              }} 
+              className="w-full py-3 bg-red-600 dark:bg-red-700 text-white font-bold text-lg rounded-xl shadow-[0_4px_0_#991b1b] dark:shadow-[0_4px_0_#7f1d1d] active:shadow-none active:translate-y-1 transition-all flex items-center justify-center gap-2"
+            >
+              <Trash2 className="w-5 h-5" /> Confirm Removal
+            </button>
           </div>
         </div>
       )}
