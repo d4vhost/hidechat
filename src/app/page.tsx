@@ -252,12 +252,6 @@ export default function Inbox() {
                     <form onSubmit={handleAddFriend} className="space-y-4">
                       
                       <div className="flex flex-col gap-3 my-5 max-w-sm mx-auto">
-                        <div className="flex justify-center">
-                          <select className="bg-gray-50 border border-gray-400 text-gray-800 text-sm sm:text-base font-bold rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 shadow-sm retro-input-field cursor-pointer">
-                            <option value="+593">🇪🇨 +593 (Ecuador)</option>
-                          </select>
-                        </div>
-                        
                         <div className="flex items-center justify-center gap-1 sm:gap-2">
                           {/* 2 digits */}
                           <div className="flex gap-1 justify-center">
@@ -360,6 +354,9 @@ export default function Inbox() {
                     <p className="text-sm font-medium text-justify leading-relaxed">
                       The friend request is sent instantly and safely wrapped in our private open protocol architecture. The recipient will be notified seamlessly in their Inbox, preventing any kind of unauthorized spam or phishing attempts from unknown sources.
                     </p>
+                    <p className="text-sm font-medium text-justify leading-relaxed">
+                      Rest assured, your full profile and messaging capabilities remain completely private until the other person explicitly accepts the request. Welcome to the safest and most efficient way to expand your secure network!
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -368,6 +365,9 @@ export default function Inbox() {
                     </p>
                     <p className="text-sm font-medium text-justify leading-relaxed">
                       Engage with users globally using just a unique username. Pop Chat's open protocol securely routes the alias request directly to the intended recipient's device, ensuring that metadata is stripped away and protected against unknown sources.
+                    </p>
+                    <p className="text-sm font-medium text-justify leading-relaxed">
+                      Our zero-knowledge architecture means you control exactly who can communicate with you. It is the perfect tool for thriving in online communities or business environments without compromising your personal safety.
                     </p>
                   </div>
                 )}
