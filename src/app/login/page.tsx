@@ -1,0 +1,471 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
+import { auth, db } from "@/lib/firebase";
+import { doc, getDoc, setDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import { useRouter } from "next/navigation";
+import { Key, AlertTriangle, QrCode } from "lucide-react";
+import { hashString, generateRecoveryKey, evaluatePasswordStrength } from "@/lib/crypto";
+
+declare global {
+  interface Window {
+    recaptchaVerifier: any;
+  }
+}
+
+type AuthMode = "LOGIN" | "REGISTER";
+type AuthStep = "MAIN" | "OTP" | "PASSWORD_SETUP" | "SHOW_NEW_KEY" | "RECOVERY_KEY";
+
+export default function LoginPage() {
+  const [authMode, setAuthMode] = useState<AuthMode>("LOGIN");
+  const [step, setStep] = useState<AuthStep>("MAIN");
+  
+  // Common
+  const [countryCode, setCountryCode] = useState("+1");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [otp, setOtp] = useState("");
+  
+  // Login Specific
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginToken, setLoginToken] = useState("");
+  
+  // Register Specific
+  const [registerPassword, setRegisterPassword] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState("");
+  const [newRecoveryKey, setNewRecoveryKey] = useState("");
+  
+  // Recovery key step
+  const [inputRecoveryKey, setInputRecoveryKey] = useState("");
+  
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<any>(null);
+  
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (window.recaptchaVerifier) {
+        try { window.recaptchaVerifier.clear(); } catch (e) {}
+        window.recaptchaVerifier = null;
+      }
+      try {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          'size': 'invisible'
+        });
+      } catch (error) {
+        console.error("Recaptcha init error:", error);
+      }
+    }
+    return () => {
+      if (typeof window !== "undefined" && window.recaptchaVerifier) {
+        try { window.recaptchaVerifier.clear(); } catch (e) {}
+        window.recaptchaVerifier = null;
+      }
+    };
+  }, []);
+
+  const getDeviceId = () => {
+    let deviceId = localStorage.getItem('pop-device-id');
+    if (!deviceId) {
+      deviceId = 'DEV-' + Math.random().toString(36).substring(2, 15);
+      localStorage.setItem('pop-device-id', deviceId);
+    }
+    return deviceId;
+  };
+
+  const getFullPhoneNumber = () => {
+    let cleanNumber = phoneNumber.replace(/\s+/g, '');
+    if (cleanNumber.startsWith('0')) cleanNumber = cleanNumber.substring(1);
+    return `${countryCode}${cleanNumber}`;
+  };
+
+  const handlePhoneSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!phoneNumber) return;
+    
+    if (authMode === "LOGIN" && !loginPassword) {
+      setError("Password is required to log in.");
+      return;
+    }
+    
+    setError("");
+    setLoading(true);
+    
+    try {
+      const fullPhoneNumber = getFullPhoneNumber();
+      console.log("Attempting SMS to:", fullPhoneNumber);
+      
+      const appVerifier = window.recaptchaVerifier;
+      const confirmation = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
+      setConfirmationResult(confirmation);
+      setStep("OTP");
+    } catch (err: any) {
+      console.error(err);
+      if (err.code === 'auth/unauthorized-domain') {
+        setError("Domain not authorized in Firebase Console.");
+      } else {
+        setError(err.message || "Error sending SMS.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otp || !confirmationResult) return;
+    setError("");
+    setLoading(true);
+
+    try {
+      const result = await confirmationResult.confirm(otp);
+      const user = result.user;
+      setFirebaseUser(user);
+
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      const userData = userDoc.data();
+      
+      if (authMode === "LOGIN") {
+        if (!userDoc.exists()) {
+          setError("Account not found. Please register.");
+          setStep("MAIN");
+          setLoading(false);
+          return;
+        }
+
+        // Verify login credentials
+        const pwdHash = await hashString(loginPassword);
+        if (userData?.passwordHash !== pwdHash) {
+          setError("Incorrect password.");
+          setStep("MAIN");
+          setLoading(false);
+          return;
+        }
+
+        const deviceId = getDeviceId();
+        const devices = userData?.devices || [];
+        
+        if (loginToken) {
+          const keyHash = await hashString(loginToken.trim());
+          if (userData?.recoveryKeyHash !== keyHash) {
+            setError("Invalid Token Key.");
+            setStep("MAIN");
+            setLoading(false);
+            return;
+          }
+          if (!devices.includes(deviceId)) {
+            await updateDoc(doc(db, "users", user.uid), {
+              devices: arrayUnion(deviceId)
+            });
+          }
+          router.push("/");
+        } else {
+          if (devices.includes(deviceId)) {
+            router.push("/");
+          } else {
+            // Needs token, transition to RECOVERY_KEY step if not provided in main form
+            setStep("RECOVERY_KEY");
+          }
+        }
+      } else {
+        // REGISTER MODE
+        if (userDoc.exists()) {
+          setError("Account already exists. Please log in.");
+          setAuthMode("LOGIN");
+          setStep("MAIN");
+        } else {
+          setStep("PASSWORD_SETUP");
+        }
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError("Invalid OTP code.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegisterPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!registerPassword || !firebaseUser) return;
+    setError("");
+    setLoading(true);
+
+    try {
+      const pwdHash = await hashString(registerPassword);
+      const deviceId = getDeviceId();
+      const generatedKey = generateRecoveryKey();
+      const keyHash = await hashString(generatedKey);
+
+      await setDoc(doc(db, "users", firebaseUser.uid), {
+        phoneNumber: firebaseUser.phoneNumber,
+        passwordHash: pwdHash,
+        recoveryKeyHash: keyHash,
+        devices: [deviceId],
+        createdAt: new Date(),
+      });
+      
+      setNewRecoveryKey(generatedKey);
+      setStep("SHOW_NEW_KEY");
+    } catch (err) {
+      console.error(err);
+      setError("Error creating account.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRecoveryKeySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputRecoveryKey || !firebaseUser) return;
+    setError("");
+    setLoading(true);
+
+    try {
+      const keyHash = await hashString(inputRecoveryKey.trim());
+      const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+      const userData = userDoc.data();
+
+      if (userData?.recoveryKeyHash !== keyHash) {
+        setError("Invalid Recovery Key.");
+        setLoading(false);
+        return;
+      }
+
+      const deviceId = getDeviceId();
+      await updateDoc(doc(db, "users", firebaseUser.uid), {
+        devices: arrayUnion(deviceId)
+      });
+      
+      router.push("/");
+    } catch (err) {
+      console.error(err);
+      setError("Error validating key.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setRegisterPassword(val);
+    setPasswordStrength(evaluatePasswordStrength(val));
+  };
+
+  return (
+    <div className="min-h-screen retro-bg text-black">
+      <header className="retro-nav px-3 py-2 flex justify-center items-center shadow-md">
+        <h1 className="text-xl font-bold text-white drop-shadow-md text-shadow-sm">POP Chat</h1>
+      </header>
+
+      <div className="p-4 mt-4">
+        <p className="text-center text-[#4d576b] font-bold text-sm mb-4 shadow-white drop-shadow-sm">
+          Private Open Protocol
+        </p>
+
+        <form 
+          onSubmit={
+            step === "MAIN" ? handlePhoneSubmit : 
+            step === "OTP" ? handleOtpSubmit : 
+            step === "PASSWORD_SETUP" ? handleRegisterPasswordSubmit :
+            step === "RECOVERY_KEY" ? handleRecoveryKeySubmit :
+            (e) => { e.preventDefault(); router.push("/"); }
+          } 
+          className="max-w-md mx-auto"
+        >
+          {error && (
+            <div className="mb-4 text-red-600 font-bold text-center text-sm">
+              {error}
+            </div>
+          )}
+
+          {step === "MAIN" && (
+            <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-4">
+              <div className="flex items-center px-4 py-3 border-b border-gray-200">
+                <span className="text-gray-500 font-bold w-24">Country</span>
+                <select 
+                  value={countryCode}
+                  onChange={(e) => setCountryCode(e.target.value)}
+                  className="flex-1 bg-transparent text-black font-bold focus:outline-none"
+                >
+                  <option value="+1">United States (+1)</option>
+                  <option value="+34">Spain (+34)</option>
+                  <option value="+52">Mexico (+52)</option>
+                  <option value="+54">Argentina (+54)</option>
+                  <option value="+57">Colombia (+57)</option>
+                  <option value="+56">Chile (+56)</option>
+                  <option value="+51">Peru (+51)</option>
+                  <option value="+593">Ecuador (+593)</option>
+                </select>
+              </div>
+              
+              <div className="flex items-center px-4 py-3 border-b border-gray-200">
+                <span className="text-gray-500 font-bold w-24">Phone</span>
+                <input
+                  type="tel"
+                  placeholder="123 456 7890"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="flex-1 bg-transparent text-black font-bold focus:outline-none"
+                />
+              </div>
+
+              {authMode === "LOGIN" && (
+                <>
+                  <div className="flex items-center px-4 py-3 border-b border-gray-200">
+                    <span className="text-gray-500 font-bold w-24">Password</span>
+                    <input
+                      type="password"
+                      placeholder="Your password"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      className="flex-1 bg-transparent text-black font-bold focus:outline-none"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center px-4 py-3">
+                    <span className="text-gray-500 font-bold w-24">Token</span>
+                    <input
+                      type="text"
+                      placeholder="Optional if recognized"
+                      value={loginToken}
+                      onChange={(e) => setLoginToken(e.target.value)}
+                      className="flex-1 bg-transparent text-black font-bold focus:outline-none"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {step === "OTP" && (
+            <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-4">
+              <div className="flex items-center px-4 py-3">
+                <span className="text-gray-500 font-bold w-24">SMS Code</span>
+                <input
+                  type="text"
+                  placeholder="123456"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  className="flex-1 bg-transparent text-black font-bold focus:outline-none tracking-widest"
+                  maxLength={6}
+                />
+              </div>
+            </div>
+          )}
+
+          {step === "PASSWORD_SETUP" && (
+            <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-4 p-4">
+              <h2 className="text-center font-bold text-lg mb-2">Create Password</h2>
+              <p className="text-center text-xs text-gray-500 mb-4">
+                Secure your account with a password.
+              </p>
+              <div className="flex flex-col gap-2">
+                <input
+                  type="password"
+                  placeholder="Max 14 chars"
+                  value={registerPassword}
+                  onChange={handlePasswordChange}
+                  maxLength={14}
+                  className="w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 text-black font-bold focus:outline-none focus:border-blue-500"
+                />
+                {registerPassword && (
+                  <div className="flex justify-between items-center px-1">
+                    <span className="text-xs font-semibold text-gray-500">Strength:</span>
+                    <span className={`text-xs font-bold ${
+                      passwordStrength === 'Weak' ? 'text-red-500' :
+                      passwordStrength === 'Moderate' ? 'text-yellow-500' :
+                      passwordStrength === 'Strong' ? 'text-green-500' : 'text-blue-600'
+                    }`}>
+                      {passwordStrength}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {step === "SHOW_NEW_KEY" && (
+            <div className="bg-white border border-gray-400 rounded-lg shadow-sm mb-4 p-5 text-center">
+              <AlertTriangle className="w-10 h-10 text-red-500 mx-auto mb-3" />
+              <h2 className="font-bold text-xl text-red-600 mb-2">Save This Key!</h2>
+              <p className="text-xs text-gray-600 mb-4 font-semibold">
+                If you lose this key, you will NEVER be able to log in on another device. There is NO password reset.
+              </p>
+              <div className="bg-gray-100 p-3 rounded border border-gray-300 mb-4 select-all">
+                <span className="font-mono font-bold text-blue-700 tracking-wider text-lg">{newRecoveryKey}</span>
+              </div>
+            </div>
+          )}
+
+          {step === "RECOVERY_KEY" && (
+            <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-4 p-4">
+              <h2 className="text-center font-bold text-lg mb-2 text-red-600 flex items-center justify-center gap-2">
+                <Key className="w-5 h-5"/> Unrecognized Device
+              </h2>
+              <p className="text-center text-xs text-gray-600 mb-4 font-semibold">
+                You are logging in from a new device. Enter your Recovery Key to authorize it.
+              </p>
+              <input
+                type="text"
+                placeholder="POP-XXXX-XXXX-XXXX-XXXX"
+                value={inputRecoveryKey}
+                onChange={(e) => setInputRecoveryKey(e.target.value.toUpperCase())}
+                className="w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 text-black font-mono tracking-widest text-sm focus:outline-none focus:border-red-500"
+              />
+            </div>
+          )}
+
+          {step === "MAIN" && authMode === "LOGIN" && (
+            <div className="mb-4">
+              <button
+                type="button"
+                onClick={() => alert("Scan to sync functionality coming soon!")}
+                className="w-full bg-blue-100 text-blue-800 font-bold text-sm py-2 rounded-lg border border-blue-300 shadow-sm flex items-center justify-center gap-2 hover:bg-blue-200 transition-colors"
+              >
+                <QrCode className="w-4 h-4" /> Scan to sync automatically
+              </button>
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full retro-btn text-white font-bold text-lg py-3 rounded-lg shadow-md active:opacity-70 transition-opacity mb-4"
+          >
+            {loading ? "Processing..." : 
+             step === "SHOW_NEW_KEY" ? "I have saved it" : 
+             authMode === "LOGIN" && step === "MAIN" ? "Log In" : "Continue"}
+          </button>
+          
+          {step === "MAIN" && (
+            <div className="text-center">
+              {authMode === "LOGIN" ? (
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode("REGISTER"); setError(""); }}
+                  className="text-sm font-bold text-blue-800 hover:underline"
+                >
+                  Don't have an account? Sign up
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode("LOGIN"); setError(""); }}
+                  className="text-sm font-bold text-blue-800 hover:underline"
+                >
+                  Already have an account? Log in
+                </button>
+              )}
+            </div>
+          )}
+        </form>
+      </div>
+      
+      <div id="recaptcha-container"></div>
+    </div>
+  );
+}

@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+:root.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* --- Retro iOS 2008 Utilities --- */
+@utility retro-bg {
+  background-color: #dbe0e7;
+  background-image: linear-gradient(transparent 50%, #c8d1df 50%);
+  background-size: 100% 6px;
+}
+
+@utility retro-nav {
+  background: linear-gradient(to bottom, #86a7cc 0%, #638ab8 50%, #4b77ad 51%, #4570a8 100%);
+  border-bottom: 1px solid #2d4c75;
+}
+
+@utility retro-btn {
+  background: linear-gradient(to bottom, #6b8db7 0%, #4f78a7 50%, #3e689d 51%, #3a6296 100%);
+  border: 1px solid #2d4c75;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 2px rgba(0,0,0,0.3);
+  border-radius: 8px;
+}
+
+@utility retro-bubble-green {
+  background: linear-gradient(to bottom, #a4e565 0%, #82d832 50%, #6cd015 51%, #62c70d 100%);
+  border: 1px solid #4a9d06;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.8), inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+  color: #000;
+}
+
+@utility retro-bubble-gray {
+  background: linear-gradient(to bottom, #e8e8e8 0%, #d8d8d8 50%, #c8c8c8 51%, #bcbcbc 100%);
+  border: 1px solid #999;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.8), inset 0 -1px 2px rgba(0, 0, 0, 0.1);
+  color: #000;
+}
+
+@utility retro-input-bar {
+  background: linear-gradient(to bottom, #cfd3d8 0%, #bac0c8 50%, #a4abb5 51%, #9aa2ac 100%);
+  border-top: 1px solid #555;
+}
+
+@utility retro-input-field {
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+  border: 1px solid #666;
+}
+
+@utility retro-send-btn {
+  background: linear-gradient(to bottom, #5080c0 0%, #3366a5 50%, #205090 51%, #154585 100%);
+  border: 1px solid #1a3a6a;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 2px rgba(0,0,0,0.3);
+  color: #fff;
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.5);
+}

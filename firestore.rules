@@ -1,0 +1,54 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+    // Variables globales permitidas
+    function isAuthorizedUser() {
+      return request.auth != null && (
+        request.auth.uid == 'HUrCHrXT4rhKTGWnQNyGufv15VJ2' || 
+        request.auth.uid == 'yGaR1wXf5BShtDWLB7dQ21P9CF83'
+      );
+    }
+    
+    function getOtherUID(myUid) {
+      return myUid == 'HUrCHrXT4rhKTGWnQNyGufv15VJ2' ? 'yGaR1wXf5BShtDWLB7dQ21P9CF83' : 'HUrCHrXT4rhKTGWnQNyGufv15VJ2';
+    }
+
+    match /messages/{messageId} {
+      // Solo pueden leer los autorizados
+      allow read: if isAuthorizedUser();
+      
+      // Reglas para crear un nuevo mensaje
+      allow create: if isAuthorizedUser()
+        && request.resource.data.keys().hasAll(['conversationId', 'senderId', 'receiverId', 'text', 'createdAt', 'expiresAt', 'status'])
+        && request.resource.data.senderId == request.auth.uid
+        && request.resource.data.receiverId == getOtherUID(request.auth.uid)
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 1000
+        && request.resource.data.status == 'sent';
+        
+      // Reglas para actualizar un mensaje (solo para marcar como entregado/leído)
+      allow update: if isAuthorizedUser()
+        && request.resource.data.text == resource.data.text
+        && request.resource.data.senderId == resource.data.senderId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.expiresAt == resource.data.expiresAt;
+        
+      // Reglas para borrar un mensaje (batch cleanup)
+      allow delete: if isAuthorizedUser();
+    }
+    
+    // Reglas para presencia
+    match /presence/{userId} {
+      allow read: if isAuthorizedUser();
+      allow write: if isAuthorizedUser() && request.auth.uid == userId;
+    }
+    
+    // Reglas para indicador "Escribiendo"
+    match /typing/{userId} {
+      allow read: if isAuthorizedUser();
+      allow write: if isAuthorizedUser() && request.auth.uid == userId;
+    }
+  }
+}
