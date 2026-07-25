@@ -22,7 +22,7 @@ export default function LoginPage() {
   const [step, setStep] = useState<AuthStep>("MAIN");
   
   // Common
-  const [countryCode, setCountryCode] = useState("+1");
+  const [countryCode, setCountryCode] = useState("+593");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
   
@@ -41,6 +41,7 @@ export default function LoginPage() {
   
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showQR, setShowQR] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -303,13 +304,6 @@ export default function LoginPage() {
                   onChange={(e) => setCountryCode(e.target.value)}
                   className="flex-1 bg-transparent text-black font-bold focus:outline-none"
                 >
-                  <option value="+1">United States (+1)</option>
-                  <option value="+34">Spain (+34)</option>
-                  <option value="+52">Mexico (+52)</option>
-                  <option value="+54">Argentina (+54)</option>
-                  <option value="+57">Colombia (+57)</option>
-                  <option value="+56">Chile (+56)</option>
-                  <option value="+51">Peru (+51)</option>
                   <option value="+593">Ecuador (+593)</option>
                 </select>
               </div>
@@ -465,10 +459,10 @@ export default function LoginPage() {
             <div className="mb-4">
               <button
                 type="button"
-                onClick={() => alert("Scan to sync functionality coming soon!")}
-                className="w-full bg-blue-100 text-blue-800 font-bold text-sm py-2 rounded-lg border border-blue-300 shadow-sm flex items-center justify-center gap-2 hover:bg-blue-200 transition-colors"
+                onClick={() => setShowQR(true)}
+                className="w-full retro-btn text-white font-bold text-lg py-3 rounded-lg shadow-md active:opacity-70 transition-opacity flex items-center justify-center gap-2"
               >
-                <QrCode className="w-4 h-4" /> Scan to sync automatically
+                <QrCode className="w-5 h-5" /> Scan with QR
               </button>
             </div>
           )}
@@ -506,6 +500,25 @@ export default function LoginPage() {
           )}
         </form>
       </div>
+      
+      {showQR && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-[#cbd5e1] border border-[#86a7cc] w-full max-w-sm rounded-xl overflow-hidden shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+            <div className="retro-nav px-4 py-3 flex items-center justify-between">
+              <h2 className="text-white font-bold text-lg text-shadow-sm">Scan QR Code</h2>
+              <button onClick={() => setShowQR(false)} className="retro-btn px-3 py-1 text-white text-sm font-bold">Close</button>
+            </div>
+            <div className="p-8 flex flex-col items-center justify-center bg-white">
+              <div className="bg-white p-4 border-2 border-gray-300 rounded-xl shadow-inner mb-6">
+                <QrCode className="w-48 h-48 text-gray-800" strokeWidth={1} />
+              </div>
+              <p className="text-center text-gray-600 font-bold text-sm">
+                Scan this code from your linked device to log in automatically.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       
       <div id="recaptcha-container"></div>
     </div>
