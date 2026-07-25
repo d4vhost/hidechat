@@ -225,9 +225,9 @@ export default function Inbox() {
           </div>
           
           <div className="flex-1 overflow-y-auto pb-6">
-            <div className="w-full sm:max-w-md sm:mx-auto sm:mt-6 bg-white sm:border sm:border-gray-300 sm:rounded-xl shadow-md overflow-hidden">
+            <div className="w-full sm:max-w-md sm:mx-auto sm:mt-6 bg-white sm:border sm:border-gray-300 sm:rounded-xl shadow-md overflow-hidden flex flex-col min-h-[calc(100vh-50px)] sm:min-h-0">
               {/* Toggle Switch */}
-              <div className="p-3 bg-gray-100 border-b border-gray-300 flex justify-center">
+              <div className="p-3 bg-gray-100 border-b border-gray-300 flex justify-center shrink-0">
                 <div className="retro-segmented-control w-full sm:max-w-sm">
                   <button 
                     onClick={() => setAddMethod('phone')}
@@ -245,14 +245,18 @@ export default function Inbox() {
               </div>
 
               {/* Content Container */}
-              <div className="p-4 sm:p-5 text-black">
+              <div className="p-4 sm:p-5 text-black shrink-0">
                 {addMethod === 'phone' ? (
                   <div>
                     <p className="text-sm font-bold text-gray-600 mb-4 text-center">Enter a phone number to send a friend request.</p>
                     <form onSubmit={handleAddFriend} className="space-y-4">
                       
                       <div className="flex items-center justify-between my-4 gap-1 sm:gap-2 max-w-sm mx-auto">
-                        <div className="font-bold text-gray-700 text-sm sm:text-lg shrink-0">+593</div>
+                        <div className="shrink-0">
+                          <select className="bg-gray-50 border border-gray-400 text-gray-800 text-sm sm:text-lg font-bold rounded-md pl-2 pr-1 py-2 sm:py-2 focus:outline-none focus:border-blue-500 shadow-sm retro-input-field cursor-pointer">
+                            <option value="+593">🇪🇨 +593</option>
+                          </select>
+                        </div>
                         
                         <div className="flex gap-1 flex-1 justify-center">
                           {[0, 1, 2].map((i) => (
@@ -314,7 +318,7 @@ export default function Inbox() {
                       {addFriendError && <p className="text-red-500 text-xs font-bold text-center">{addFriendError}</p>}
                       {addFriendSuccess && <p className="text-green-500 text-xs font-bold text-center">{addFriendSuccess}</p>}
                       
-                      <button type="submit" className="w-full retro-btn text-white font-bold py-2 rounded-md shadow-sm active:opacity-70 flex justify-center items-center">
+                      <button type="submit" className="w-full retro-btn text-white font-bold py-3 sm:py-2 rounded-md shadow-sm active:opacity-70 flex justify-center items-center text-base">
                         Send Request
                       </button>
                     </form>
@@ -328,47 +332,47 @@ export default function Inbox() {
                         placeholder="Enter Alias (e.g. majito_123)"
                         value={addFriendAlias}
                         onChange={(e) => setAddFriendAlias(e.target.value)}
-                        className="w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 font-bold outline-none focus:border-blue-500 retro-input-field"
+                        className="w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-3 font-bold outline-none focus:border-blue-500 retro-input-field"
                       />
                       
-                      <button type="submit" className="w-full retro-btn text-white font-bold py-2 rounded-md shadow-sm active:opacity-70 flex justify-center items-center">
+                      <button type="submit" className="w-full retro-btn text-white font-bold py-3 sm:py-2 rounded-md shadow-sm active:opacity-70 flex justify-center items-center text-base">
                         Search & Add
                       </button>
                     </form>
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* Informational Text */}
-            <div className="w-full sm:max-w-md sm:mx-auto mt-4 sm:mt-6 text-gray-800 bg-white/70 backdrop-blur-sm sm:rounded-lg p-5 sm:border sm:border-gray-300 shadow-sm">
-              <h3 className="text-sm font-bold mb-3 text-center">Pop Chat (Private Open Protocol)</h3>
-              
-              {addMethod === 'phone' ? (
-                <>
-                  <p className="text-xs mb-3 font-medium text-justify">
-                    Adding a contact by <span className="font-bold">phone number</span> ensures you connect directly with individuals already in your address book or those whose trusted contact details you possess. By linking through a phone number, Pop Chat utilizes a highly secure peer-to-peer encryption protocol to initiate the connection.
-                  </p>
-                  <p className="text-xs mb-3 font-medium text-justify">
-                    The friend request is sent instantly and safely wrapped in our private open protocol architecture. The recipient will be notified seamlessly in their Inbox, preventing spam from unknown sources.
-                  </p>
-                  <p className="text-xs font-medium text-justify">
-                    Until the request is explicitly accepted, your full profile and messaging capabilities remain completely private and inaccessible.
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-xs mb-3 font-medium text-justify">
-                    Adding a contact by <span className="font-bold">Alias</span> allows you to connect with new friends without sharing your personal phone number or real-world identity. This approach guarantees 100% privacy and anonymity.
-                  </p>
-                  <p className="text-xs mb-3 font-medium text-justify">
-                    Engage with users globally using just a unique username. Pop Chat's open protocol securely routes the alias request directly to the intended recipient's device, ensuring that metadata is stripped away.
-                  </p>
-                  <p className="text-xs font-medium text-justify">
-                    It's the perfect method for participating in online communities, public networking, or maintaining a strict boundary between your public digital presence and your private phone number.
-                  </p>
-                </>
-              )}
+              {/* Informational Text (Merged into the same container) */}
+              <div className="flex-1 bg-gray-50 border-t border-gray-200 p-5 sm:p-6 text-gray-800">
+                <h3 className="text-base font-bold mb-4 text-center text-gray-900 border-b border-gray-300 pb-2">Pop Chat (Private Open Protocol)</h3>
+                
+                {addMethod === 'phone' ? (
+                  <div className="space-y-4">
+                    <p className="text-sm font-medium text-justify leading-relaxed">
+                      Adding a contact by <span className="font-bold">phone number</span> ensures you connect directly with individuals already in your address book or those whose trusted contact details you currently possess. By linking through a phone number, Pop Chat utilizes a highly secure peer-to-peer encryption protocol to strictly authenticate and initiate the connection.
+                    </p>
+                    <p className="text-sm font-medium text-justify leading-relaxed">
+                      The friend request is sent instantly and safely wrapped in our private open protocol architecture. The recipient will be notified seamlessly in their Inbox, preventing any kind of unauthorized spam or phishing attempts from unknown sources. Our servers never store the contents of your messages in plain text, meaning even our infrastructure cannot read your communications.
+                    </p>
+                    <p className="text-sm font-medium text-justify leading-relaxed">
+                      Until the request is explicitly accepted by the other party, your full profile, online status, and messaging capabilities remain completely private and inaccessible. This provides a robust layer of security for everyday communication, making it impossible for strangers to interrupt your privacy without consent. Welcome to the new standard of secure digital messaging!
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <p className="text-sm font-medium text-justify leading-relaxed">
+                      Adding a contact by <span className="font-bold">Alias</span> allows you to safely connect with new friends without ever having to share your personal phone number or your real-world identity. This approach guarantees 100% privacy and anonymity from the start.
+                    </p>
+                    <p className="text-sm font-medium text-justify leading-relaxed">
+                      Engage with users globally using just a unique username. Pop Chat's open protocol securely routes the alias request directly to the intended recipient's device, ensuring that metadata—like your IP address or geographic location—is stripped away and protected. Our system uses zero-knowledge architecture to verify the alias without exposing underlying network identities.
+                    </p>
+                    <p className="text-sm font-medium text-justify leading-relaxed">
+                      It's the perfect method for participating in online communities, public networking, business inquiries, or simply maintaining a strict, impenetrable boundary between your public digital presence and your private phone number. You are always in control of who gets to talk to you.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
