@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion } from "firebase/firestore";
@@ -28,15 +28,13 @@ export default function LoginPage() {
   
   // Login Specific
   const [loginPassword, setLoginPassword] = useState("");
-  const [loginToken, setLoginToken] = useState("");
+  const [tokenParts, setTokenParts] = useState<string[]>(Array(8).fill(""));
+  const tokenRefs = useRef<(HTMLInputElement | null)[]>([]);
   
   // Register Specific
   const [registerPassword, setRegisterPassword] = useState("");
   const [passwordStrength, setPasswordStrength] = useState("");
   const [newRecoveryKey, setNewRecoveryKey] = useState("");
-  
-  // Recovery key step
-  const [inputRecoveryKey, setInputRecoveryKey] = useState("");
   
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [firebaseUser, setFirebaseUser] = useState<any>(null);
@@ -145,31 +143,8 @@ export default function LoginPage() {
           return;
         }
 
-        const deviceId = getDeviceId();
-        const devices = userData?.devices || [];
-        
-        if (loginToken) {
-          const keyHash = await hashString(loginToken.trim());
-          if (userData?.recoveryKeyHash !== keyHash) {
-            setError("Invalid Token Key.");
-            setStep("MAIN");
-            setLoading(false);
-            return;
-          }
-          if (!devices.includes(deviceId)) {
-            await updateDoc(doc(db, "users", user.uid), {
-              devices: arrayUnion(deviceId)
-            });
-          }
-          router.push("/");
-        } else {
-          if (devices.includes(deviceId)) {
-            router.push("/");
-          } else {
-            // Needs token, transition to RECOVERY_KEY step if not provided in main form
-            setStep("RECOVERY_KEY");
-          }
-        }
+        // Password is correct. Move to token step.
+        setStep("RECOVERY_KEY");
       } else {
         // REGISTER MODE
         if (userDoc.exists()) {
@@ -220,17 +195,18 @@ export default function LoginPage() {
 
   const handleRecoveryKeySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputRecoveryKey || !firebaseUser) return;
+    const combinedToken = `POP-${tokenParts.slice(0,4).join("")}-${tokenParts.slice(4,8).join("")}`;
+    if (!firebaseUser) return;
     setError("");
     setLoading(true);
 
     try {
-      const keyHash = await hashString(inputRecoveryKey.trim());
+      const keyHash = await hashString(combinedToken.trim());
       const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
       const userData = userDoc.data();
 
       if (userData?.recoveryKeyHash !== keyHash) {
-        setError("Invalid Recovery Key.");
+        setError("Invalid Token.");
         setLoading(false);
         return;
       }
@@ -253,6 +229,43 @@ export default function LoginPage() {
     const val = e.target.value;
     setRegisterPassword(val);
     setPasswordStrength(evaluatePasswordStrength(val));
+  };
+
+  const handleTokenChange = (index: number, value: string) => {
+    const newParts = [...tokenParts];
+    const char = value.slice(-1).toUpperCase();
+    newParts[index] = char;
+    setTokenParts(newParts);
+
+    if (char && index < 7) {
+      tokenRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleTokenKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !tokenParts[index] && index > 0) {
+      tokenRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleTokenPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").toUpperCase();
+    const clean = pasted.replace(/[^A-Z0-9]/g, "");
+    const withoutPop = clean.startsWith("POP") ? clean.slice(3) : clean;
+    
+    const newParts = [...tokenParts];
+    for (let i = 0; i < 8 && i < withoutPop.length; i++) {
+      newParts[i] = withoutPop[i];
+    }
+    setTokenParts(newParts);
+    
+    const nextEmpty = newParts.findIndex(p => !p);
+    if (nextEmpty !== -1) {
+      tokenRefs.current[nextEmpty]?.focus();
+    } else {
+      tokenRefs.current[7]?.focus();
+    }
   };
 
   return (
@@ -302,7 +315,7 @@ export default function LoginPage() {
                 </select>
               </div>
               
-              <div className="flex items-center px-4 py-3 border-b border-gray-200">
+              <div className={`flex items-center px-4 py-3 ${authMode === "LOGIN" ? "border-b border-gray-200" : ""}`}>
                 <span className="text-gray-500 font-bold w-24">Phone</span>
                 <input
                   type="tel"
@@ -314,30 +327,16 @@ export default function LoginPage() {
               </div>
 
               {authMode === "LOGIN" && (
-                <>
-                  <div className="flex items-center px-4 py-3 border-b border-gray-200">
-                    <span className="text-gray-500 font-bold w-24">Password</span>
-                    <input
-                      type="password"
-                      placeholder="Your password"
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      className="flex-1 bg-transparent text-black font-bold focus:outline-none"
-                    />
-                  </div>
-                  
-                  <div className="flex items-center px-4 py-3">
-                    <span className="text-gray-500 font-bold w-24">Token</span>
-                    <input
-                      type="text"
-                      placeholder="POP-XXXX-XXXX"
-                      value={loginToken}
-                      onChange={(e) => setLoginToken(e.target.value.toUpperCase())}
-                      maxLength={13}
-                      className="flex-1 bg-transparent text-black font-bold focus:outline-none"
-                    />
-                  </div>
-                </>
+                <div className="flex items-center px-4 py-3">
+                  <span className="text-gray-500 font-bold w-24">Password</span>
+                  <input
+                    type="password"
+                    placeholder="Your password"
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    className="flex-1 bg-transparent text-black font-bold focus:outline-none"
+                  />
+                </div>
               )}
             </div>
           )}
@@ -403,21 +402,42 @@ export default function LoginPage() {
           )}
 
           {step === "RECOVERY_KEY" && (
-            <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-4 p-4">
-              <h2 className="text-center font-bold text-lg mb-2 text-red-600 flex items-center justify-center gap-2">
-                <Key className="w-5 h-5"/> Unrecognized Device
+            <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-4 p-5 text-center">
+              <h2 className="font-bold text-lg mb-2 text-gray-800 flex items-center justify-center gap-2">
+                <Key className="w-5 h-5"/> Enter Token
               </h2>
-              <p className="text-center text-xs text-gray-600 mb-4 font-semibold">
-                You are logging in from a new device. Enter your Recovery Key to authorize it.
+              <p className="text-xs text-gray-500 mb-5 font-semibold">
+                Please enter your 8-character token key to continue.
               </p>
-              <input
-                type="text"
-                placeholder="POP-XXXX-XXXX"
-                value={inputRecoveryKey}
-                onChange={(e) => setInputRecoveryKey(e.target.value.toUpperCase())}
-                maxLength={13}
-                className="w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 text-black font-mono tracking-widest text-sm focus:outline-none focus:border-red-500"
-              />
+              <div className="flex justify-center items-center gap-2 mb-2">
+                {tokenParts.slice(0, 4).map((part, i) => (
+                  <input
+                    key={i}
+                    ref={(el) => { tokenRefs.current[i] = el; }}
+                    type="text"
+                    value={part}
+                    onChange={(e) => handleTokenChange(i, e.target.value)}
+                    onKeyDown={(e) => handleTokenKeyDown(i, e)}
+                    onPaste={handleTokenPaste}
+                    className="w-10 h-10 text-center font-bold text-lg border border-gray-300 rounded-lg bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all shadow-sm"
+                    maxLength={2}
+                  />
+                ))}
+                <span className="font-bold text-gray-400 mx-1">-</span>
+                {tokenParts.slice(4, 8).map((part, i) => (
+                  <input
+                    key={i + 4}
+                    ref={(el) => { tokenRefs.current[i + 4] = el; }}
+                    type="text"
+                    value={part}
+                    onChange={(e) => handleTokenChange(i + 4, e.target.value)}
+                    onKeyDown={(e) => handleTokenKeyDown(i + 4, e)}
+                    onPaste={handleTokenPaste}
+                    className="w-10 h-10 text-center font-bold text-lg border border-gray-300 rounded-lg bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all shadow-sm"
+                    maxLength={2}
+                  />
+                ))}
+              </div>
             </div>
           )}
 
