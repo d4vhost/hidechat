@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { Key, AlertTriangle, QrCode } from "lucide-react";
 import QRCode from "react-qr-code";
 import { hashString, generateRecoveryKey, evaluatePasswordStrength } from "@/lib/crypto";
+import { useLanguage } from "@/context/LanguageContext";
 
 declare global {
   interface Window {
@@ -19,6 +20,7 @@ type AuthMode = "LOGIN" | "REGISTER";
 type AuthStep = "MAIN" | "OTP" | "PASSWORD_SETUP" | "SHOW_NEW_KEY" | "RECOVERY_KEY";
 
 export default function LoginPage() {
+  const { t, language, toggleLanguage } = useLanguage();
   const [authMode, setAuthMode] = useState<AuthMode>("LOGIN");
   const [step, setStep] = useState<AuthStep>("MAIN");
   
@@ -342,13 +344,22 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen retro-bg text-black">
-      <header className="retro-nav px-3 py-2 flex justify-center items-center shadow-md">
-        <h1 className="text-xl font-bold text-white drop-shadow-md text-shadow-sm">POP Chat</h1>
+      <header className="retro-nav px-3 py-2 flex justify-between items-center shadow-md relative">
+        <div className="w-16"></div> {/* Spacer for centering */}
+        <h1 className="text-xl font-bold text-white drop-shadow-md text-shadow-sm">{t('loginTitle')}</h1>
+        <div className="w-16 flex justify-end">
+          <button 
+            onClick={toggleLanguage}
+            className="bg-white/20 hover:bg-white/30 transition-colors rounded-full px-3 py-1 text-xs font-bold text-white shadow-sm border border-white/30 backdrop-blur-sm"
+          >
+            {language === 'es' ? 'ESP' : 'ENG'}
+          </button>
+        </div>
       </header>
 
       <div className="p-4 mt-4">
         <p className="text-center text-[#4d576b] font-bold text-sm mb-4 shadow-white drop-shadow-sm">
-          Private Open Protocol
+          {t('loginSubtitle')}
         </p>
 
         <form 
@@ -370,18 +381,25 @@ export default function LoginPage() {
           {step === "MAIN" && (
             <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-4">
               <div className="flex items-center px-4 py-3 border-b border-gray-200">
-                <span className="text-gray-500 font-bold w-24">Country</span>
+                <span className="text-gray-500 font-bold w-24">{t('country')}</span>
                 <select 
-                  value={countryCode}
+                  value={countryCode} 
                   onChange={(e) => setCountryCode(e.target.value)}
-                  className="flex-1 bg-transparent text-black font-bold focus:outline-none"
+                  className="flex-1 bg-transparent text-black font-bold focus:outline-none cursor-pointer appearance-none"
                 >
                   <option value="+593">Ecuador (+593)</option>
+                  <option value="+1">United States (+1)</option>
+                  <option value="+44">United Kingdom (+44)</option>
+                  <option value="+34">Spain (+34)</option>
+                  <option value="+52">Mexico (+52)</option>
+                  <option value="+57">Colombia (+57)</option>
+                  <option value="+54">Argentina (+54)</option>
+                  <option value="+56">Chile (+56)</option>
                 </select>
               </div>
               
               <div className={`flex items-center px-4 py-3 ${authMode === "LOGIN" ? "border-b border-gray-200" : ""}`}>
-                <span className="text-gray-500 font-bold w-24">Phone</span>
+                <span className="text-gray-500 font-bold w-24">{t('phone')}</span>
                 <input
                   type="tel"
                   placeholder="123 456 7890"
@@ -393,10 +411,10 @@ export default function LoginPage() {
 
               {authMode === "LOGIN" && (
                 <div className="flex items-center px-4 py-3">
-                  <span className="text-gray-500 font-bold w-24">Password</span>
+                  <span className="text-gray-500 font-bold w-24">{t('password')}</span>
                   <input
                     type="password"
-                    placeholder="Your password"
+                    placeholder={t('yourPassword')}
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     className="flex-1 bg-transparent text-black font-bold focus:outline-none"
@@ -409,7 +427,7 @@ export default function LoginPage() {
           {step === "OTP" && (
             <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-4">
               <div className="flex items-center px-4 py-3">
-                <span className="text-gray-500 font-bold w-24">SMS Code</span>
+                <span className="text-gray-500 font-bold w-24">{t('smsCode')}</span>
                 <input
                   type="text"
                   placeholder="123456"
@@ -424,14 +442,14 @@ export default function LoginPage() {
 
           {step === "PASSWORD_SETUP" && (
             <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-4 p-4">
-              <h2 className="text-center font-bold text-lg mb-2">Create Password</h2>
+              <h2 className="text-center font-bold text-lg mb-2">{t('setupPassword')}</h2>
               <p className="text-center text-xs text-gray-500 mb-4">
-                Secure your account with a password.
+                {t('secureAccount')}
               </p>
               <div className="flex flex-col gap-2">
                 <input
                   type="password"
-                  placeholder="Max 14 chars"
+                  placeholder={t('maxChars')}
                   value={registerPassword}
                   onChange={handlePasswordChange}
                   maxLength={14}
@@ -439,7 +457,7 @@ export default function LoginPage() {
                 />
                 {registerPassword && (
                   <div className="flex justify-between items-center px-1">
-                    <span className="text-xs font-semibold text-gray-500">Strength:</span>
+                    <span className="text-xs font-semibold text-gray-500">{t('strength')}</span>
                     <span className={`text-xs font-bold ${
                       passwordStrength === 'Weak' ? 'text-red-500' :
                       passwordStrength === 'Moderate' ? 'text-yellow-500' :
@@ -456,9 +474,9 @@ export default function LoginPage() {
           {step === "SHOW_NEW_KEY" && (
             <div className="bg-white border border-gray-400 rounded-lg shadow-sm mb-4 p-5 text-center">
               <AlertTriangle className="w-10 h-10 text-red-500 mx-auto mb-3" />
-              <h2 className="font-bold text-xl text-red-600 mb-2">Save This Key!</h2>
+              <h2 className="font-bold text-xl text-red-600 mb-2">{t('saveThisKey')}</h2>
               <p className="text-xs text-gray-600 mb-4 font-semibold">
-                If you lose this key, you will NEVER be able to log in on another device. There is NO password reset.
+                {t('loseKeyWarning')}
               </p>
               <div className="bg-gray-100 p-3 rounded border border-gray-300 mb-4 select-all">
                 <span className="font-mono font-bold text-blue-700 tracking-wider text-lg">{newRecoveryKey}</span>
@@ -469,10 +487,10 @@ export default function LoginPage() {
           {step === "RECOVERY_KEY" && (
             <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-4 p-5 text-center">
               <h2 className="font-bold text-lg mb-2 text-gray-800 flex items-center justify-center gap-2">
-                <Key className="w-5 h-5"/> Enter Token
+                <Key className="w-5 h-5"/> {t('enterToken')}
               </h2>
               <p className="text-xs text-gray-500 mb-5 font-semibold">
-                Please enter your 13-character token key to continue.
+                {t('enterTokenText')}
               </p>
               <div className="flex justify-center items-center gap-1 mb-2">
                 {/* First 3 boxes (POP) */}
@@ -537,7 +555,7 @@ export default function LoginPage() {
                 }}
                 className="w-full retro-btn text-white font-bold text-lg py-3 rounded-lg shadow-md active:opacity-70 transition-opacity flex items-center justify-center gap-2"
               >
-                <QrCode className="w-5 h-5" /> Show QR to Login
+                <QrCode className="w-5 h-5" /> {t('showQrToLogin')}
               </button>
             </div>
           )}
@@ -547,9 +565,9 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full retro-btn text-white font-bold text-lg py-3 rounded-lg shadow-md active:opacity-70 transition-opacity mb-4"
           >
-            {loading ? "Processing..." : 
-             step === "SHOW_NEW_KEY" ? "I have saved it" : 
-             authMode === "LOGIN" && step === "MAIN" ? "Log In" : "Continue"}
+            {loading ? t('processing') : 
+             step === "SHOW_NEW_KEY" ? t('iHaveSavedIt') : 
+             authMode === "LOGIN" && step === "MAIN" ? t('login') : t('continue')}
           </button>
           
           {step === "MAIN" && (
@@ -560,7 +578,7 @@ export default function LoginPage() {
                   onClick={() => { setAuthMode("REGISTER"); setError(""); }}
                   className="text-sm font-bold text-blue-800 hover:underline"
                 >
-                  Don't have an account? Sign up
+                  {t('dontHaveAccount')}
                 </button>
               ) : (
                 <button
@@ -568,7 +586,7 @@ export default function LoginPage() {
                   onClick={() => { setAuthMode("LOGIN"); setError(""); }}
                   className="text-sm font-bold text-blue-800 hover:underline"
                 >
-                  Already have an account? Log in
+                  {t('alreadyHaveAccount')}
                 </button>
               )}
             </div>
@@ -576,20 +594,22 @@ export default function LoginPage() {
 
           {step === "MAIN" && (
             <div className="mt-8 pt-6 border-t border-gray-300 dark:border-[#444] text-center">
-              <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-2 uppercase tracking-wide">About POP Chat</h3>
-              <p className="text-xs text-gray-600 dark:text-gray-400 font-medium leading-relaxed max-w-sm mx-auto">
-                POP (Private Open Protocol) Chat is a secure, decentralized messaging client. It allows you to connect with others using aliases or phone numbers while enforcing strict end-to-end encryption and device-level authentication to keep your network spam-free and entirely private.
-              </p>
+              <div className="bg-white dark:bg-[#1a1a1a] rounded-xl p-4 shadow-sm border border-gray-200 dark:border-[#333]">
+                <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-2 uppercase tracking-wide">{t('aboutTitle')}</h3>
+                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium leading-relaxed max-w-sm mx-auto">
+                  {t('aboutText')}
+                </p>
+              </div>
             </div>
           )}
         </form>
       </div>
       
       {showQR && (
-        <div className="fixed inset-0 z-50 flex flex-col retro-bg dark:bg-[#121212]">
+        <div className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-[#121212]">
           <div className="retro-nav px-4 py-3 flex items-center justify-between shadow-md shrink-0">
-            <h2 className="text-white font-bold text-lg text-shadow-sm">Scan QR Code</h2>
-            <button onClick={() => setShowQR(false)} className="retro-btn px-3 py-1 text-white text-sm font-bold">Close</button>
+            <h2 className="text-white font-bold text-lg text-shadow-sm">{t('scanQrCode')}</h2>
+            <button onClick={() => setShowQR(false)} className="retro-btn px-3 py-1 text-white text-sm font-bold">{t('close')}</button>
           </div>
           
           <div className="flex-1 flex flex-col items-center justify-center p-4">
@@ -604,11 +624,10 @@ export default function LoginPage() {
             
             <div className="bg-white/80 dark:bg-[#1e1e1e]/80 backdrop-blur-sm p-4 rounded-lg border border-gray-300 dark:border-[#333] shadow-sm max-w-sm text-center">
               <p className="text-gray-800 dark:text-gray-200 font-bold text-lg mb-2">
-                Sync Device
+                {t('syncDevice')}
               </p>
               <p className="text-gray-600 dark:text-gray-400 font-semibold text-sm">
-                Scan this unique code from your primary device to log in automatically.
-                This QR code is generated securely and uniquely for this session. Do not share it with anyone.
+                {t('syncDeviceText')}
               </p>
             </div>
           </div>
