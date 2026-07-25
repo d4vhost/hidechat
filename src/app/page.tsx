@@ -268,7 +268,7 @@ export default function Inbox() {
                                 onKeyDown={(e) => {
                                   if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
                                 }}
-                                className="w-8 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                                className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
                             ))}
                           </div>
                           <div className="text-gray-500 font-bold shrink-0">-</div>
@@ -288,7 +288,7 @@ export default function Inbox() {
                                 onKeyDown={(e) => {
                                   if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
                                 }}
-                                className="w-8 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                                className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
                             ))}
                           </div>
                           <div className="text-gray-500 font-bold shrink-0">-</div>
@@ -308,7 +308,7 @@ export default function Inbox() {
                                 onKeyDown={(e) => {
                                   if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
                                 }}
-                                className="w-8 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                                className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
                             ))}
                           </div>
                         </div>
@@ -352,7 +352,7 @@ export default function Inbox() {
                       Adding a contact by <span className="font-bold">phone number</span> ensures you connect directly with individuals already in your address book. Pop Chat utilizes a secure peer-to-peer encryption protocol to strictly authenticate and initiate the connection.
                     </p>
                     <p className="text-sm font-medium text-justify leading-relaxed">
-                      The friend request is sent instantly and safely wrapped in our private open protocol architecture. The recipient will be notified seamlessly in their Inbox, preventing spam from unknown sources.
+                      The friend request is sent instantly and safely wrapped in our private open protocol architecture. The recipient will be notified seamlessly in their Inbox, preventing spam from unknown sources. This ensures your network stays completely clean and secure at all times.
                     </p>
                   </div>
                 ) : (
