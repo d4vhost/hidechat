@@ -211,65 +211,74 @@ export default function Inbox() {
             <button onClick={() => {setShowAddFriend(false); setAddFriendError(""); setAddFriendSuccess(""); setAddFriendAlias("");}} className="retro-btn px-3 py-1 text-white text-sm font-bold">Close</button>
           </div>
           
-          <div className="flex-1 overflow-y-auto">
-            {/* Toggle Switch */}
-            <div className="p-4 flex justify-center">
-              <div className="retro-segmented-control w-full max-w-sm">
-                <button 
-                  onClick={() => setAddMethod('phone')}
-                  className={`retro-segmented-btn ${addMethod === 'phone' ? 'retro-segmented-btn-active' : ''}`}
-                >
-                  By Phone
-                </button>
-                <button 
-                  onClick={() => setAddMethod('alias')}
-                  className={`retro-segmented-btn ${addMethod === 'alias' ? 'retro-segmented-btn-active' : ''}`}
-                >
-                  By Alias
-                </button>
+          <div className="flex-1 overflow-y-auto p-4">
+            <div className="max-w-md mx-auto w-full bg-white border border-gray-300 rounded-xl shadow-md overflow-hidden">
+              {/* Toggle Switch */}
+              <div className="p-3 bg-gray-100 border-b border-gray-300 flex justify-center">
+                <div className="retro-segmented-control w-full">
+                  <button 
+                    onClick={() => setAddMethod('phone')}
+                    className={`retro-segmented-btn ${addMethod === 'phone' ? 'retro-segmented-btn-active' : ''}`}
+                  >
+                    By Phone
+                  </button>
+                  <button 
+                    onClick={() => setAddMethod('alias')}
+                    className={`retro-segmented-btn ${addMethod === 'alias' ? 'retro-segmented-btn-active' : ''}`}
+                  >
+                    By Alias
+                  </button>
+                </div>
+              </div>
+
+              {/* Content Container */}
+              <div className="p-5 text-black">
+                {addMethod === 'phone' ? (
+                  <div>
+                    <p className="text-sm font-bold text-gray-600 mb-4">Enter a phone number to send a friend request.</p>
+                    <form onSubmit={handleAddFriend} className="space-y-4">
+                      <input
+                        type="tel"
+                        placeholder="+1234567890"
+                        value={addFriendPhone}
+                        onChange={(e) => setAddFriendPhone(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 font-bold outline-none focus:border-blue-500 retro-input-field"
+                      />
+                      
+                      {addFriendError && <p className="text-red-500 text-xs font-bold">{addFriendError}</p>}
+                      {addFriendSuccess && <p className="text-green-500 text-xs font-bold">{addFriendSuccess}</p>}
+                      
+                      <button type="submit" className="w-full retro-btn text-white font-bold py-2 rounded-md shadow-sm active:opacity-70 flex justify-center items-center">
+                        Send Request
+                      </button>
+                    </form>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-sm font-bold text-gray-600 mb-4">Add a friend using their unique HideChat alias.</p>
+                    <form onSubmit={(e) => { e.preventDefault(); alert("Alias functionality coming soon!"); }} className="space-y-4">
+                      <input
+                        type="text"
+                        placeholder="Enter Alias (e.g. majito_123)"
+                        value={addFriendAlias}
+                        onChange={(e) => setAddFriendAlias(e.target.value)}
+                        className="w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 font-bold outline-none focus:border-blue-500 retro-input-field"
+                      />
+                      
+                      <button type="submit" className="w-full retro-btn text-white font-bold py-2 rounded-md shadow-sm active:opacity-70 flex justify-center items-center">
+                        Search & Add
+                      </button>
+                    </form>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Content Container (Full Width) */}
-            <div className="bg-white border-y border-gray-300 shadow-sm p-4 text-black">
-              {addMethod === 'phone' ? (
-                <div>
-                  <p className="text-sm font-bold text-gray-600 mb-4">Enter a phone number to send a friend request.</p>
-                  <form onSubmit={handleAddFriend} className="space-y-4">
-                    <input
-                      type="tel"
-                      placeholder="+1234567890"
-                      value={addFriendPhone}
-                      onChange={(e) => setAddFriendPhone(e.target.value)}
-                      className="w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 font-bold outline-none focus:border-blue-500 retro-input-field"
-                    />
-                    
-                    {addFriendError && <p className="text-red-500 text-xs font-bold">{addFriendError}</p>}
-                    {addFriendSuccess && <p className="text-green-500 text-xs font-bold">{addFriendSuccess}</p>}
-                    
-                    <button type="submit" className="w-full retro-btn text-white font-bold py-2 rounded-md shadow-sm active:opacity-70 flex justify-center items-center">
-                      Send Request
-                    </button>
-                  </form>
-                </div>
-              ) : (
-                <div>
-                  <p className="text-sm font-bold text-gray-600 mb-4">Add a friend using their unique HideChat alias.</p>
-                  <form onSubmit={(e) => { e.preventDefault(); alert("Alias functionality coming soon!"); }} className="space-y-4">
-                    <input
-                      type="text"
-                      placeholder="Enter Alias (e.g. majito_123)"
-                      value={addFriendAlias}
-                      onChange={(e) => setAddFriendAlias(e.target.value)}
-                      className="w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 font-bold outline-none focus:border-blue-500 retro-input-field"
-                    />
-                    
-                    <button type="submit" className="w-full retro-btn text-white font-bold py-2 rounded-md shadow-sm active:opacity-70 flex justify-center items-center">
-                      Search & Add
-                    </button>
-                  </form>
-                </div>
-              )}
+            {/* Informational Text */}
+            <div className="max-w-md mx-auto w-full mt-6 text-center text-gray-700 bg-white/50 backdrop-blur-sm rounded-lg p-4 border border-gray-300/50 shadow-sm">
+              <h3 className="text-sm font-bold mb-2">Secure Connections</h3>
+              <p className="text-xs mb-2">HideChat uses a secure peer-to-peer approach to connect you with your friends. Your requests are handled privately and only the recipient can see your invitation.</p>
+              <p className="text-xs">You will be notified in your Inbox as soon as they accept.</p>
             </div>
           </div>
         </div>
