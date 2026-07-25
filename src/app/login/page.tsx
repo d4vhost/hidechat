@@ -537,7 +537,7 @@ export default function LoginPage() {
                 }}
                 className="w-full retro-btn text-white font-bold text-lg py-3 rounded-lg shadow-md active:opacity-70 transition-opacity flex items-center justify-center gap-2"
               >
-                <QrCode className="w-5 h-5" /> Show QR to Scan
+                <QrCode className="w-5 h-5" /> Show QR to Login
               </button>
             </div>
           )}
