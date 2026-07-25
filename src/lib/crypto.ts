@@ -15,7 +15,7 @@ export function generateRecoveryKey(): string {
     }
     return s;
   };
-  return `POP-${segment()}-${segment()}-${segment()}-${segment()}`;
+  return `POP-${segment()}-${segment()}`;
 }
 
 export function evaluatePasswordStrength(password: string): string {

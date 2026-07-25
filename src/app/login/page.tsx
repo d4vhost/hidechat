@@ -330,9 +330,10 @@ export default function LoginPage() {
                     <span className="text-gray-500 font-bold w-24">Token</span>
                     <input
                       type="text"
-                      placeholder="Optional if recognized"
+                      placeholder="POP-XXXX-XXXX"
                       value={loginToken}
-                      onChange={(e) => setLoginToken(e.target.value)}
+                      onChange={(e) => setLoginToken(e.target.value.toUpperCase())}
+                      maxLength={13}
                       className="flex-1 bg-transparent text-black font-bold focus:outline-none"
                     />
                   </div>
@@ -411,9 +412,10 @@ export default function LoginPage() {
               </p>
               <input
                 type="text"
-                placeholder="POP-XXXX-XXXX-XXXX-XXXX"
+                placeholder="POP-XXXX-XXXX"
                 value={inputRecoveryKey}
                 onChange={(e) => setInputRecoveryKey(e.target.value.toUpperCase())}
+                maxLength={13}
                 className="w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 text-black font-mono tracking-widest text-sm focus:outline-none focus:border-red-500"
               />
             </div>
