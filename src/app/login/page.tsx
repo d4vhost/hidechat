@@ -344,8 +344,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen retro-bg text-black">
-      <header className="retro-nav p-4 flex items-center shadow-md z-10 shrink-0">
+    <div className="h-[100dvh] flex flex-col overflow-hidden retro-bg text-black">
+      <header className="retro-nav p-3 sm:p-4 flex items-center shadow-md z-10 shrink-0">
         <div className="flex-1" /> {/* Spacer for balance */}
         
         <h1 className="text-xl sm:text-2xl font-bold text-white text-center drop-shadow-md text-shadow-sm truncate shrink-0">
@@ -357,8 +357,8 @@ export default function LoginPage() {
         </div>
       </header>
 
-      <div className="p-4 mt-4">
-        <p className="text-center text-[#4d576b] font-bold text-sm mb-4 shadow-white drop-shadow-sm">
+      <div className="px-4 py-2 sm:p-4 flex-1 flex flex-col justify-center overflow-y-auto">
+        <p className="text-center text-[#4d576b] font-bold text-sm mb-3 shadow-white drop-shadow-sm">
           {t('loginSubtitle')}
         </p>
 
@@ -379,7 +379,7 @@ export default function LoginPage() {
           )}
 
           {step === "MAIN" && (
-            <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-4">
+            <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-3">
               <div className="flex items-center px-4 py-3 border-b border-gray-200">
                 <span className="text-gray-500 font-bold w-24">{t('country')}</span>
                 <select 
@@ -546,8 +546,8 @@ export default function LoginPage() {
           )}
 
           {step === "MAIN" && authMode === "LOGIN" && (
-            <div className="mb-4">
-              <button
+            <div className="space-y-3 mt-4">
+              <button 
                 type="button"
                 onClick={() => {
                   setQrValue(crypto.randomUUID());
@@ -593,10 +593,10 @@ export default function LoginPage() {
           )}
 
           {step === "MAIN" && (
-            <div className="mt-6 text-center">
-              <div className="bg-white dark:bg-[#1a1a1a] rounded-xl p-4 shadow-sm border border-gray-200 dark:border-[#333]">
-                <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-2 uppercase tracking-wide">{t('aboutTitle')}</h3>
-                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium leading-relaxed max-w-sm mx-auto">
+            <div className="mt-3 text-center">
+              <div className="bg-white dark:bg-[#1a1a1a] rounded-xl p-3 shadow-sm border border-gray-200 dark:border-[#333]">
+                <h3 className="text-[11px] sm:text-xs font-bold text-gray-800 dark:text-gray-200 mb-1 uppercase tracking-wide">{t('aboutTitle')}</h3>
+                <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 font-medium leading-tight max-w-sm mx-auto">
                   {t('aboutText')}
                 </p>
               </div>
