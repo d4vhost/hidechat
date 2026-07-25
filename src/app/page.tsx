@@ -197,7 +197,19 @@ export default function Inbox() {
   };
 
   const handleLogout = async () => {
+    if (user && currentDeviceId) {
+      try {
+        const newDevices = devices.filter(d => {
+          const dId = (typeof d === 'object' && d !== null) ? d.id : d;
+          return dId !== currentDeviceId;
+        });
+        await updateDoc(doc(db, "users", user.uid), { devices: newDevices });
+      } catch (e) {
+        console.error(e);
+      }
+    }
     await signOut(auth);
+    router.push("/login");
   };
 
   if (loading || !user) {
@@ -510,7 +522,19 @@ export default function Inbox() {
                 <div className="bg-gray-100 dark:bg-[#2a2a2a] px-4 py-1 border-b border-gray-300 dark:border-[#444]">
                   <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active Sessions</span>
                 </div>
-                {devices.map((device, idx) => {
+                {(() => {
+                  const deduped = [];
+                  const seen = new Set();
+                  for (let i = devices.length - 1; i >= 0; i--) {
+                    const d = devices[i];
+                    const dId = (typeof d === 'object' && d !== null) ? d.id : d;
+                    if (!seen.has(dId)) {
+                      seen.add(dId);
+                      deduped.unshift(d);
+                    }
+                  }
+                  return deduped;
+                })().map((device, idx) => {
                   const isObject = typeof device === 'object' && device !== null;
                   const devId = isObject ? device.id : device;
                   const devName = isObject ? device.name : "Linked Device";
