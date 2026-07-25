@@ -268,7 +268,7 @@ export default function Inbox() {
                                 onKeyDown={(e) => {
                                   if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
                                 }}
-                                className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                                className="w-8 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
                             ))}
                           </div>
                           <div className="text-gray-500 font-bold shrink-0">-</div>
@@ -288,7 +288,7 @@ export default function Inbox() {
                                 onKeyDown={(e) => {
                                   if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
                                 }}
-                                className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                                className="w-8 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
                             ))}
                           </div>
                           <div className="text-gray-500 font-bold shrink-0">-</div>
@@ -308,7 +308,7 @@ export default function Inbox() {
                                 onKeyDown={(e) => {
                                   if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
                                 }}
-                                className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                                className="w-8 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
                             ))}
                           </div>
                         </div>
