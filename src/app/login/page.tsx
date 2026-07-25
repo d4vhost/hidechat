@@ -28,7 +28,7 @@ export default function LoginPage() {
   
   // Login Specific
   const [loginPassword, setLoginPassword] = useState("");
-  const [tokenParts, setTokenParts] = useState<string[]>(Array(8).fill(""));
+  const [tokenParts, setTokenParts] = useState<string[]>(Array(11).fill(""));
   const tokenRefs = useRef<(HTMLInputElement | null)[]>([]);
   
   // Register Specific
@@ -195,7 +195,7 @@ export default function LoginPage() {
 
   const handleRecoveryKeySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const combinedToken = `POP-${tokenParts.slice(0,4).join("")}-${tokenParts.slice(4,8).join("")}`;
+    const combinedToken = `${tokenParts.slice(0,3).join("")}-${tokenParts.slice(3,7).join("")}-${tokenParts.slice(7,11).join("")}`;
     if (!firebaseUser) return;
     setError("");
     setLoading(true);
@@ -237,7 +237,7 @@ export default function LoginPage() {
     newParts[index] = char;
     setTokenParts(newParts);
 
-    if (char && index < 7) {
+    if (char && index < 10) {
       tokenRefs.current[index + 1]?.focus();
     }
   };
@@ -252,11 +252,10 @@ export default function LoginPage() {
     e.preventDefault();
     const pasted = e.clipboardData.getData("text").toUpperCase();
     const clean = pasted.replace(/[^A-Z0-9]/g, "");
-    const withoutPop = clean.startsWith("POP") ? clean.slice(3) : clean;
     
     const newParts = [...tokenParts];
-    for (let i = 0; i < 8 && i < withoutPop.length; i++) {
-      newParts[i] = withoutPop[i];
+    for (let i = 0; i < 11 && i < clean.length; i++) {
+      newParts[i] = clean[i];
     }
     setTokenParts(newParts);
     
@@ -264,7 +263,7 @@ export default function LoginPage() {
     if (nextEmpty !== -1) {
       tokenRefs.current[nextEmpty]?.focus();
     } else {
-      tokenRefs.current[7]?.focus();
+      tokenRefs.current[10]?.focus();
     }
   };
 
@@ -407,10 +406,11 @@ export default function LoginPage() {
                 <Key className="w-5 h-5"/> Enter Token
               </h2>
               <p className="text-xs text-gray-500 mb-5 font-semibold">
-                Please enter your 8-character token key to continue.
+                Please enter your 13-character token key to continue.
               </p>
-              <div className="flex justify-center items-center gap-2 mb-2">
-                {tokenParts.slice(0, 4).map((part, i) => (
+              <div className="flex justify-center items-center gap-1 mb-2">
+                {/* First 3 boxes (POP) */}
+                {tokenParts.slice(0, 3).map((part, i) => (
                   <input
                     key={i}
                     ref={(el) => { tokenRefs.current[i] = el; }}
@@ -419,21 +419,41 @@ export default function LoginPage() {
                     onChange={(e) => handleTokenChange(i, e.target.value)}
                     onKeyDown={(e) => handleTokenKeyDown(i, e)}
                     onPaste={handleTokenPaste}
-                    className="w-10 h-10 text-center font-bold text-lg border border-gray-300 rounded-lg bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all shadow-sm"
+                    className="w-8 h-10 sm:w-10 text-center font-bold text-lg border border-gray-300 rounded-lg bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all shadow-sm"
                     maxLength={2}
                   />
                 ))}
+                
                 <span className="font-bold text-gray-400 mx-1">-</span>
-                {tokenParts.slice(4, 8).map((part, i) => (
+                
+                {/* Next 4 boxes */}
+                {tokenParts.slice(3, 7).map((part, i) => (
                   <input
-                    key={i + 4}
-                    ref={(el) => { tokenRefs.current[i + 4] = el; }}
+                    key={i + 3}
+                    ref={(el) => { tokenRefs.current[i + 3] = el; }}
                     type="text"
                     value={part}
-                    onChange={(e) => handleTokenChange(i + 4, e.target.value)}
-                    onKeyDown={(e) => handleTokenKeyDown(i + 4, e)}
+                    onChange={(e) => handleTokenChange(i + 3, e.target.value)}
+                    onKeyDown={(e) => handleTokenKeyDown(i + 3, e)}
                     onPaste={handleTokenPaste}
-                    className="w-10 h-10 text-center font-bold text-lg border border-gray-300 rounded-lg bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all shadow-sm"
+                    className="w-8 h-10 sm:w-10 text-center font-bold text-lg border border-gray-300 rounded-lg bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all shadow-sm"
+                    maxLength={2}
+                  />
+                ))}
+
+                <span className="font-bold text-gray-400 mx-1">-</span>
+                
+                {/* Final 4 boxes */}
+                {tokenParts.slice(7, 11).map((part, i) => (
+                  <input
+                    key={i + 7}
+                    ref={(el) => { tokenRefs.current[i + 7] = el; }}
+                    type="text"
+                    value={part}
+                    onChange={(e) => handleTokenChange(i + 7, e.target.value)}
+                    onKeyDown={(e) => handleTokenKeyDown(i + 7, e)}
+                    onPaste={handleTokenPaste}
+                    className="w-8 h-10 sm:w-10 text-center font-bold text-lg border border-gray-300 rounded-lg bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all shadow-sm"
                     maxLength={2}
                   />
                 ))}
