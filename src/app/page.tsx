@@ -251,67 +251,72 @@ export default function Inbox() {
                     <p className="text-sm font-bold text-gray-600 mb-4 text-center">Enter a phone number to send a friend request.</p>
                     <form onSubmit={handleAddFriend} className="space-y-4">
                       
-                      <div className="flex items-center justify-between my-4 gap-1 sm:gap-2 max-w-sm mx-auto">
-                        <div className="shrink-0">
-                          <select className="bg-gray-50 border border-gray-400 text-gray-800 text-sm sm:text-lg font-bold rounded-md pl-2 pr-1 py-2 sm:py-2 focus:outline-none focus:border-blue-500 shadow-sm retro-input-field cursor-pointer">
-                            <option value="+593">🇪🇨 +593</option>
+                      <div className="flex flex-col gap-3 my-5 max-w-sm mx-auto">
+                        <div className="flex justify-center">
+                          <select className="bg-gray-50 border border-gray-400 text-gray-800 text-sm sm:text-base font-bold rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 shadow-sm retro-input-field cursor-pointer">
+                            <option value="+593">🇪🇨 +593 (Ecuador)</option>
                           </select>
                         </div>
                         
-                        <div className="flex gap-1 flex-1 justify-center">
-                          {[0, 1, 2].map((i) => (
-                            <input key={i} id={`phone-digit-${i}`} type="tel" maxLength={1}
-                              value={phoneDigits[i]}
-                              onChange={(e) => {
-                                const val = e.target.value.replace(/\D/g, '').slice(-1);
-                                const newDigits = [...phoneDigits];
-                                newDigits[i] = val;
-                                setPhoneDigits(newDigits);
-                                if (val && i < 8) document.getElementById(`phone-digit-${i + 1}`)?.focus();
-                              }}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
-                              }}
-                              className="w-full min-w-0 max-w-[2.5rem] h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
-                          ))}
-                        </div>
-                        <div className="text-gray-500 font-bold shrink-0">-</div>
-                        
-                        <div className="flex gap-1 flex-1 justify-center">
-                          {[3, 4, 5].map((i) => (
-                            <input key={i} id={`phone-digit-${i}`} type="tel" maxLength={1}
-                              value={phoneDigits[i]}
-                              onChange={(e) => {
-                                const val = e.target.value.replace(/\D/g, '').slice(-1);
-                                const newDigits = [...phoneDigits];
-                                newDigits[i] = val;
-                                setPhoneDigits(newDigits);
-                                if (val && i < 8) document.getElementById(`phone-digit-${i + 1}`)?.focus();
-                              }}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
-                              }}
-                              className="w-full min-w-0 max-w-[2.5rem] h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
-                          ))}
-                        </div>
-                        <div className="text-gray-500 font-bold shrink-0">-</div>
-                        
-                        <div className="flex gap-1 flex-1 justify-center">
-                          {[6, 7, 8].map((i) => (
-                            <input key={i} id={`phone-digit-${i}`} type="tel" maxLength={1}
-                              value={phoneDigits[i]}
-                              onChange={(e) => {
-                                const val = e.target.value.replace(/\D/g, '').slice(-1);
-                                const newDigits = [...phoneDigits];
-                                newDigits[i] = val;
-                                setPhoneDigits(newDigits);
-                                if (val && i < 8) document.getElementById(`phone-digit-${i + 1}`)?.focus();
-                              }}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
-                              }}
-                              className="w-full min-w-0 max-w-[2.5rem] h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
-                          ))}
+                        <div className="flex items-center justify-center gap-1 sm:gap-2">
+                          {/* 2 digits */}
+                          <div className="flex gap-1 justify-center">
+                            {[0, 1].map((i) => (
+                              <input key={i} id={`phone-digit-${i}`} type="tel" maxLength={1}
+                                value={phoneDigits[i]}
+                                onChange={(e) => {
+                                  const val = e.target.value.replace(/\D/g, '').slice(-1);
+                                  const newDigits = [...phoneDigits];
+                                  newDigits[i] = val;
+                                  setPhoneDigits(newDigits);
+                                  if (val && i < 8) document.getElementById(`phone-digit-${i + 1}`)?.focus();
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
+                                }}
+                                className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                            ))}
+                          </div>
+                          <div className="text-gray-500 font-bold shrink-0">-</div>
+                          
+                          {/* 3 digits */}
+                          <div className="flex gap-1 justify-center">
+                            {[2, 3, 4].map((i) => (
+                              <input key={i} id={`phone-digit-${i}`} type="tel" maxLength={1}
+                                value={phoneDigits[i]}
+                                onChange={(e) => {
+                                  const val = e.target.value.replace(/\D/g, '').slice(-1);
+                                  const newDigits = [...phoneDigits];
+                                  newDigits[i] = val;
+                                  setPhoneDigits(newDigits);
+                                  if (val && i < 8) document.getElementById(`phone-digit-${i + 1}`)?.focus();
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
+                                }}
+                                className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                            ))}
+                          </div>
+                          <div className="text-gray-500 font-bold shrink-0">-</div>
+                          
+                          {/* 4 digits */}
+                          <div className="flex gap-1 justify-center">
+                            {[5, 6, 7, 8].map((i) => (
+                              <input key={i} id={`phone-digit-${i}`} type="tel" maxLength={1}
+                                value={phoneDigits[i]}
+                                onChange={(e) => {
+                                  const val = e.target.value.replace(/\D/g, '').slice(-1);
+                                  const newDigits = [...phoneDigits];
+                                  newDigits[i] = val;
+                                  setPhoneDigits(newDigits);
+                                  if (val && i < 8) document.getElementById(`phone-digit-${i + 1}`)?.focus();
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
+                                }}
+                                className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                            ))}
+                          </div>
                         </div>
                       </div>
                       
@@ -353,10 +358,7 @@ export default function Inbox() {
                       Adding a contact by <span className="font-bold">phone number</span> ensures you connect directly with individuals already in your address book or those whose trusted contact details you currently possess. By linking through a phone number, Pop Chat utilizes a highly secure peer-to-peer encryption protocol to strictly authenticate and initiate the connection.
                     </p>
                     <p className="text-sm font-medium text-justify leading-relaxed">
-                      The friend request is sent instantly and safely wrapped in our private open protocol architecture. The recipient will be notified seamlessly in their Inbox, preventing any kind of unauthorized spam or phishing attempts from unknown sources. Our servers never store the contents of your messages in plain text, meaning even our infrastructure cannot read your communications.
-                    </p>
-                    <p className="text-sm font-medium text-justify leading-relaxed">
-                      Until the request is explicitly accepted by the other party, your full profile, online status, and messaging capabilities remain completely private and inaccessible. This provides a robust layer of security for everyday communication, making it impossible for strangers to interrupt your privacy without consent. Welcome to the new standard of secure digital messaging!
+                      The friend request is sent instantly and safely wrapped in our private open protocol architecture. The recipient will be notified seamlessly in their Inbox, preventing any kind of unauthorized spam or phishing attempts from unknown sources.
                     </p>
                   </div>
                 ) : (
@@ -365,10 +367,7 @@ export default function Inbox() {
                       Adding a contact by <span className="font-bold">Alias</span> allows you to safely connect with new friends without ever having to share your personal phone number or your real-world identity. This approach guarantees 100% privacy and anonymity from the start.
                     </p>
                     <p className="text-sm font-medium text-justify leading-relaxed">
-                      Engage with users globally using just a unique username. Pop Chat's open protocol securely routes the alias request directly to the intended recipient's device, ensuring that metadata—like your IP address or geographic location—is stripped away and protected. Our system uses zero-knowledge architecture to verify the alias without exposing underlying network identities.
-                    </p>
-                    <p className="text-sm font-medium text-justify leading-relaxed">
-                      It's the perfect method for participating in online communities, public networking, business inquiries, or simply maintaining a strict, impenetrable boundary between your public digital presence and your private phone number. You are always in control of who gets to talk to you.
+                      Engage with users globally using just a unique username. Pop Chat's open protocol securely routes the alias request directly to the intended recipient's device, ensuring that metadata is stripped away and protected against unknown sources.
                     </p>
                   </div>
                 )}
