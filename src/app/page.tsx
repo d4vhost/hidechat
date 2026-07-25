@@ -224,11 +224,11 @@ export default function Inbox() {
             <button onClick={() => {setShowAddFriend(false); setAddFriendError(""); setAddFriendSuccess(""); setAddFriendAlias("");}} className="retro-btn px-3 py-1 text-white text-sm font-bold">Close</button>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-4">
-            <div className="max-w-md mx-auto w-full bg-white border border-gray-300 rounded-xl shadow-md overflow-hidden">
+          <div className="flex-1 overflow-y-auto pb-6">
+            <div className="w-full sm:max-w-md sm:mx-auto sm:mt-6 bg-white sm:border sm:border-gray-300 sm:rounded-xl shadow-md overflow-hidden">
               {/* Toggle Switch */}
               <div className="p-3 bg-gray-100 border-b border-gray-300 flex justify-center">
-                <div className="retro-segmented-control w-full">
+                <div className="retro-segmented-control w-full sm:max-w-sm">
                   <button 
                     onClick={() => setAddMethod('phone')}
                     className={`retro-segmented-btn ${addMethod === 'phone' ? 'retro-segmented-btn-active' : ''}`}
@@ -245,16 +245,16 @@ export default function Inbox() {
               </div>
 
               {/* Content Container */}
-              <div className="p-5 text-black">
+              <div className="p-4 sm:p-5 text-black">
                 {addMethod === 'phone' ? (
                   <div>
                     <p className="text-sm font-bold text-gray-600 mb-4 text-center">Enter a phone number to send a friend request.</p>
                     <form onSubmit={handleAddFriend} className="space-y-4">
                       
-                      <div className="flex items-center gap-1 sm:gap-2 justify-center my-4">
-                        <div className="font-bold text-gray-700 mr-1 text-sm sm:text-lg">+593</div>
+                      <div className="flex items-center justify-between my-4 gap-1 sm:gap-2 max-w-sm mx-auto">
+                        <div className="font-bold text-gray-700 text-sm sm:text-lg shrink-0">+593</div>
                         
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 flex-1 justify-center">
                           {[0, 1, 2].map((i) => (
                             <input key={i} id={`phone-digit-${i}`} type="tel" maxLength={1}
                               value={phoneDigits[i]}
@@ -268,12 +268,12 @@ export default function Inbox() {
                               onKeyDown={(e) => {
                                 if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
                               }}
-                              className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                              className="w-full min-w-0 max-w-[2.5rem] h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
                           ))}
                         </div>
-                        <div className="text-gray-500 font-bold">-</div>
+                        <div className="text-gray-500 font-bold shrink-0">-</div>
                         
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 flex-1 justify-center">
                           {[3, 4, 5].map((i) => (
                             <input key={i} id={`phone-digit-${i}`} type="tel" maxLength={1}
                               value={phoneDigits[i]}
@@ -287,12 +287,12 @@ export default function Inbox() {
                               onKeyDown={(e) => {
                                 if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
                               }}
-                              className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                              className="w-full min-w-0 max-w-[2.5rem] h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
                           ))}
                         </div>
-                        <div className="text-gray-500 font-bold">-</div>
+                        <div className="text-gray-500 font-bold shrink-0">-</div>
                         
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 flex-1 justify-center">
                           {[6, 7, 8].map((i) => (
                             <input key={i} id={`phone-digit-${i}`} type="tel" maxLength={1}
                               value={phoneDigits[i]}
@@ -306,7 +306,7 @@ export default function Inbox() {
                               onKeyDown={(e) => {
                                 if (e.key === 'Backspace' && !phoneDigits[i] && i > 0) document.getElementById(`phone-digit-${i - 1}`)?.focus();
                               }}
-                              className="w-7 sm:w-10 h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
+                              className="w-full min-w-0 max-w-[2.5rem] h-10 sm:h-12 text-center text-lg sm:text-xl font-bold bg-gray-50 border border-gray-400 rounded-md retro-input-field focus:border-blue-500 focus:outline-none" />
                           ))}
                         </div>
                       </div>
@@ -341,30 +341,32 @@ export default function Inbox() {
             </div>
 
             {/* Informational Text */}
-            <div className="max-w-md mx-auto w-full mt-6 text-gray-800 bg-white/70 backdrop-blur-sm rounded-lg p-5 border border-gray-300 shadow-sm">
+            <div className="w-full sm:max-w-md sm:mx-auto mt-4 sm:mt-6 text-gray-800 bg-white/70 backdrop-blur-sm sm:rounded-lg p-5 sm:border sm:border-gray-300 shadow-sm">
               <h3 className="text-sm font-bold mb-3 text-center">Pop Chat (Private Open Protocol)</h3>
               
               {addMethod === 'phone' ? (
                 <>
-                  <p className="text-xs mb-3 font-medium">
-                    Adding a contact by <span className="font-bold">phone number</span> ensures you connect directly with individuals already in your address book or those whose trusted contact details you possess.
+                  <p className="text-xs mb-3 font-medium text-justify">
+                    Adding a contact by <span className="font-bold">phone number</span> ensures you connect directly with individuals already in your address book or those whose trusted contact details you possess. By linking through a phone number, Pop Chat utilizes a highly secure peer-to-peer encryption protocol to initiate the connection.
                   </p>
-                  <ul className="text-xs space-y-2 list-disc pl-4">
-                    <li>Send encrypted peer-to-peer friend requests instantly.</li>
-                    <li>They will get a notification in their Inbox safely.</li>
-                    <li>Requests remain private until they accept them.</li>
-                  </ul>
+                  <p className="text-xs mb-3 font-medium text-justify">
+                    The friend request is sent instantly and safely wrapped in our private open protocol architecture. The recipient will be notified seamlessly in their Inbox, preventing spam from unknown sources.
+                  </p>
+                  <p className="text-xs font-medium text-justify">
+                    Until the request is explicitly accepted, your full profile and messaging capabilities remain completely private and inaccessible.
+                  </p>
                 </>
               ) : (
                 <>
-                  <p className="text-xs mb-3 font-medium">
-                    Adding a contact by <span className="font-bold">Alias</span> allows you to connect with new friends without sharing your personal phone number.
+                  <p className="text-xs mb-3 font-medium text-justify">
+                    Adding a contact by <span className="font-bold">Alias</span> allows you to connect with new friends without sharing your personal phone number or real-world identity. This approach guarantees 100% privacy and anonymity.
                   </p>
-                  <ul className="text-xs space-y-2 list-disc pl-4">
-                    <li>Maintain 100% privacy and anonymity.</li>
-                    <li>Connect with users worldwide using just a unique username.</li>
-                    <li>Great for online communities and public networking.</li>
-                  </ul>
+                  <p className="text-xs mb-3 font-medium text-justify">
+                    Engage with users globally using just a unique username. Pop Chat's open protocol securely routes the alias request directly to the intended recipient's device, ensuring that metadata is stripped away.
+                  </p>
+                  <p className="text-xs font-medium text-justify">
+                    It's the perfect method for participating in online communities, public networking, or maintaining a strict boundary between your public digital presence and your private phone number.
+                  </p>
                 </>
               )}
             </div>
