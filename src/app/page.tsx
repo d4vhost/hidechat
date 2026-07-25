@@ -138,7 +138,7 @@ export default function Inbox() {
   }
 
   return (
-    <div className="min-h-screen retro-bg">
+    <div className="min-h-screen retro-bg flex flex-col">
       <header className="retro-nav px-3 py-2 flex justify-between items-center sticky top-0 z-10 shadow-md">
         <button 
           onClick={() => setShowSettings(true)}
@@ -185,9 +185,9 @@ export default function Inbox() {
         </div>
       )}
 
-      <div className="flex flex-col border-b border-gray-400 bg-white">
+      <div className="flex-1 flex flex-col contacts-bg shadow-inner">
         {contacts.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 font-bold">
+          <div className="p-8 text-center text-gray-500 font-bold bg-white border-b border-gray-300">
             No contacts yet. Tap the + icon to add a friend.
           </div>
         ) : (
@@ -197,7 +197,7 @@ export default function Inbox() {
               <Link 
                 key={contact.uid}
                 href={`/chat/${conversationId}`}
-                className="flex items-center px-4 py-3 border-b border-gray-200 hover:bg-gray-200 active:bg-blue-500 active:text-white transition-colors group"
+                className="flex items-center px-4 py-3 border-b border-gray-200 bg-white hover:bg-gray-100 active:bg-blue-500 active:text-white transition-colors group"
               >
                 <div className="flex-1 min-w-0 pr-2">
                   <div className="flex justify-between items-center mb-1">
