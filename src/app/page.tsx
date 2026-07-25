@@ -25,6 +25,7 @@ export default function Inbox() {
   // Friend Request States
   const [showAddFriend, setShowAddFriend] = useState(false);
   const [addFriendPhone, setAddFriendPhone] = useState("");
+  const [addFriendAlias, setAddFriendAlias] = useState("");
   const [addFriendError, setAddFriendError] = useState("");
   const [addFriendSuccess, setAddFriendSuccess] = useState("");
   const [contacts, setContacts] = useState<any[]>([]);
@@ -201,35 +202,65 @@ export default function Inbox() {
         )}
       </div>
 
-      {/* Add Friend Modal */}
+      {/* Add Friend Full Screen Panel */}
       {showAddFriend && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-[#cbd5e1] border border-[#86a7cc] w-11/12 max-w-sm rounded-xl overflow-hidden shadow-2xl relative">
-            <div className="retro-nav px-4 py-3 flex items-center justify-between">
-              <h2 className="text-white font-bold text-lg text-shadow-sm">Add Friend</h2>
-              <button onClick={() => {setShowAddFriend(false); setAddFriendError(""); setAddFriendSuccess("");}} className="retro-btn px-3 py-1 text-white text-sm font-bold">Close</button>
-            </div>
+        <div className="fixed inset-0 z-50 flex flex-col bg-[#cbd5e1]">
+          <div className="retro-nav px-4 py-3 flex items-center justify-between shadow-md shrink-0">
+            <h2 className="text-white font-bold text-lg text-shadow-sm">Add Friend</h2>
+            <button onClick={() => {setShowAddFriend(false); setAddFriendError(""); setAddFriendSuccess(""); setAddFriendAlias("");}} className="retro-btn px-3 py-1 text-white text-sm font-bold">Close</button>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto p-4 space-y-6">
             
-            <div className="p-4 bg-white text-black">
-              <p className="text-sm font-bold text-gray-600 mb-4">Enter a phone number to send a friend request.</p>
-              
-              <form onSubmit={handleAddFriend} className="space-y-4">
-                <input
-                  type="tel"
-                  placeholder="+1234567890"
-                  value={addFriendPhone}
-                  onChange={(e) => setAddFriendPhone(e.target.value)}
-                  className="w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 font-bold outline-none focus:border-blue-500"
-                />
+            <div className="bg-white rounded-lg border border-gray-300 overflow-hidden shadow-sm">
+              <div className="bg-gray-100 px-4 py-2 border-b border-gray-300">
+                <h3 className="text-sm font-bold text-gray-700">By Phone Number</h3>
+              </div>
+              <div className="p-4">
+                <p className="text-xs font-bold text-gray-500 mb-3">Enter a phone number to send a friend request.</p>
                 
-                {addFriendError && <p className="text-red-500 text-xs font-bold">{addFriendError}</p>}
-                {addFriendSuccess && <p className="text-green-500 text-xs font-bold">{addFriendSuccess}</p>}
-                
-                <button type="submit" className="w-full bg-blue-600 text-white font-bold py-2 rounded-md shadow-sm active:opacity-70">
-                  Send Request
-                </button>
-              </form>
+                <form onSubmit={handleAddFriend} className="space-y-3">
+                  <input
+                    type="tel"
+                    placeholder="+1234567890"
+                    value={addFriendPhone}
+                    onChange={(e) => setAddFriendPhone(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 font-bold outline-none focus:border-blue-500"
+                  />
+                  
+                  {addFriendError && <p className="text-red-500 text-xs font-bold">{addFriendError}</p>}
+                  {addFriendSuccess && <p className="text-green-500 text-xs font-bold">{addFriendSuccess}</p>}
+                  
+                  <button type="submit" className="w-full retro-btn text-white font-bold py-2 rounded-md shadow-sm active:opacity-70 flex justify-center items-center">
+                    Send Request
+                  </button>
+                </form>
+              </div>
             </div>
+
+            <div className="bg-white rounded-lg border border-gray-300 overflow-hidden shadow-sm">
+              <div className="bg-gray-100 px-4 py-2 border-b border-gray-300">
+                <h3 className="text-sm font-bold text-gray-700">By Unique Alias</h3>
+              </div>
+              <div className="p-4">
+                <p className="text-xs font-bold text-gray-500 mb-3">Add a friend using their unique HideChat alias.</p>
+                
+                <form onSubmit={(e) => { e.preventDefault(); alert("Alias functionality coming soon!"); }} className="space-y-3">
+                  <input
+                    type="text"
+                    placeholder="Enter Alias (e.g. majito_123)"
+                    value={addFriendAlias}
+                    onChange={(e) => setAddFriendAlias(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 font-bold outline-none focus:border-blue-500"
+                  />
+                  
+                  <button type="submit" className="w-full retro-btn text-white font-bold py-2 rounded-md shadow-sm active:opacity-70 flex justify-center items-center">
+                    Search & Add
+                  </button>
+                </form>
+              </div>
+            </div>
+
           </div>
         </div>
       )}
