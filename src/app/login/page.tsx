@@ -75,11 +75,14 @@ export default function LoginPage() {
     const unsubscribe = onSnapshot(doc(db, "qr_sessions", qrValue), async (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
+        console.log("QR Session update received:", data);
         if (data.authorized && data.token) {
+          console.log("Token received, attempting login...");
           setShowQR(false);
           try {
             // Log in natively with the custom token
             await signInWithCustomToken(auth, data.token);
+            console.log("Login successful!");
             // Ensure device is "authorized" locally
             let deviceId = localStorage.getItem('pop-device-id');
             if (!deviceId) {
@@ -91,7 +94,7 @@ export default function LoginPage() {
             await updateDoc(doc(db, "users", data.authorizingUid), {
               devices: arrayUnion(deviceId)
             });
-            
+            console.log("Device registered, redirecting...");
             // Redirect to Inbox
             router.push("/");
           } catch (error) {
@@ -99,7 +102,11 @@ export default function LoginPage() {
             setError("Failed to sync device.");
           }
         }
+      } else {
+        console.log("QR Session document does not exist yet.");
       }
+    }, (error) => {
+      console.error("Firestore Listener Error:", error);
     });
 
     return () => unsubscribe();

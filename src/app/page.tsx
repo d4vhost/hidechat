@@ -107,6 +107,7 @@ export default function Inbox() {
         setScanStatus("SUCCESS");
         try {
           const idToken = await user?.getIdToken();
+          console.log("Sending QR Value:", qrValue, "with idToken");
           const res = await fetch('/api/auth/qr-sync', {
             method: 'POST',
             headers: {
@@ -115,7 +116,10 @@ export default function Inbox() {
             body: JSON.stringify({ qrValue, idToken })
           });
           
-          if (!res.ok) throw new Error('API Error');
+          const responseData = await res.json();
+          console.log("QR Sync API Response:", responseData);
+          
+          if (!res.ok) throw new Error(responseData.error || 'API Error');
           
           setTimeout(() => {
             setShowScanner(false);
