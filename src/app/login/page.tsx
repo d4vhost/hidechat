@@ -357,8 +357,8 @@ export default function LoginPage() {
         </div>
       </header>
 
-      <div className="px-4 py-2 sm:p-4 flex-1 flex flex-col justify-center overflow-y-auto">
-        <p className="text-center text-[#4d576b] font-bold text-sm mb-3 shadow-white drop-shadow-sm">
+      <div className="px-4 py-2 sm:p-4 flex-1 flex flex-col justify-start pt-6 sm:pt-10 overflow-y-auto">
+        <p className="text-center text-[#4d576b] font-bold text-sm mb-4 shadow-white drop-shadow-sm">
           {t('loginSubtitle')}
         </p>
 
@@ -593,10 +593,10 @@ export default function LoginPage() {
           )}
 
           {step === "MAIN" && (
-            <div className="mt-3 text-center">
-              <div className="bg-white dark:bg-[#1a1a1a] rounded-xl p-3 shadow-sm border border-gray-200 dark:border-[#333]">
-                <h3 className="text-[11px] sm:text-xs font-bold text-gray-800 dark:text-gray-200 mb-1 uppercase tracking-wide">{t('aboutTitle')}</h3>
-                <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400 font-medium leading-tight max-w-sm mx-auto">
+            <div className="mt-4 text-center">
+              <div className="bg-white dark:bg-[#1a1a1a] rounded-xl p-4 shadow-sm border border-gray-200 dark:border-[#333]">
+                <h3 className="text-xs sm:text-sm font-bold text-gray-800 dark:text-gray-200 mb-2 uppercase tracking-wide">{t('aboutTitle')}</h3>
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium leading-relaxed max-w-sm mx-auto">
                   {t('aboutText')}
                 </p>
               </div>
