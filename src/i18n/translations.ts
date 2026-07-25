@@ -68,7 +68,20 @@ export const translations = {
     disconnectDevice: "Desconectar Dispositivo",
     confirmRemoval: "Confirmar Eliminación",
 
-    // Inbox Page (page.tsx)
+    // Chat Page
+    messages: "Mensajes",
+    online: "En línea",
+    offline: "Desconectado",
+    clear: "Limpiar",
+    clearConfirm: "¿Seguro que quieres borrar toda la conversación? Esto es irreversible para ambos.",
+    replyingTo: "Respondiendo a",
+    send: "Enviar",
+    errorSendingMessage: "Error al enviar el mensaje:",
+    errorSending: "Error al enviar:",
+    you: "Tú",
+    isTyping: "está escribiendo...",
+    loading: "Cargando...",
+    messagesWillDisappear: "Los mensajes desaparecerán en 24h",
     settings: "Configuración",
     done: "Listo",
     profile: "Perfil",
@@ -97,8 +110,6 @@ export const translations = {
     sendRequest: "Enviar Solicitud",
     removeDeviceTitle: "Eliminar Dispositivo",
     removeDeviceWarning: "¿Estás seguro de que deseas eliminar este dispositivo? La sesión en ese dispositivo se cerrará inmediatamente y requerirá un nuevo escaneo QR para acceder.",
-    confirmRemoval: "Confirmar Eliminación",
-    deviceSynced: "¡Dispositivo Sincronizado!",
 
     // Chat Page
     back: "Atrás",
@@ -188,7 +199,20 @@ export const translations = {
     disconnectDevice: "Disconnect Device",
     confirmRemoval: "Confirm Removal",
 
-    // Inbox Page (page.tsx)
+    // Chat Page
+    messages: "Messages",
+    online: "Online",
+    offline: "Offline",
+    clear: "Clear",
+    clearConfirm: "Are you sure you want to clear the entire conversation? This is irreversible for both parties.",
+    replyingTo: "Replying to",
+    send: "Send",
+    errorSendingMessage: "Error sending message:",
+    errorSending: "Error sending:",
+    you: "You",
+    isTyping: "is typing...",
+    loading: "Loading...",
+    messagesWillDisappear: "Messages will disappear in 24h",
     settings: "Settings",
     done: "Done",
     profile: "Profile",
@@ -217,8 +241,6 @@ export const translations = {
     sendRequest: "Send Request",
     removeDeviceTitle: "Remove Device",
     removeDeviceWarning: "Are you sure you want to remove this device? The session on that device will be closed immediately and require a new QR scan to access.",
-    confirmRemoval: "Confirm Removal",
-    deviceSynced: "Device Synced!",
 
     // Chat Page
     back: "Back",

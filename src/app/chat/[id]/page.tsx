@@ -8,8 +8,10 @@ import MessageList from "@/components/MessageList";
 import MessageInput from "@/components/MessageInput";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ChatPage({ params }: { params: Promise<{ id: string }> }) {
+  const { t } = useLanguage();
   const { user, loading } = useAuth();
   const router = useRouter();
   const { id: conversationId } = use(params);
@@ -60,7 +62,7 @@ export default function ChatPage({ params }: { params: Promise<{ id: string }> }
     return (
       <div className="min-h-screen bg-white dark:bg-[#0a0a0a] flex items-center justify-center p-4">
         <div className="text-gray-500 dark:text-gray-400 font-bold">
-          Cargando...
+          {t('loading')}
         </div>
       </div>
     );

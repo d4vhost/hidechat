@@ -6,6 +6,7 @@ import { translations, Language } from '@/i18n/translations';
 interface LanguageContextType {
   language: Language;
   toggleLanguage: () => void;
+  setLanguage: (lang: Language) => void;
   t: (key: keyof typeof translations.es) => string;
 }
 
@@ -23,10 +24,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const handleSetLanguage = (lang: Language) => {
+    setLanguage(lang);
+    localStorage.setItem('pop-language', lang);
+  };
+
   const toggleLanguage = () => {
     const newLang = language === 'es' ? 'en' : 'es';
-    setLanguage(newLang);
-    localStorage.setItem('pop-language', newLang);
+    handleSetLanguage(newLang);
   };
 
   const t = (key: keyof typeof translations.es): string => {
@@ -37,7 +42,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <LanguageContext.Provider value={{ language, toggleLanguage, t }}>
+    <LanguageContext.Provider value={{ language, toggleLanguage, setLanguage: handleSetLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );

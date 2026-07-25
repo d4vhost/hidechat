@@ -6,6 +6,7 @@ import { useMessages } from "@/hooks/useMessages";
 import { useTyping } from "@/hooks/useTyping";
 import { useChatColor } from "@/hooks/useChatColor";
 import { Reply } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface MessageListProps {
   onReply: (msg: any) => void;
@@ -16,6 +17,7 @@ interface MessageListProps {
 }
 
 const SwipeableMessage = ({ msg, isMine, color, dateObj, onReply, contactName, isStealthMode }: any) => {
+  const { t } = useLanguage();
   const [translateX, setTranslateX] = useState(0);
   const startX = useRef(0);
   
@@ -34,7 +36,7 @@ const SwipeableMessage = ({ msg, isMine, color, dateObj, onReply, contactName, i
 
   const handleTouchEnd = () => {
     if (Math.abs(translateX) > 40) {
-      onReply({ id: msg.id, text: msg.text, senderName: isMine ? "Tú" : contactName });
+      onReply({ id: msg.id, text: msg.text, senderName: isMine ? t('you') : contactName });
     }
     setTranslateX(0); // bounce back
   };
@@ -96,6 +98,7 @@ const SwipeableMessage = ({ msg, isMine, color, dateObj, onReply, contactName, i
 };
 
 export default function MessageList({ onReply, isStealthMode, conversationId, receiverId, contactName }: MessageListProps) {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const { messages, markAsRead } = useMessages(conversationId, receiverId);
   const { isOtherTyping } = useTyping(receiverId);
@@ -114,10 +117,18 @@ export default function MessageList({ onReply, isStealthMode, conversationId, re
 
   return (
     <div className="flex-1 overflow-y-auto overscroll-contain p-4 bg-transparent flex flex-col space-y-4">
+      {/* Typing Indicator */}
+      {isOtherTyping && (
+        <div className="flex justify-start mb-2 px-2 fade-in relative z-10">
+          <div className="bg-white/80 dark:bg-[#1a1a1a]/80 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm text-xs text-gray-500 font-bold border border-gray-200 dark:border-[#333]">
+            {contactName} {t('isTyping')}
+          </div>
+        </div>
+      )}
       {messages.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center bg-white/50 backdrop-blur-md px-4 py-2 text-gray-700 font-bold text-xs border border-white/50 rounded-full shadow-sm">
-            Los mensajes desaparecerán en 24h
+            {t('messagesWillDisappear')}
           </div>
         </div>
       ) : (

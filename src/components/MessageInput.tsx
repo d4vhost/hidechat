@@ -5,6 +5,7 @@ import { useMessages } from "@/hooks/useMessages";
 import { useTyping } from "@/hooks/useTyping";
 import { Smile, X } from "lucide-react";
 import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface MessageInputProps {
   replyTo?: any;
@@ -15,6 +16,7 @@ interface MessageInputProps {
 }
 
 export default function MessageInput({ replyTo, onCancelReply, isStealthMode, conversationId, receiverId }: MessageInputProps) {
+  const { t } = useLanguage();
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -60,8 +62,8 @@ export default function MessageInput({ replyTo, onCancelReply, isStealthMode, co
       await sendMessage(messageToSend, replyTo);
       if (onCancelReply) onCancelReply();
     } catch (error: any) {
-      console.error("Error al enviar el mensaje:", error);
-      alert("Error al enviar: " + error.message + "\n\n(Revisa las Reglas de Firestore en Firebase)");
+      console.error(t('errorSendingMessage'), error);
+      alert(t('errorSending') + " " + error.message);
       setText(messageToSend); // Restore text on error
     } finally {
       setSending(false);
@@ -90,7 +92,7 @@ export default function MessageInput({ replyTo, onCancelReply, isStealthMode, co
         <div className="max-w-4xl w-full mx-auto mb-2 bg-white/80 border border-[#999] border-l-4 border-l-[#4a9d06] rounded-r-lg p-2 relative shadow-md flex items-start">
           <div className="flex-1 overflow-hidden">
             <div className="text-xs font-bold text-[#4a9d06] mb-1">
-              Replying to {replyTo.senderName}
+              {t('replyingTo')} {replyTo.senderName}
             </div>
             <div className="text-xs text-gray-800 truncate">
               {replyTo.text}
@@ -140,7 +142,7 @@ export default function MessageInput({ replyTo, onCancelReply, isStealthMode, co
           disabled={!text.trim() || sending}
           className="retro-send-btn px-4 rounded-full font-bold text-sm disabled:opacity-50 h-[36px] flex items-center justify-center shrink-0 min-w-[60px]"
         >
-          {sending ? "..." : "Send"}
+          {sending ? "..." : t('send')}
         </button>
       </form>
     </div>

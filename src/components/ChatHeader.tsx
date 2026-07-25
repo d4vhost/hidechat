@@ -4,11 +4,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { usePresence } from "@/hooks/usePresence";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
-import { User, LogOut, Settings, Menu, X, EyeOff, Eye, ChevronLeft, Moon, Sun } from "lucide-react";
+import { User, LogOut, Settings, Menu, X, EyeOff, Eye, ChevronLeft, Moon, Sun, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import { useMessages } from "@/hooks/useMessages";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface ChatHeaderProps {
   isStealthMode?: boolean;
@@ -19,6 +20,7 @@ interface ChatHeaderProps {
 }
 
 export default function ChatHeader({ isStealthMode, contactName, otherUid, conversationId }: ChatHeaderProps) {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const { otherUserOnline } = usePresence(otherUid);
   const { clearAllMessages } = useMessages(conversationId, otherUid);
@@ -33,7 +35,7 @@ export default function ChatHeader({ isStealthMode, contactName, otherUid, conve
   };
 
   const handleClear = async () => {
-    if (window.confirm("¿Seguro que quieres borrar toda la conversación? Esto es irreversible para ambos.")) {
+    if (window.confirm(t('clearConfirm'))) {
       await clearAllMessages();
     }
   };
@@ -44,23 +46,24 @@ export default function ChatHeader({ isStealthMode, contactName, otherUid, conve
       {/* Left: Back Button */}
       <Link href="/" className="retro-btn px-3 py-1 flex items-center justify-center text-white font-bold text-sm shadow-sm active:opacity-70 transition-opacity">
         <ChevronLeft className="w-5 h-5 -ml-1" />
-        <span>Messages</span>
+        <span>{t('messages')}</span>
       </Link>
 
       {/* Center: Contact Info */}
       <div className="flex flex-col items-center flex-1 mx-2 overflow-hidden">
         <p className="text-white font-bold text-lg leading-tight truncate drop-shadow-md text-shadow-sm">{contactName}</p>
         <span className={`text-[11px] leading-none font-bold ${otherUserOnline ? 'text-[#a4e565]' : 'text-gray-300'}`}>
-          {otherUserOnline ? 'Online' : 'Offline'}
+          {otherUserOnline ? t('online') : t('offline')}
         </span>
       </div>
 
       {/* Right: Clear button */}
       <button
         onClick={handleClear}
-        className="retro-btn px-3 py-1 text-white font-bold text-sm shadow-sm active:opacity-70 transition-opacity"
+        className="retro-btn px-3 py-1 text-white font-bold text-sm active:opacity-70 flex items-center gap-1 bg-red-600/80 border-red-800"
       >
-        Clear
+        <Trash2 className="w-4 h-4" />
+        <span className="hidden sm:inline">{t('clear')}</span>
       </button>
     </div>
   );
