@@ -132,9 +132,10 @@ export default function LoginPage() {
     if (navigator.userAgent) {
       const ua = navigator.userAgent;
       if (ua.includes("Windows")) deviceName = "Windows PC";
-      else if (ua.includes("Mac OS")) deviceName = "Mac";
       else if (ua.includes("iPhone")) deviceName = "iPhone";
+      else if (ua.includes("iPad")) deviceName = "iPad";
       else if (ua.includes("Android")) deviceName = "Android";
+      else if (ua.includes("Mac OS")) deviceName = "Mac";
       else if (ua.includes("Linux")) deviceName = "Linux PC";
     }
 
