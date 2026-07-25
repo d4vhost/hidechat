@@ -187,7 +187,7 @@ export default function Inbox() {
 
       <div className="flex-1 flex flex-col contacts-bg shadow-inner">
         {contacts.length === 0 ? (
-          <div className="p-8 text-center text-gray-500 font-bold bg-white border-b border-gray-300 shadow-sm relative z-10">
+          <div className="p-8 text-center text-gray-500 font-bold bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm relative z-10">
             No contacts yet. Tap the + icon to add a friend.
           </div>
         ) : (
