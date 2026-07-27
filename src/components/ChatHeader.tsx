@@ -70,26 +70,59 @@ export default function ChatHeader({ isStealthMode, contactName, otherUid, conve
 
       {/* Clear Confirmation Modal */}
       {showClearModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#1e1e1e] border border-[#333] p-6 rounded-2xl shadow-2xl max-w-sm w-full text-center">
-            <h2 className="text-xl font-bold text-white mb-2">{t('clearConfirmTitle')}</h2>
-            <p className="text-gray-300 text-sm mb-6 whitespace-pre-wrap">
+        <div className="fixed inset-0 z-[100] bg-gray-100 dark:bg-[#121212] flex flex-col">
+          {/* Header */}
+          <div className="retro-nav px-4 py-3 flex items-center justify-between shrink-0 shadow-md">
+            <h2 className="text-white font-bold text-lg drop-shadow-md text-shadow-sm">{t('clearConfirmTitle')}</h2>
+            <button
+              onClick={() => setShowClearModal(false)}
+              className="retro-btn-gray px-4 py-1 text-white font-bold text-sm shadow-sm active:opacity-70"
+            >
+              {t('cancel')}
+            </button>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto p-6 flex flex-col items-center text-center mt-4">
+            <div className="w-20 h-20 bg-blue-100 dark:bg-[#1e1e1e] border border-blue-200 dark:border-[#333] rounded-full flex items-center justify-center mb-6 shadow-inner">
+              <Trash2 className="w-10 h-10 text-[#4b77ad]" />
+            </div>
+            
+            <p className="text-gray-800 dark:text-gray-200 text-xl font-bold mb-4">
+              ¿Estás seguro de que quieres limpiar este chat?
+            </p>
+            
+            <p className="text-gray-600 dark:text-gray-400 text-sm mb-8 leading-relaxed px-2">
               {t('clearConfirmDesc')}
             </p>
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={handleClear}
-                className="retro-btn w-full py-3 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 border-red-800"
-              >
-                {t('clearConfirmBtn')}
-              </button>
-              <button
-                onClick={() => setShowClearModal(false)}
-                className="retro-btn-gray w-full py-3 rounded-xl font-bold text-white"
-              >
-                {t('cancel')}
-              </button>
+
+            <div className="bg-white dark:bg-[#1e1e1e] p-5 rounded-2xl border border-gray-300 dark:border-[#333] shadow-sm w-full max-w-sm mb-6 text-left">
+              <h3 className="font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#4b77ad]"></span>
+                Privacidad Local
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-4">
+                Esta acción elimina todos los datos de esta conversación <b>solo de tu dispositivo</b>. La otra persona aún podrá ver los mensajes.
+              </p>
+              
+              <h3 className="font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                Autodestrucción a las 24h
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                Recuerda que, por seguridad de la red POP Chat, todos los mensajes se <b>autodestruyen permanentemente</b> de nuestros servidores 24 horas después de ser enviados.
+              </p>
             </div>
+          </div>
+
+          {/* Fixed Bottom Button */}
+          <div className="p-4 bg-gray-100 dark:bg-[#121212] border-t border-gray-300 dark:border-[#333] shrink-0 pb-8">
+            <button
+              onClick={handleClear}
+              className="retro-btn w-full py-4 flex justify-center items-center rounded-xl font-bold text-white text-lg shadow-md"
+            >
+              {t('clearConfirmBtn')}
+            </button>
           </div>
         </div>
       )}
