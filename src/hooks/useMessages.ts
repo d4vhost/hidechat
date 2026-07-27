@@ -10,7 +10,8 @@ import {
   orderBy, 
   where,
   getDocs,
-  writeBatch
+  writeBatch,
+  or
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Message } from "@/types/message";
@@ -27,7 +28,10 @@ export function useMessages(conversationId?: string, receiverId?: string) {
     const messagesRef = collection(db, "messages");
     const q = query(
       messagesRef,
-      where("conversationId", "==", conversationId)
+      or(
+        where("senderId", "==", user.uid),
+        where("receiverId", "==", user.uid)
+      )
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -38,6 +42,10 @@ export function useMessages(conversationId?: string, receiverId?: string) {
 
       snapshot.forEach((docSnap) => {
         const data = docSnap.data();
+        
+        // Filter locally by conversationId to avoid composite index requirements
+        if (data.conversationId !== conversationId) return;
+
         const expiresAt = data.expiresAt?.toDate ? data.expiresAt.toDate() : (data.expiresAt instanceof Date ? data.expiresAt : null);
         
         // 1. Check if expired (24h self-destruct)
@@ -129,12 +137,20 @@ export function useMessages(conversationId?: string, receiverId?: string) {
     if (!user) return;
     try {
       const messagesRef = collection(db, "messages");
-      const q = query(messagesRef, where("conversationId", "==", conversationId));
+      const q = query(
+        messagesRef,
+        or(
+          where("senderId", "==", user.uid),
+          where("receiverId", "==", user.uid)
+        )
+      );
       const snapshot = await getDocs(q);
       
       const batch = writeBatch(db);
       snapshot.forEach((docSnap) => {
-        batch.delete(docSnap.ref);
+        if (docSnap.data().conversationId === conversationId) {
+          batch.delete(docSnap.ref);
+        }
       });
       await batch.commit();
     } catch (error) {
