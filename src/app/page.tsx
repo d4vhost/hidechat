@@ -377,7 +377,7 @@ export default function Inbox() {
                     <div className="flex gap-2">
                       <button 
                         onClick={() => acceptRequest(req.id, req.fromId)}
-                        className="retro-btn px-4 py-1.5 text-sm font-bold rounded-md"
+                        className="retro-btn px-4 py-1.5 text-sm font-bold rounded-md text-white shadow-sm"
                       >
                         {t('accept')}
                       </button>
