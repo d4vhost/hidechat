@@ -109,8 +109,24 @@ export default function ChatHeader({ isStealthMode, contactName, otherUid, conve
                 <span className="w-2 h-2 rounded-full bg-green-500"></span>
                 {t('autoDestruct')}
               </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-4">
                 {t('autoDestructDesc')}
+              </p>
+
+              <h3 className="font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                {t('irreversibleAction')}
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-4">
+                {t('irreversibleActionDesc')}
+              </p>
+
+              <h3 className="font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                {t('secureEncryption')}
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                {t('secureEncryptionDesc')}
               </p>
             </div>
           </div>
