@@ -478,14 +478,14 @@ export default function LoginPage() {
           )}
 
           {step === "RECOVERY_KEY" && (
-            <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-4 p-5 text-center">
-              <h2 className="font-bold text-lg mb-2 text-gray-800 flex items-center justify-center gap-2">
-                <Key className="w-5 h-5"/> {t('enterToken')}
+            <div className="mb-6 mt-4 text-center w-full">
+              <h2 className="font-bold text-xl mb-2 text-black drop-shadow-sm flex items-center justify-center gap-2">
+                <Key className="w-6 h-6"/> {t('enterToken')}
               </h2>
-              <p className="text-xs text-gray-500 mb-5 font-semibold">
+              <p className="text-sm text-gray-700 mb-6 font-bold drop-shadow-sm">
                 {t('enterTokenText')}
               </p>
-              <div className="flex justify-center items-center gap-1 mb-2">
+              <div className="flex justify-center items-center gap-1 sm:gap-2 mb-2 w-full max-w-lg mx-auto">
                 {/* First 3 boxes (POP) */}
                 {tokenParts.slice(0, 3).map((part, i) => (
                   <input
@@ -496,7 +496,7 @@ export default function LoginPage() {
                     onChange={(e) => handleTokenChange(i, e.target.value)}
                     onKeyDown={(e) => handleTokenKeyDown(i, e)}
                     onPaste={handleTokenPaste}
-                    className="w-6 h-8 sm:w-8 sm:h-10 md:w-9 md:h-10 text-center font-bold text-sm sm:text-base border border-gray-300 rounded-md sm:rounded-lg bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all shadow-sm"
+                    className="w-7 h-10 sm:w-10 sm:h-12 md:w-12 md:h-14 text-center font-bold text-base sm:text-lg border-2 border-gray-400 rounded-md sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
                     maxLength={2}
                   />
                 ))}
@@ -513,7 +513,7 @@ export default function LoginPage() {
                     onChange={(e) => handleTokenChange(i + 3, e.target.value)}
                     onKeyDown={(e) => handleTokenKeyDown(i + 3, e)}
                     onPaste={handleTokenPaste}
-                    className="w-6 h-8 sm:w-8 sm:h-10 md:w-9 md:h-10 text-center font-bold text-sm sm:text-base border border-gray-300 rounded-md sm:rounded-lg bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all shadow-sm"
+                    className="w-7 h-10 sm:w-10 sm:h-12 md:w-12 md:h-14 text-center font-bold text-base sm:text-lg border-2 border-gray-400 rounded-md sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
                     maxLength={2}
                   />
                 ))}
@@ -530,7 +530,7 @@ export default function LoginPage() {
                     onChange={(e) => handleTokenChange(i + 7, e.target.value)}
                     onKeyDown={(e) => handleTokenKeyDown(i + 7, e)}
                     onPaste={handleTokenPaste}
-                    className="w-6 h-8 sm:w-8 sm:h-10 md:w-9 md:h-10 text-center font-bold text-sm sm:text-base border border-gray-300 rounded-md sm:rounded-lg bg-gray-50 text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none transition-all shadow-sm"
+                    className="w-7 h-10 sm:w-10 sm:h-12 md:w-12 md:h-14 text-center font-bold text-base sm:text-lg border-2 border-gray-400 rounded-md sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
                     maxLength={2}
                   />
                 ))}
