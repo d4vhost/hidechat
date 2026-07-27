@@ -371,7 +371,7 @@ export default function LoginPage() {
             step === "RECOVERY_KEY" ? handleRecoveryKeySubmit :
             (e) => { e.preventDefault(); router.push("/"); }
           } 
-          className="max-w-md mx-auto"
+          className="w-full max-w-md mx-auto flex flex-col"
         >
           {error && (
             <div className="mb-4 text-red-600 font-bold text-center text-sm">
@@ -442,7 +442,7 @@ export default function LoginPage() {
           )}
 
           {step === "PASSWORD_SETUP" && (
-            <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-4 p-4 sm:p-5 max-w-sm mx-auto w-full">
+            <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-4 p-4 sm:p-5 w-full">
               <h2 className="text-center font-bold text-lg mb-2">{t('setupPassword')}</h2>
               <p className="text-center text-xs text-gray-500 mb-4 font-semibold">
                 {t('secureAccount')}
@@ -491,6 +491,13 @@ export default function LoginPage() {
                     maxLength={14}
                     className="w-full bg-gray-50 border border-gray-300 rounded-md pl-3 pr-10 py-3 text-black font-bold focus:outline-none focus:border-blue-500 shadow-inner"
                   />
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
                 </div>
               </div>
             </div>
@@ -588,7 +595,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full max-w-sm mx-auto block retro-btn text-white font-bold text-lg py-3 rounded-lg shadow-md active:opacity-70 transition-opacity mb-4"
+            className="w-full block retro-btn text-white font-bold text-lg py-3 rounded-lg shadow-md active:opacity-70 transition-opacity mb-4"
           >
             {loading ? t('processing') : 
              step === "SHOW_NEW_KEY" ? t('iHaveSavedIt') : 
