@@ -2,18 +2,21 @@ import { useState, useEffect } from "react";
 import { db } from "@/lib/firebase";
 import { collection, query, where, onSnapshot, getDocs, doc, setDoc, deleteDoc, updateDoc, arrayUnion, serverTimestamp } from "firebase/firestore";
 import { useAuth } from "./useAuth";
+import { useLanguage } from "@/context/LanguageContext";
 
 export interface FriendRequest {
   id: string;
   fromId: string;
   toId: string;
   fromPhone: string;
+  fromUsername?: string;
   status: string;
   createdAt: any;
 }
 
 export function useFriendRequests() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [pendingRequests, setPendingRequests] = useState<FriendRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,34 +45,38 @@ export function useFriendRequests() {
     return () => unsubscribe();
   }, [user]);
 
-  const sendRequest = async (targetPhone: string, currentUserPhone: string) => {
+  const sendRequest = async (targetIdentifier: string, currentUserPhone: string, currentUsername?: string) => {
     if (!user) throw new Error("Not authenticated");
     
-    // Normalize phone (strip spaces)
-    const normalizedPhone = targetPhone.replace(/\s+/g, '');
-    
-    // 1. Find user by phone
+    const isPhone = /^\+?[0-9\s]+$/.test(targetIdentifier);
+    let q;
     const usersRef = collection(db, "users");
-    const q = query(usersRef, where("phoneNumber", "==", normalizedPhone));
+
+    if (isPhone) {
+      const normalizedPhone = targetIdentifier.replace(/\s+/g, '');
+      q = query(usersRef, where("phoneNumber", "==", normalizedPhone));
+    } else {
+      q = query(usersRef, where("username", "==", targetIdentifier.trim()));
+    }
+    
     const snapshot = await getDocs(q);
     
     if (snapshot.empty) {
-      throw new Error("User with this phone number not found.");
+      throw new Error(t('userNotFound'));
     }
     
     const targetUserDoc = snapshot.docs[0];
     const targetUserId = targetUserDoc.id;
     
     if (targetUserId === user.uid) {
-      throw new Error("You cannot send a friend request to yourself.");
+      throw new Error(t('cantAddSelf'));
     }
     
     const targetUserData = targetUserDoc.data();
     if (targetUserData.contacts && targetUserData.contacts.includes(user.uid)) {
-      throw new Error("You are already friends with this user.");
+      throw new Error(t('alreadyFriends'));
     }
 
-    // 2. Check if a request already exists
     const reqQ = query(
       collection(db, "friend_requests"),
       where("fromId", "==", user.uid),
@@ -80,11 +87,11 @@ export function useFriendRequests() {
       throw new Error("Friend request already sent.");
     }
     
-    // 3. Create the request
     const requestId = `${user.uid}_${targetUserId}`;
     await setDoc(doc(db, "friend_requests", requestId), {
       fromId: user.uid,
       fromPhone: currentUserPhone,
+      fromUsername: currentUsername || "",
       toId: targetUserId,
       status: "pending",
       createdAt: serverTimestamp()

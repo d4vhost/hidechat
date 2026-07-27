@@ -128,7 +128,13 @@ export const translations = {
     errorCreatingAccount: "Error creating account.",
     invalidToken: "Invalid Token.",
     errorValidatingKey: "Error validating key.",
-    failedToSync: "Failed to sync device."
+    failedToSync: "Failed to sync device.",
+    friendRequests: "Requests",
+    usernameTaken: "Username is already taken.",
+    userNotFound: "User not found.",
+    cantAddSelf: "You cannot send a friend request to yourself.",
+    alreadyFriends: "You are already friends with this user.",
+    requestSent: "Friend request sent!"
   }
 };
 

@@ -8,7 +8,7 @@ import { ChevronRight, Settings as SettingsIcon, LogOut, Moon, Sun, Eye, EyeOff,
 import { useTheme } from "@/context/ThemeContext";
 import { auth, db } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
-import { doc, getDoc, updateDoc, setDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, updateDoc, setDoc, onSnapshot, collection, query, where, getDocs } from "firebase/firestore";
 import { useFriendRequests } from "@/hooks/useFriendRequests";
 import { UserPlus, Check, X } from "lucide-react";
 import { Scanner } from "@yudiel/react-qr-scanner";
@@ -25,6 +25,7 @@ export default function Inbox() {
   const [devices, setDevices] = useState<any[]>([]);
   const [initialDevicesCount, setInitialDevicesCount] = useState(-1);
   const [username, setUsername] = useState("");
+  const [usernameError, setUsernameError] = useState("");
   const [isEditingUsername, setIsEditingUsername] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [scanStatus, setScanStatus] = useState<"IDLE" | "SUCCESS" | "ERROR">("IDLE");
@@ -156,8 +157,25 @@ export default function Inbox() {
 
   const handleSaveUsername = async () => {
     if (!user) return;
+    setUsernameError("");
+    
+    if (username.trim().length > 0) {
+      const q = query(
+        collection(db, "users"),
+        where("username", "==", username.trim())
+      );
+      const snapshot = await getDocs(q);
+      
+      const takenBySomeoneElse = snapshot.docs.some(d => d.id !== user.uid);
+      
+      if (takenBySomeoneElse) {
+        setUsernameError(t('usernameTaken'));
+        return;
+      }
+    }
+
     await updateDoc(doc(db, "users", user.uid), {
-      username: username
+      username: username.trim()
     });
     setIsEditingUsername(false);
   };
@@ -263,7 +281,7 @@ export default function Inbox() {
     }
     
     try {
-      await sendRequest(targetPhone, user?.phoneNumber || "");
+      await sendRequest(targetPhone, user?.phoneNumber || "", username || undefined);
       setAddFriendSuccess("Friend request sent!");
       setPhoneDigits(Array(9).fill(''));
       setAddFriendAlias("");
@@ -321,7 +339,7 @@ export default function Inbox() {
             {pendingRequests.map(req => (
               <div key={req.id} className="bg-white dark:bg-[#2a2a2a] rounded-lg shadow-sm border border-gray-200 dark:border-[#333] p-3 flex justify-between items-center">
                 <div>
-                  <div className="font-bold text-sm text-gray-800 dark:text-gray-200">{req.fromPhone}</div>
+                  <div className="font-bold text-sm text-gray-800 dark:text-gray-200">{req.fromUsername || req.fromPhone}</div>
                   <div className="text-xs text-gray-500 dark:text-gray-400">Wants to add you</div>
                 </div>
                 <div className="flex gap-2">
@@ -566,6 +584,11 @@ export default function Inbox() {
                     </span>
                   )}
                 </div>
+                {usernameError && (
+                  <div className="mt-2 text-xs text-red-500 font-bold">
+                    {usernameError}
+                  </div>
+                )}
               </div>
 
               <div className="bg-white dark:bg-[#1e1e1e] rounded-lg border border-gray-300 dark:border-[#333] overflow-hidden">
