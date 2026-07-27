@@ -333,24 +333,26 @@ export default function Inbox() {
         </button>
       </header>
       
-      <div className="flex border-b border-gray-300 dark:border-[#333] bg-white dark:bg-[#1e1e1e] shrink-0">
-        <button 
-          onClick={() => setActiveMainTab('chats')} 
-          className={`flex-1 py-3 font-bold text-sm ${activeMainTab === 'chats' ? 'text-[#4b77ad] border-b-2 border-[#4b77ad]' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
-        >
-          Chats
-        </button>
-        <button 
-          onClick={() => setActiveMainTab('requests')} 
-          className={`flex-1 py-3 font-bold text-sm relative flex justify-center items-center gap-2 ${activeMainTab === 'requests' ? 'text-[#4b77ad] border-b-2 border-[#4b77ad]' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
-        >
-          {t('friendRequests')}
-          {pendingRequests.length > 0 && (
-            <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
-              {pendingRequests.length}
-            </span>
-          )}
-        </button>
+      <div className="p-3 bg-gray-100 dark:bg-[#2a2a2a] border-b border-gray-300 dark:border-[#333] flex justify-center shrink-0">
+        <div className="retro-segmented-control w-full sm:max-w-sm">
+          <button 
+            onClick={() => setActiveMainTab('chats')} 
+            className={`retro-segmented-btn ${activeMainTab === 'chats' ? 'retro-segmented-btn-active' : ''}`}
+          >
+            Chats
+          </button>
+          <button 
+            onClick={() => setActiveMainTab('requests')} 
+            className={`retro-segmented-btn flex justify-center items-center gap-2 ${activeMainTab === 'requests' ? 'retro-segmented-btn-active' : ''}`}
+          >
+            {t('friendRequests')}
+            {pendingRequests.length > 0 && (
+              <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                {pendingRequests.length}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 flex flex-col contacts-bg dark:!bg-[#121212] shadow-inner overflow-y-auto">
@@ -366,22 +368,24 @@ export default function Inbox() {
                   <div key={req.id} className="bg-white dark:bg-[#2a2a2a] rounded-lg shadow-sm border border-gray-200 dark:border-[#333] p-3 flex justify-between items-center">
                     <div>
                       <div className="font-bold text-sm text-gray-800 dark:text-gray-200">
-                        {req.sentVia === 'alias' && req.fromUsername ? req.fromUsername : req.fromPhone}
+                        {req.sentVia === 'alias' ? (req.fromUsername || req.fromPhone) : 
+                         req.sentVia === 'phone' ? req.fromPhone : 
+                         (req.fromUsername || req.fromPhone)}
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">Wants to add you</div>
                     </div>
                     <div className="flex gap-2">
                       <button 
                         onClick={() => acceptRequest(req.id, req.fromId)}
-                        className="p-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full hover:bg-green-200 dark:hover:bg-green-900/50 active:bg-green-300 transition-colors"
+                        className="retro-btn-success px-4 py-1.5 text-sm font-bold rounded-md"
                       >
-                        <Check className="w-4 h-4" />
+                        {t('accept')}
                       </button>
                       <button 
                         onClick={() => rejectRequest(req.id)}
-                        className="p-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full hover:bg-red-200 dark:hover:bg-red-900/50 active:bg-red-300 transition-colors"
+                        className="retro-btn-danger px-4 py-1.5 text-sm font-bold rounded-md"
                       >
-                        <X className="w-4 h-4" />
+                        {t('reject')}
                       </button>
                     </div>
                   </div>
