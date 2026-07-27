@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { RecaptchaVerifier, signInWithPhoneNumber, signInWithCustomToken, ConfirmationResult } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
-import { doc, getDoc, setDoc, updateDoc, arrayUnion, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, arrayUnion, onSnapshot, deleteDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { Key, AlertTriangle, QrCode, Eye, EyeOff } from "lucide-react";
 import QRCode from "react-qr-code";
@@ -79,14 +79,14 @@ export default function LoginPage() {
     const unsubscribe = onSnapshot(doc(db, "qr_sessions", qrValue), async (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-        console.log("QR Session update received:", data);
+
         if (data.authorized && data.token) {
-          console.log("Token received, attempting login...");
+
           setShowQR(false);
           try {
             // Log in natively with the custom token
             await signInWithCustomToken(auth, data.token);
-            console.log("Login successful!");
+
             
             const deviceInfo = await getDeviceInfo();
             
@@ -94,7 +94,10 @@ export default function LoginPage() {
             await updateDoc(doc(db, "users", data.authorizingUid), {
               devices: arrayUnion(deviceInfo)
             });
-            console.log("Device registered, redirecting...");
+
+            // Delete QR session to prevent token reuse
+            try { await deleteDoc(doc(db, "qr_sessions", qrValue)); } catch (e) {}
+
             // Redirect to Inbox
             router.push("/");
           } catch (error) {
@@ -103,7 +106,7 @@ export default function LoginPage() {
           }
         }
       } else {
-        console.log("QR Session document does not exist yet.");
+
       }
     }, (error) => {
       console.error("Firestore Listener Error:", error);
@@ -115,7 +118,7 @@ export default function LoginPage() {
   const getDeviceId = () => {
     let deviceId = localStorage.getItem('pop-device-id');
     if (!deviceId) {
-      deviceId = 'DEV-' + Math.random().toString(36).substring(2, 15);
+      deviceId = 'DEV-' + crypto.randomUUID().replace(/-/g, '').substring(0, 13);
       localStorage.setItem('pop-device-id', deviceId);
     }
     return deviceId;
@@ -171,7 +174,7 @@ export default function LoginPage() {
     
     try {
       const fullPhoneNumber = getFullPhoneNumber();
-      console.log("Attempting SMS to:", fullPhoneNumber);
+
       
       const appVerifier = window.recaptchaVerifier;
       const confirmation = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
@@ -211,13 +214,42 @@ export default function LoginPage() {
           return;
         }
 
-        // Verify login credentials
-        const pwdHash = await hashString(loginPassword);
-        if (userData?.passwordHash !== pwdHash) {
+        // Verify login credentials - try private subcollection first, fallback to main doc (migration)
+        const privDoc = await getDoc(doc(db, "users", user.uid, "private", "credentials"));
+        let storedHash: string | undefined;
+        let needsMigration = false;
+        
+        if (privDoc.exists()) {
+          storedHash = privDoc.data().passwordHash;
+        } else if (userData?.passwordHash) {
+          storedHash = userData.passwordHash;
+          needsMigration = true;
+        }
+        
+        // Try salted hash first, then unsalted (for pre-migration users)
+        const saltedHash = await hashString(loginPassword, user.uid);
+        const unsaltedHash = await hashString(loginPassword);
+        
+        if (storedHash !== saltedHash && storedHash !== unsaltedHash) {
           setError(t('incorrectPassword'));
           setStep("MAIN");
           setLoading(false);
           return;
+        }
+        
+        // Migrate credentials to private subcollection if needed
+        if (needsMigration || storedHash === unsaltedHash) {
+          const newSaltedHash = await hashString(loginPassword, user.uid);
+          const recoveryHash = userData?.recoveryKeyHash || "";
+          await setDoc(doc(db, "users", user.uid, "private", "credentials"), {
+            passwordHash: newSaltedHash,
+            recoveryKeyHash: recoveryHash
+          });
+          // Remove sensitive fields from main document
+          await updateDoc(doc(db, "users", user.uid), {
+            passwordHash: "",
+            recoveryKeyHash: ""
+          });
         }
 
         // Password is correct. Move to token step.
@@ -253,17 +285,22 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const pwdHash = await hashString(registerPassword);
+      const pwdHash = await hashString(registerPassword, firebaseUser.uid);
       const deviceInfo = await getDeviceInfo();
       const generatedKey = generateRecoveryKey();
-      const keyHash = await hashString(generatedKey);
+      const keyHash = await hashString(generatedKey, firebaseUser.uid);
 
+      // Store public profile data in main document (NO sensitive hashes)
       await setDoc(doc(db, "users", firebaseUser.uid), {
         phoneNumber: firebaseUser.phoneNumber,
-        passwordHash: pwdHash,
-        recoveryKeyHash: keyHash,
         devices: [deviceInfo],
         createdAt: new Date(),
+      });
+      
+      // Store sensitive credentials in private subcollection
+      await setDoc(doc(db, "users", firebaseUser.uid, "private", "credentials"), {
+        passwordHash: pwdHash,
+        recoveryKeyHash: keyHash
       });
       
       setNewRecoveryKey(generatedKey);
@@ -284,11 +321,23 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const keyHash = await hashString(combinedToken.trim());
+      // Try salted hash first, then unsalted (for pre-migration users)
+      const saltedKeyHash = await hashString(combinedToken.trim(), firebaseUser.uid);
+      const unsaltedKeyHash = await hashString(combinedToken.trim());
+      
+      // Check private subcollection first, then main doc
+      const privDoc = await getDoc(doc(db, "users", firebaseUser.uid, "private", "credentials"));
       const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
       const userData = userDoc.data();
+      
+      let storedKeyHash: string | undefined;
+      if (privDoc.exists()) {
+        storedKeyHash = privDoc.data().recoveryKeyHash;
+      } else if (userData?.recoveryKeyHash) {
+        storedKeyHash = userData.recoveryKeyHash;
+      }
 
-      if (userData?.recoveryKeyHash !== keyHash) {
+      if (storedKeyHash !== saltedKeyHash && storedKeyHash !== unsaltedKeyHash) {
         setError(t('invalidToken'));
         setLoading(false);
         return;

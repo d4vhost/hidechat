@@ -85,7 +85,7 @@ export function useFriendRequests() {
     );
     const reqSnapshot = await getDocs(reqQ);
     if (!reqSnapshot.empty) {
-      throw new Error("Friend request already sent.");
+      return; // Silently ignore duplicate requests
     }
     
     const requestId = `${user.uid}_${targetUserId}`;

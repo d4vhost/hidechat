@@ -198,26 +198,46 @@ export default function Inbox() {
     if (!user) return;
   
     try {
-      const docRef = doc(db, "users", user.uid);
-      const docSnap = await getDoc(docRef);
-      if (!docSnap.exists()) return;
+      // Read credentials from private subcollection first, fallback to main doc
+      const privRef = doc(db, "users", user.uid, "private", "credentials");
+      const privSnap = await getDoc(privRef);
+      const mainRef = doc(db, "users", user.uid);
+      const mainSnap = await getDoc(mainRef);
       
-      const data = docSnap.data();
-      const currentHash = await hashString(currentPassword);
+      let storedHash: string | undefined;
+      if (privSnap.exists()) {
+        storedHash = privSnap.data().passwordHash;
+      } else if (mainSnap.exists()) {
+        storedHash = mainSnap.data().passwordHash;
+      }
       
-      if (data.passwordHash !== currentHash) {
+      // Verify current password (try salted then unsalted)
+      const saltedCurrent = await hashString(currentPassword, user.uid);
+      const unsaltedCurrent = await hashString(currentPassword);
+      
+      if (storedHash !== saltedCurrent && storedHash !== unsaltedCurrent) {
         setPasswordChangeError("Incorrect current password.");
         return;
       }
       
-      const newHash = await hashString(newPassword);
+      // Generate new salted hash and new recovery key
+      const newHash = await hashString(newPassword, user.uid);
       const newKey = generateRecoveryKey();
-      const newKeyHash = await hashString(newKey);
+      const newKeyHash = await hashString(newKey, user.uid);
       
-      await updateDoc(docRef, {
+      // Store in private subcollection
+      await setDoc(privRef, {
         passwordHash: newHash,
         recoveryKeyHash: newKeyHash
       });
+      
+      // Clear any old hashes from main document
+      if (mainSnap.exists() && mainSnap.data().passwordHash) {
+        await updateDoc(mainRef, {
+          passwordHash: "",
+          recoveryKeyHash: ""
+        });
+      }
       
       setNewRecoveryKey(newKey);
       setCurrentPassword("");
@@ -236,7 +256,7 @@ export default function Inbox() {
         setScanStatus("SUCCESS");
         try {
           const idToken = await user?.getIdToken();
-          console.log("Sending QR Value:", qrValue, "with idToken");
+
           const res = await fetch('/api/auth/qr-sync', {
             method: 'POST',
             headers: {
@@ -246,7 +266,7 @@ export default function Inbox() {
           });
           
           const responseData = await res.json();
-          console.log("QR Sync API Response:", responseData);
+
           
           if (!res.ok) throw new Error(responseData.error || 'API Error');
           
