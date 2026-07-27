@@ -377,13 +377,13 @@ export default function Inbox() {
                     <div className="flex gap-2">
                       <button 
                         onClick={() => acceptRequest(req.id, req.fromId)}
-                        className="retro-btn-success px-4 py-1.5 text-sm font-bold rounded-md"
+                        className="retro-btn px-4 py-1.5 text-sm font-bold rounded-md"
                       >
                         {t('accept')}
                       </button>
                       <button 
                         onClick={() => rejectRequest(req.id)}
-                        className="retro-btn-danger px-4 py-1.5 text-sm font-bold rounded-md"
+                        className="retro-btn-gray px-4 py-1.5 text-sm font-bold rounded-md"
                       >
                         {t('reject')}
                       </button>
