@@ -5,7 +5,7 @@ import { RecaptchaVerifier, signInWithPhoneNumber, signInWithCustomToken, Confir
 import { auth, db } from "@/lib/firebase";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, onSnapshot } from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import { Key, AlertTriangle, QrCode } from "lucide-react";
+import { Key, AlertTriangle, QrCode, Eye, EyeOff } from "lucide-react";
 import QRCode from "react-qr-code";
 import { hashString, generateRecoveryKey, evaluatePasswordStrength } from "@/lib/crypto";
 import { useLanguage } from "@/context/LanguageContext";
@@ -36,6 +36,8 @@ export default function LoginPage() {
   
   // Register Specific
   const [registerPassword, setRegisterPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState("");
   const [newRecoveryKey, setNewRecoveryKey] = useState("");
   
@@ -240,7 +242,13 @@ export default function LoginPage() {
 
   const handleRegisterPasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!registerPassword || !firebaseUser) return;
+    if (!registerPassword || !confirmPassword || !firebaseUser) return;
+    
+    if (registerPassword !== confirmPassword) {
+      setError(t('passwordsDoNotMatch') || 'Passwords do not match');
+      return;
+    }
+    
     setError("");
     setLoading(true);
 
@@ -434,22 +442,32 @@ export default function LoginPage() {
           )}
 
           {step === "PASSWORD_SETUP" && (
-            <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-4 p-4">
+            <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-4 p-4 sm:p-5 max-w-sm mx-auto w-full">
               <h2 className="text-center font-bold text-lg mb-2">{t('setupPassword')}</h2>
-              <p className="text-center text-xs text-gray-500 mb-4">
+              <p className="text-center text-xs text-gray-500 mb-4 font-semibold">
                 {t('secureAccount')}
               </p>
-              <div className="flex flex-col gap-2">
-                <input
-                  type="password"
-                  placeholder={t('maxChars')}
-                  value={registerPassword}
-                  onChange={handlePasswordChange}
-                  maxLength={14}
-                  className="w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 text-black font-bold focus:outline-none focus:border-blue-500"
-                />
+              <div className="flex flex-col gap-3">
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder={t('maxChars')}
+                    value={registerPassword}
+                    onChange={handlePasswordChange}
+                    maxLength={14}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-md pl-3 pr-10 py-3 text-black font-bold focus:outline-none focus:border-blue-500 shadow-inner"
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+                
                 {registerPassword && (
-                  <div className="flex justify-between items-center px-1">
+                  <div className="flex justify-between items-center px-1 mb-1">
                     <span className="text-xs font-semibold text-gray-500">{t('strength')}</span>
                     <span className={`text-xs font-bold ${
                       passwordStrength === 'Weak' ? 'text-red-500' :
@@ -460,6 +478,20 @@ export default function LoginPage() {
                     </span>
                   </div>
                 )}
+
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder={t('confirmPassword') || 'Confirm Password'}
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      setError("");
+                    }}
+                    maxLength={14}
+                    className="w-full bg-gray-50 border border-gray-300 rounded-md pl-3 pr-10 py-3 text-black font-bold focus:outline-none focus:border-blue-500 shadow-inner"
+                  />
+                </div>
               </div>
             </div>
           )}
