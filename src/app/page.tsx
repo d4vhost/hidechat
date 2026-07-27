@@ -153,7 +153,7 @@ export default function Inbox() {
 
   const handleSetStealthMode = (value: boolean) => {
     setIsStealthMode(value);
-    localStorage.setItem('popchat-stealth-mode', value.toString());
+    localStorage.setItem('hidechat-stealth-mode', value.toString());
   };
 
   const handleSaveUsername = async () => {

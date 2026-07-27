@@ -51,7 +51,9 @@ export default function ChatHeader({ isStealthMode, contactName, otherUid, conve
 
       {/* Center: Contact Info */}
       <div className="flex flex-col items-center flex-1 mx-2 overflow-hidden">
-        <p className="text-white font-bold text-lg leading-tight truncate drop-shadow-md text-shadow-sm">{contactName}</p>
+        <p className={`text-white font-bold text-lg leading-tight truncate drop-shadow-md text-shadow-sm transition-all duration-300 ${isStealthMode ? 'blur-[5px] hover:blur-none active:blur-none' : ''}`}>
+          {contactName}
+        </p>
         <span className={`text-[11px] leading-none font-bold ${otherUserOnline ? 'text-[#a4e565]' : 'text-gray-300'}`}>
           {otherUserOnline ? t('online') : t('offline')}
         </span>
