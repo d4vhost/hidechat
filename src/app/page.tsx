@@ -502,10 +502,10 @@ export default function Inbox() {
                 ) : (
                   <div>
                     <p className="text-sm font-bold text-gray-600 dark:text-gray-400 mb-4 text-center">{t('enterAliasToAdd')}</p>
-                    <form onSubmit={(e) => { e.preventDefault(); alert("Alias functionality coming soon!"); }} className="space-y-4">
+                    <form onSubmit={handleAddFriend} className="space-y-4">
                       <input
                         type="text"
-                        placeholder="Enter Alias (e.g. majito_123)"
+                        placeholder="Enter Alias (e.g. usuario_123)"
                         value={addFriendAlias}
                         onChange={(e) => setAddFriendAlias(e.target.value)}
                         className="w-full bg-gray-50 dark:bg-[#2a2a2a] border border-gray-300 dark:border-[#444] rounded-md px-3 py-3 font-bold outline-none focus:border-blue-500 retro-input-field dark:text-white"
