@@ -198,11 +198,19 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
+    let user;
     try {
       const result = await confirmationResult.confirm(otp);
-      const user = result.user;
+      user = result.user;
       setFirebaseUser(user);
+    } catch (err: any) {
+      console.error("OTP confirmation error:", err);
+      setError(t('invalidOtp'));
+      setLoading(false);
+      return;
+    }
 
+    try {
       const userDoc = await getDoc(doc(db, "users", user.uid));
       const userData = userDoc.data();
       
@@ -265,8 +273,9 @@ export default function LoginPage() {
         }
       }
     } catch (err: any) {
-      console.error(err);
-      setError(t('invalidOtp'));
+      console.error("Database or Auth logic error after OTP:", err);
+      // We don't set 'invalidOtp' here because OTP was already successful
+      setError("System error: " + err.message);
     } finally {
       setLoading(false);
     }
