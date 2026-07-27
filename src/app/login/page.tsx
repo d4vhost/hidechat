@@ -478,7 +478,7 @@ export default function LoginPage() {
           )}
 
           {step === "RECOVERY_KEY" && (
-            <div className="bg-white border-y sm:border border-gray-400 sm:rounded-lg overflow-hidden shadow-sm mb-4 p-5 text-center -mx-4 sm:mx-0">
+            <div className="bg-white border border-gray-400 rounded-lg overflow-hidden shadow-sm mb-4 p-4 sm:p-5 text-center max-w-sm mx-auto w-full">
               <h2 className="font-bold text-lg mb-2 text-gray-800 flex items-center justify-center gap-2">
                 <Key className="w-5 h-5"/> {t('enterToken')}
               </h2>
@@ -496,7 +496,7 @@ export default function LoginPage() {
                     onChange={(e) => handleTokenChange(i, e.target.value)}
                     onKeyDown={(e) => handleTokenKeyDown(i, e)}
                     onPaste={handleTokenPaste}
-                    className="flex-1 min-w-0 max-w-[2rem] sm:max-w-[2.5rem] h-9 sm:h-12 text-center font-bold text-sm sm:text-lg border-2 border-gray-400 rounded sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
+                    className="w-5 h-8 sm:w-8 sm:h-10 text-center font-bold text-sm sm:text-lg border-2 border-gray-400 rounded sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
                     maxLength={2}
                   />
                 ))}
@@ -513,7 +513,7 @@ export default function LoginPage() {
                     onChange={(e) => handleTokenChange(i + 3, e.target.value)}
                     onKeyDown={(e) => handleTokenKeyDown(i + 3, e)}
                     onPaste={handleTokenPaste}
-                    className="flex-1 min-w-0 max-w-[2rem] sm:max-w-[2.5rem] h-9 sm:h-12 text-center font-bold text-sm sm:text-lg border-2 border-gray-400 rounded sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
+                    className="w-5 h-8 sm:w-8 sm:h-10 text-center font-bold text-sm sm:text-lg border-2 border-gray-400 rounded sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
                     maxLength={2}
                   />
                 ))}
@@ -530,7 +530,7 @@ export default function LoginPage() {
                     onChange={(e) => handleTokenChange(i + 7, e.target.value)}
                     onKeyDown={(e) => handleTokenKeyDown(i + 7, e)}
                     onPaste={handleTokenPaste}
-                    className="flex-1 min-w-0 max-w-[2rem] sm:max-w-[2.5rem] h-9 sm:h-12 text-center font-bold text-sm sm:text-lg border-2 border-gray-400 rounded sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
+                    className="w-5 h-8 sm:w-8 sm:h-10 text-center font-bold text-sm sm:text-lg border-2 border-gray-400 rounded sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
                     maxLength={2}
                   />
                 ))}
@@ -556,7 +556,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full retro-btn text-white font-bold text-lg py-3 rounded-lg shadow-md active:opacity-70 transition-opacity mb-4"
+            className="w-[85%] max-w-xs mx-auto block retro-btn text-white font-bold text-lg py-3 rounded-lg shadow-md active:opacity-70 transition-opacity mb-4"
           >
             {loading ? t('processing') : 
              step === "SHOW_NEW_KEY" ? t('iHaveSavedIt') : 
