@@ -10,6 +10,7 @@ export interface FriendRequest {
   toId: string;
   fromPhone: string;
   fromUsername?: string;
+  sentVia?: 'phone' | 'alias';
   status: string;
   createdAt: any;
 }
@@ -92,6 +93,7 @@ export function useFriendRequests() {
       fromId: user.uid,
       fromPhone: currentUserPhone,
       fromUsername: currentUsername || "",
+      sentVia: isPhone ? 'phone' : 'alias',
       toId: targetUserId,
       status: "pending",
       createdAt: serverTimestamp()
