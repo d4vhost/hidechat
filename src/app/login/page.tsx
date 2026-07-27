@@ -363,7 +363,7 @@ export default function LoginPage() {
             step === "RECOVERY_KEY" ? handleRecoveryKeySubmit :
             (e) => { e.preventDefault(); router.push("/"); }
           } 
-          className="max-w-md mx-auto"
+          className="max-w-md mx-auto w-full flex-1 flex flex-col"
         >
           {error && (
             <div className="mb-4 text-red-600 font-bold text-center text-sm">
@@ -553,18 +553,20 @@ export default function LoginPage() {
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full retro-btn text-white font-bold text-lg py-3 rounded-lg shadow-md active:opacity-70 transition-opacity mb-4"
-          >
-            {loading ? t('processing') : 
-             step === "SHOW_NEW_KEY" ? t('iHaveSavedIt') : 
-             authMode === "LOGIN" && step === "MAIN" ? t('login') : t('continue')}
-          </button>
+          <div className="mt-auto pt-8 pb-4 w-full flex justify-center">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-[85%] max-w-[300px] retro-btn text-white font-bold text-lg py-3 rounded-lg shadow-md active:opacity-70 transition-opacity"
+            >
+              {loading ? t('processing') : 
+               step === "SHOW_NEW_KEY" ? t('iHaveSavedIt') : 
+               authMode === "LOGIN" && step === "MAIN" ? t('login') : t('continue')}
+            </button>
+          </div>
           
           {step === "MAIN" && (
-            <div className="text-center">
+            <div className="text-center mb-4">
               {authMode === "LOGIN" ? (
                 <button
                   type="button"
