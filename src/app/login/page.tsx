@@ -496,7 +496,7 @@ export default function LoginPage() {
                     onChange={(e) => handleTokenChange(i, e.target.value)}
                     onKeyDown={(e) => handleTokenKeyDown(i, e)}
                     onPaste={handleTokenPaste}
-                    className="w-6 h-8 sm:w-8 sm:h-10 text-center font-bold text-sm sm:text-lg border-2 border-gray-400 rounded sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
+                    className="flex-1 min-w-0 max-w-[1.75rem] sm:max-w-[2.5rem] h-9 sm:h-11 text-center font-bold text-sm sm:text-lg border-2 border-gray-400 rounded sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
                     maxLength={2}
                   />
                 ))}
@@ -513,7 +513,7 @@ export default function LoginPage() {
                     onChange={(e) => handleTokenChange(i + 3, e.target.value)}
                     onKeyDown={(e) => handleTokenKeyDown(i + 3, e)}
                     onPaste={handleTokenPaste}
-                    className="w-6 h-8 sm:w-8 sm:h-10 text-center font-bold text-sm sm:text-lg border-2 border-gray-400 rounded sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
+                    className="flex-1 min-w-0 max-w-[1.75rem] sm:max-w-[2.5rem] h-9 sm:h-11 text-center font-bold text-sm sm:text-lg border-2 border-gray-400 rounded sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
                     maxLength={2}
                   />
                 ))}
@@ -530,7 +530,7 @@ export default function LoginPage() {
                     onChange={(e) => handleTokenChange(i + 7, e.target.value)}
                     onKeyDown={(e) => handleTokenKeyDown(i + 7, e)}
                     onPaste={handleTokenPaste}
-                    className="w-6 h-8 sm:w-8 sm:h-10 text-center font-bold text-sm sm:text-lg border-2 border-gray-400 rounded sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
+                    className="flex-1 min-w-0 max-w-[1.75rem] sm:max-w-[2.5rem] h-9 sm:h-11 text-center font-bold text-sm sm:text-lg border-2 border-gray-400 rounded sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
                     maxLength={2}
                   />
                 ))}
