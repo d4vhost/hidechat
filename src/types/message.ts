@@ -16,6 +16,7 @@ export interface Message {
     text: string;
     senderName: string;
   };
+  deletedBy?: string[];
 }
 
 export interface UserPresence {

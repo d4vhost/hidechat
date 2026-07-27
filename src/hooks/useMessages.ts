@@ -11,7 +11,8 @@ import {
   where,
   getDocs,
   writeBatch,
-  or
+  or,
+  arrayUnion
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Message } from "@/types/message";
@@ -45,6 +46,9 @@ export function useMessages(conversationId?: string, receiverId?: string) {
         
         // Filter locally by conversationId to avoid composite index requirements
         if (data.conversationId !== conversationId) return;
+
+        // Skip messages that were soft-deleted by the current user
+        if (data.deletedBy && data.deletedBy.includes(user.uid)) return;
 
         const expiresAt = data.expiresAt?.toDate ? data.expiresAt.toDate() : (data.expiresAt instanceof Date ? data.expiresAt : null);
         
@@ -148,8 +152,18 @@ export function useMessages(conversationId?: string, receiverId?: string) {
       
       const batch = writeBatch(db);
       snapshot.forEach((docSnap) => {
-        if (docSnap.data().conversationId === conversationId) {
-          batch.delete(docSnap.ref);
+        const data = docSnap.data();
+        if (data.conversationId === conversationId) {
+          const deletedBy = data.deletedBy || [];
+          if (deletedBy.length > 0 && !deletedBy.includes(user.uid)) {
+            // The other person already deleted it. Now I am deleting it. So we can actually delete the document!
+            batch.delete(docSnap.ref);
+          } else if (!deletedBy.includes(user.uid)) {
+            // Only I am deleting it (soft delete)
+            batch.update(docSnap.ref, {
+              deletedBy: arrayUnion(user.uid)
+            });
+          }
         }
       });
       await batch.commit();

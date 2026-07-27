@@ -24,6 +24,7 @@ export default function ChatHeader({ isStealthMode, contactName, otherUid, conve
   const { user } = useAuth();
   const { otherUserOnline } = usePresence(otherUid);
   const { clearAllMessages } = useMessages(conversationId, otherUid);
+  const [showClearModal, setShowClearModal] = useState(false);
   
 
   const handleLogout = async () => {
@@ -35,9 +36,8 @@ export default function ChatHeader({ isStealthMode, contactName, otherUid, conve
   };
 
   const handleClear = async () => {
-    if (window.confirm(t('clearConfirm'))) {
-      await clearAllMessages();
-    }
+    await clearAllMessages();
+    setShowClearModal(false);
   };
 
   return (
@@ -61,12 +61,38 @@ export default function ChatHeader({ isStealthMode, contactName, otherUid, conve
 
       {/* Right: Clear button */}
       <button
-        onClick={handleClear}
-        className="retro-btn px-3 py-1 text-white font-bold text-sm active:opacity-70 flex items-center gap-1 bg-red-600/80 border-red-800"
+        onClick={() => setShowClearModal(true)}
+        className="retro-btn px-3 py-1 text-white font-bold text-sm active:opacity-70 flex items-center gap-1"
       >
         <Trash2 className="w-4 h-4" />
         <span className="hidden sm:inline">{t('clear')}</span>
       </button>
+
+      {/* Clear Confirmation Modal */}
+      {showClearModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#1e1e1e] border border-[#333] p-6 rounded-2xl shadow-2xl max-w-sm w-full text-center">
+            <h2 className="text-xl font-bold text-white mb-2">{t('clearConfirmTitle')}</h2>
+            <p className="text-gray-300 text-sm mb-6 whitespace-pre-wrap">
+              {t('clearConfirmDesc')}
+            </p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={handleClear}
+                className="retro-btn w-full py-3 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 border-red-800"
+              >
+                {t('clearConfirmBtn')}
+              </button>
+              <button
+                onClick={() => setShowClearModal(false)}
+                className="retro-btn-gray w-full py-3 rounded-xl font-bold text-white"
+              >
+                {t('cancel')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
