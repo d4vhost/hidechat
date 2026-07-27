@@ -38,7 +38,7 @@ export function useMessages(conversationId?: string, receiverId?: string) {
 
       snapshot.forEach((docSnap) => {
         const data = docSnap.data();
-        const expiresAt = data.expiresAt?.toDate();
+        const expiresAt = data.expiresAt?.toDate ? data.expiresAt.toDate() : (data.expiresAt instanceof Date ? data.expiresAt : null);
         
         // 1. Check if expired (24h self-destruct)
         if (expiresAt && expiresAt < now) {
