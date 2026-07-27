@@ -76,7 +76,7 @@ export default function ChatHeader({ isStealthMode, contactName, otherUid, conve
             <h2 className="text-white font-bold text-lg drop-shadow-md text-shadow-sm">{t('clearConfirmTitle')}</h2>
             <button
               onClick={() => setShowClearModal(false)}
-              className="retro-btn-gray px-4 py-1 text-white font-bold text-sm shadow-sm active:opacity-70"
+              className="retro-btn px-3 py-1 text-white font-bold text-sm shadow-sm active:opacity-70"
             >
               {t('cancel')}
             </button>
@@ -89,28 +89,28 @@ export default function ChatHeader({ isStealthMode, contactName, otherUid, conve
             </div>
             
             <p className="text-gray-800 dark:text-gray-200 text-xl font-bold mb-4">
-              ¿Estás seguro de que quieres limpiar este chat?
+              {t('clearConfirmTitle2')}
             </p>
             
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-8 leading-relaxed px-2">
               {t('clearConfirmDesc')}
             </p>
 
-            <div className="bg-white dark:bg-[#1e1e1e] p-5 rounded-2xl border border-gray-300 dark:border-[#333] shadow-sm w-full max-w-sm mb-6 text-left">
+            <div className="w-full max-w-sm mb-6 text-left">
               <h3 className="font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#4b77ad]"></span>
-                Privacidad Local
+                {t('localPrivacy')}
               </h3>
               <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-4">
-                Esta acción elimina todos los datos de esta conversación <b>solo de tu dispositivo</b>. La otra persona aún podrá ver los mensajes.
+                {t('localPrivacyDesc')}
               </p>
               
               <h3 className="font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                Autodestrucción a las 24h
+                {t('autoDestruct')}
               </h3>
               <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                Recuerda que, por seguridad de la red POP Chat, todos los mensajes se <b>autodestruyen permanentemente</b> de nuestros servidores 24 horas después de ser enviados.
+                {t('autoDestructDesc')}
               </p>
             </div>
           </div>
