@@ -485,7 +485,7 @@ export default function LoginPage() {
               <p className="text-sm text-gray-500 mb-6 font-semibold">
                 {t('enterTokenText')}
               </p>
-              <div className="flex justify-center items-center gap-1 sm:gap-2 mb-2 w-full max-w-lg mx-auto">
+              <div className="flex justify-center items-center gap-0.5 sm:gap-2 mb-2 w-full max-w-lg mx-auto">
                 {/* First 3 boxes (POP) */}
                 {tokenParts.slice(0, 3).map((part, i) => (
                   <input
@@ -496,12 +496,12 @@ export default function LoginPage() {
                     onChange={(e) => handleTokenChange(i, e.target.value)}
                     onKeyDown={(e) => handleTokenKeyDown(i, e)}
                     onPaste={handleTokenPaste}
-                    className="w-7 h-10 sm:w-10 sm:h-12 md:w-12 md:h-14 text-center font-bold text-base sm:text-lg border-2 border-gray-400 rounded-md sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
+                    className="flex-1 min-w-0 max-w-[2rem] sm:max-w-[2.5rem] h-9 sm:h-12 text-center font-bold text-sm sm:text-lg border-2 border-gray-400 rounded sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
                     maxLength={2}
                   />
                 ))}
                 
-                <span className="font-bold text-gray-400 mx-1">-</span>
+                <span className="font-bold text-gray-400 shrink-0">-</span>
                 
                 {/* Next 4 boxes */}
                 {tokenParts.slice(3, 7).map((part, i) => (
@@ -513,12 +513,12 @@ export default function LoginPage() {
                     onChange={(e) => handleTokenChange(i + 3, e.target.value)}
                     onKeyDown={(e) => handleTokenKeyDown(i + 3, e)}
                     onPaste={handleTokenPaste}
-                    className="w-7 h-10 sm:w-10 sm:h-12 md:w-12 md:h-14 text-center font-bold text-base sm:text-lg border-2 border-gray-400 rounded-md sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
+                    className="flex-1 min-w-0 max-w-[2rem] sm:max-w-[2.5rem] h-9 sm:h-12 text-center font-bold text-sm sm:text-lg border-2 border-gray-400 rounded sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
                     maxLength={2}
                   />
                 ))}
 
-                <span className="font-bold text-gray-400 mx-1">-</span>
+                <span className="font-bold text-gray-400 shrink-0">-</span>
                 
                 {/* Final 4 boxes */}
                 {tokenParts.slice(7, 11).map((part, i) => (
@@ -530,7 +530,7 @@ export default function LoginPage() {
                     onChange={(e) => handleTokenChange(i + 7, e.target.value)}
                     onKeyDown={(e) => handleTokenKeyDown(i + 7, e)}
                     onPaste={handleTokenPaste}
-                    className="w-7 h-10 sm:w-10 sm:h-12 md:w-12 md:h-14 text-center font-bold text-base sm:text-lg border-2 border-gray-400 rounded-md sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
+                    className="flex-1 min-w-0 max-w-[2rem] sm:max-w-[2.5rem] h-9 sm:h-12 text-center font-bold text-sm sm:text-lg border-2 border-gray-400 rounded sm:rounded-lg bg-white text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all shadow-md"
                     maxLength={2}
                   />
                 ))}
