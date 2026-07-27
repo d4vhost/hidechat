@@ -7,7 +7,7 @@ interface LanguageContextType {
   language: Language;
   toggleLanguage: () => void;
   setLanguage: (lang: Language) => void;
-  t: (key: keyof typeof translations.es) => string;
+  t: (key: keyof typeof translations.en) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
