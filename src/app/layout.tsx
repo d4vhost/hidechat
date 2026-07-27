@@ -12,13 +12,15 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Mensajería Intranet",
-  description: "Chat corporativo privado y seguro",
-  manifest: "/manifest.json",
+  title: "POP Chat",
+  description: "Protocolo Abierto Privado - Chat corporativo seguro",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Intranet",
+    title: "POP Chat",
+  },
+  icons: {
+    apple: "/logo.jpg",
   },
 };
 

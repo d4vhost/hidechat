@@ -2,12 +2,30 @@ import { MetadataRoute } from 'next'
  
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Mensajería Intranet',
-    short_name: 'Intranet',
-    description: 'Chat corporativo seguro',
+    name: 'POP Chat',
+    short_name: 'POP Chat',
+    description: 'Protocolo Abierto Privado - Chat corporativo seguro',
     start_url: '/',
     display: 'standalone',
     background_color: '#000000',
     theme_color: '#000000',
+    icons: [
+      {
+        src: '/logo.jpg',
+        sizes: '192x192',
+        type: 'image/jpeg',
+      },
+      {
+        src: '/logo.jpg',
+        sizes: '512x512',
+        type: 'image/jpeg',
+      },
+      {
+        src: '/logo.jpg',
+        sizes: '180x180',
+        type: 'image/jpeg',
+        purpose: 'apple touch icon'
+      }
+    ]
   }
 }
