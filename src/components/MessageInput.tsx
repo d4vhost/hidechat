@@ -125,7 +125,7 @@ export default function MessageInput({ replyTo, onCancelReply, isStealthMode, co
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
             className={`flex-1 bg-transparent px-4 py-2 focus:outline-none text-[16px] resize-none max-h-32 min-h-[36px] rounded-full ${
-              isStealthMode ? 'text-black/20' : 'text-black'
+              isStealthMode ? 'text-gray-400' : 'text-black'
             }`}
             rows={1}
           />
