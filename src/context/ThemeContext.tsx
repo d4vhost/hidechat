@@ -17,31 +17,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
-    // Verificar localStorage o preferencia del sistema
-    const storedTheme = localStorage.getItem("hidechat-theme") as Theme | null;
-    if (storedTheme) {
-      setTheme(storedTheme);
-    } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      setTheme("dark");
-    }
+    // Dark mode is intentionally disabled per user request
+    document.documentElement.classList.remove("dark");
   }, []);
 
   useEffect(() => {
     if (!mounted) return;
-    
-    // Aplicar clase dark al document element (HTML)
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-    
-    // Guardar en localStorage
-    localStorage.setItem("hidechat-theme", theme);
+    document.documentElement.classList.remove("dark");
   }, [theme, mounted]);
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+    // Disabled
   };
 
   return (

@@ -13,32 +13,26 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguage] = useState<Language>('es');
+  const [language, setLanguage] = useState<Language>('en');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const storedLang = localStorage.getItem('pop-language') as Language;
-    if (storedLang && (storedLang === 'es' || storedLang === 'en')) {
-      setLanguage(storedLang);
-    }
   }, []);
 
   const handleSetLanguage = (lang: Language) => {
-    setLanguage(lang);
-    localStorage.setItem('pop-language', lang);
+    // Disabled
   };
 
   const toggleLanguage = () => {
-    const newLang = language === 'es' ? 'en' : 'es';
-    handleSetLanguage(newLang);
+    // Disabled
   };
 
-  const t = (key: keyof typeof translations.es): string => {
+  const t = (key: keyof typeof translations.en): string => {
     if (!mounted) {
-      return translations['es'][key]; // default during SSR
+      return translations['en'][key];
     }
-    return translations[language][key] || translations['es'][key];
+    return translations['en'][key];
   };
 
   return (

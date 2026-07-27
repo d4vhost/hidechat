@@ -570,16 +570,6 @@ export default function Inbox() {
 
               <div className="bg-white dark:bg-[#1e1e1e] rounded-lg border border-gray-300 dark:border-[#333] overflow-hidden">
                 <div
-                  onClick={() => toggleTheme()}
-                  className="w-full flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-[#333] active:bg-gray-100 dark:active:bg-[#2a2a2a] cursor-pointer"
-                >
-                  <span className="flex items-center gap-2 font-bold"><Sun className="w-5 h-5"/> {t('themeMode')}</span>
-                  <div className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 shadow-inner border ${theme === 'dark' ? 'bg-[#4b77ad] border-[#2d4c75]' : 'bg-gray-300 border-gray-400 dark:bg-gray-600 dark:border-gray-500'}`}>
-                    <div className={`bg-white w-4 h-4 rounded-full shadow-sm transform transition-transform duration-300 ${theme === 'dark' ? 'translate-x-6' : ''}`} />
-                  </div>
-                </div>
-
-                <div
                   onClick={() => handleSetStealthMode(!isStealthMode)}
                   className="w-full flex items-center justify-between px-4 py-3 active:bg-gray-100 dark:active:bg-[#2a2a2a] cursor-pointer"
                 >
