@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     title: "POP Chat",
   },
   icons: {
-    apple: "/logo.jpg",
+    apple: "/icon.jpg",
   },
 };
 
