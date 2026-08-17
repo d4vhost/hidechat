@@ -300,11 +300,12 @@ export default function LoginPage() {
       const keyHash = await hashString(generatedKey, firebaseUser.uid);
 
       // Store public profile data in main document (NO sensitive hashes)
+      // Use merge:true to preserve existing data (contacts, username, etc.) if user re-registers
       await setDoc(doc(db, "users", firebaseUser.uid), {
         phoneNumber: firebaseUser.phoneNumber,
         devices: [deviceInfo],
         createdAt: new Date(),
-      });
+      }, { merge: true });
       
       // Store sensitive credentials in private subcollection
       await setDoc(doc(db, "users", firebaseUser.uid, "private", "credentials"), {

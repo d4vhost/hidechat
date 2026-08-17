@@ -307,7 +307,13 @@ export default function Inbox() {
       setPhoneDigits(Array(9).fill(''));
       setAddFriendAlias("");
     } catch (err: any) {
-      setAddFriendError(err.message);
+      // If the error is "already friends", the auto-repair in sendRequest
+      // has already restored the contact. Show as success instead of error.
+      if (err.message === t('alreadyFriends')) {
+        setAddFriendSuccess(err.message);
+      } else {
+        setAddFriendError(err.message);
+      }
     }
   };
 

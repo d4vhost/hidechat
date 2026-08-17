@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { db } from "@/lib/firebase";
-import { collection, query, where, onSnapshot, getDocs, doc, setDoc, deleteDoc, updateDoc, arrayUnion, serverTimestamp } from "firebase/firestore";
+import { collection, query, where, onSnapshot, getDocs, getDoc, doc, setDoc, deleteDoc, updateDoc, arrayUnion, serverTimestamp } from "firebase/firestore";
 import { useAuth } from "./useAuth";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -73,8 +73,32 @@ export function useFriendRequests() {
       throw new Error(t('cantAddSelf'));
     }
     
+    // Check friendship in BOTH directions
     const targetUserData = targetUserDoc.data();
-    if (targetUserData.contacts && targetUserData.contacts.includes(user.uid)) {
+    const targetHasMe = targetUserData.contacts && targetUserData.contacts.includes(user.uid);
+    
+    const myDoc = await getDoc(doc(db, "users", user.uid));
+    const myData = myDoc.data();
+    const iHaveTarget = myData?.contacts && myData.contacts.includes(targetUserId);
+    
+    if (targetHasMe && iHaveTarget) {
+      // Both sides have each other - truly already friends
+      throw new Error(t('alreadyFriends'));
+    }
+    
+    if (targetHasMe || iHaveTarget) {
+      // One-sided friendship (caused by re-registration wiping contacts)
+      // Auto-repair: add the missing side
+      if (!iHaveTarget) {
+        await updateDoc(doc(db, "users", user.uid), {
+          contacts: arrayUnion(targetUserId)
+        });
+      }
+      if (!targetHasMe) {
+        await updateDoc(doc(db, "users", targetUserId), {
+          contacts: arrayUnion(user.uid)
+        });
+      }
       throw new Error(t('alreadyFriends'));
     }
 
