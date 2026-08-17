@@ -3,9 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useMessages } from "@/hooks/useMessages";
 import { useTyping } from "@/hooks/useTyping";
-import { Smile, X } from "lucide-react";
+import { Smile, X, Camera } from "lucide-react";
 import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { compressImage } from "@/lib/imageUtils";
 
 interface MessageInputProps {
   replyTo?: any;
@@ -20,11 +21,12 @@ export default function MessageInput({ replyTo, onCancelReply, isStealthMode, co
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const { sendMessage } = useMessages(conversationId, receiverId);
+  const { sendMessage, sendImage } = useMessages(conversationId, receiverId);
   const { setTyping } = useTyping(receiverId, conversationId);
   const pickerRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isTypingRef = useRef(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Debounce typing status - only write to Firestore when state changes
   useEffect(() => {
@@ -88,6 +90,25 @@ export default function MessageInput({ replyTo, onCancelReply, isStealthMode, co
     }
   };
 
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || sending) return;
+
+    // Reset file input so the same file can be selected again
+    e.target.value = "";
+
+    setSending(true);
+    try {
+      const compressed = await compressImage(file);
+      await sendImage(compressed);
+    } catch (error: any) {
+      console.error("Error sending image:", error);
+      alert("Error sending image: " + error.message);
+    } finally {
+      setSending(false);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -131,6 +152,17 @@ export default function MessageInput({ replyTo, onCancelReply, isStealthMode, co
           />
         </div>
       )}
+
+      {/* Hidden file input for images */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleImageSelect}
+        className="hidden"
+      />
+
       <form onSubmit={handleSend} className="max-w-4xl w-full mx-auto flex items-end space-x-2">
         <div className="flex-1 retro-input-field bg-white rounded-full flex items-center pr-2">
           <textarea
@@ -143,6 +175,14 @@ export default function MessageInput({ replyTo, onCancelReply, isStealthMode, co
             }`}
             rows={1}
           />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={sending}
+            className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+          >
+            <Camera className="w-5 h-5" />
+          </button>
           <button
             type="button"
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}

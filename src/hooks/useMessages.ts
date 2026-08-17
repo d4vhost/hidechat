@@ -12,7 +12,8 @@ import {
   getDocs,
   writeBatch,
   or,
-  arrayUnion
+  arrayUnion,
+  deleteField
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Message } from "@/types/message";
@@ -106,7 +107,8 @@ export function useMessages(conversationId?: string, receiverId?: string) {
       expiresAt: expiresAt,
       deliveredAt: null,
       readAt: null,
-      status: "sent"
+      status: "sent",
+      type: "text"
     };
 
     if (replyTo) {
@@ -114,6 +116,40 @@ export function useMessages(conversationId?: string, receiverId?: string) {
     }
 
     await addDoc(collection(db, "messages"), messageData);
+  };
+
+  const sendImage = async (imageBase64: string) => {
+    if (!user || !conversationId || !receiverId) return;
+
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24);
+
+    await addDoc(collection(db, "messages"), {
+      conversationId: conversationId,
+      senderId: user.uid,
+      receiverId,
+      text: "📷 Photo",
+      createdAt: serverTimestamp(),
+      expiresAt: expiresAt,
+      deliveredAt: null,
+      readAt: null,
+      status: "sent",
+      type: "image",
+      imageData: imageBase64,
+      imageViewed: false
+    });
+  };
+
+  const viewImage = async (messageId: string) => {
+    if (!user || !messageId) return;
+    const msgRef = doc(db, "messages", messageId);
+    await updateDoc(msgRef, {
+      imageData: "",
+      imageViewed: true,
+      text: "📷 Photo opened",
+      status: "read",
+      readAt: serverTimestamp()
+    });
   };
 
   const markAsRead = async () => {
@@ -172,5 +208,5 @@ export function useMessages(conversationId?: string, receiverId?: string) {
     }
   };
 
-  return { messages, sendMessage, markAsRead, clearAllMessages };
+  return { messages, sendMessage, sendImage, viewImage, markAsRead, clearAllMessages };
 }

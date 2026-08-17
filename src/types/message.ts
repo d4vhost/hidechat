@@ -17,6 +17,10 @@ export interface Message {
     senderName: string;
   };
   deletedBy?: string[];
+  // View-once image fields
+  type?: 'text' | 'image';
+  imageData?: string;       // Base64 compressed image data
+  imageViewed?: boolean;    // true after receiver opens the image
 }
 
 export interface UserPresence {
