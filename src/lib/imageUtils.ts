@@ -2,7 +2,7 @@
  * Compresses an image file to a Base64 string suitable for Firestore storage.
  * Max dimensions: 800x800, JPEG quality: 0.5, target size: ~150KB
  */
-export function compressImage(file: File, maxSize = 800, quality = 0.5): Promise<string> {
+export function compressImage(file: File | Blob, maxSize = 800, quality = 0.5): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = () => reject(new Error("Failed to read file"));
@@ -51,4 +51,31 @@ export function compressImage(file: File, maxSize = 800, quality = 0.5): Promise
     };
     reader.readAsDataURL(file);
   });
+}
+
+/**
+ * Converts a File to a Base64 data URL string.
+ * For non-image files (PDFs, docs, etc.)
+ * Max size: ~500KB after encoding
+ */
+export function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    if (file.size > 500 * 1024) {
+      reject(new Error("File too large. Maximum size is 500KB."));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Failed to read file"));
+    reader.onload = () => resolve(reader.result as string);
+    reader.readAsDataURL(file);
+  });
+}
+
+/**
+ * Formats a file size in bytes to a human-readable string
+ */
+export function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
 }

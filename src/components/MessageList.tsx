@@ -5,7 +5,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useMessages } from "@/hooks/useMessages";
 import { useTyping } from "@/hooks/useTyping";
 import { useChatColor } from "@/hooks/useChatColor";
-import { Reply, Camera, Eye } from "lucide-react";
+import { Reply, Camera, Eye, File as FileIcon } from "lucide-react";
+import { formatFileSize } from "@/lib/imageUtils";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface MessageListProps {
@@ -53,7 +54,8 @@ function ImageBubble({ msg, isMine, dateObj, userId, viewImage }: {
   const [showViewer, setShowViewer] = useState(false);
   const hasImage = msg.imageData && msg.imageData.length > 0;
   const isViewed = msg.imageViewed === true;
-  const canView = !isMine && hasImage && !isViewed;
+  // Now sender can also view the image, but it doesn't destroy it for the sender
+  const canView = hasImage && (!isViewed || isMine);
 
   const handleOpen = () => {
     if (canView) {
@@ -63,8 +65,8 @@ function ImageBubble({ msg, isMine, dateObj, userId, viewImage }: {
 
   const handleClose = async () => {
     setShowViewer(false);
-    // Destroy the image after viewing
-    if (msg.id) {
+    // Destroy the image after viewing only if I am the receiver
+    if (msg.id && !isMine && !isViewed) {
       try {
         await viewImage(msg.id);
       } catch (e) {
@@ -74,12 +76,12 @@ function ImageBubble({ msg, isMine, dateObj, userId, viewImage }: {
   };
 
   return (
-    <>
+    <div className={`flex items-center relative ${isMine ? 'justify-end' : 'justify-start'}`}>
       {showViewer && hasImage && (
         <ImageViewerModal imageData={msg.imageData} onClose={handleClose} />
       )}
       <div 
-        className={`px-4 py-3 ${
+        className={`max-w-[85%] sm:max-w-[75%] px-4 py-3 z-10 ${
           isMine 
             ? 'retro-bubble-green rounded-2xl rounded-br-sm' 
             : 'retro-bubble-gray rounded-2xl rounded-bl-sm'
@@ -87,27 +89,36 @@ function ImageBubble({ msg, isMine, dateObj, userId, viewImage }: {
         onClick={handleOpen}
       >
         {/* Image content */}
-        {isViewed || !hasImage ? (
-          // Image was already viewed or destroyed
+        {isViewed && !isMine ? (
+          // Receiver viewed it and it's destroyed
           <div className="flex items-center gap-2 py-1">
-            <Eye className={`w-4 h-4 ${isMine ? 'text-white/70' : 'text-gray-500'}`} />
-            <span className={`text-sm italic ${isMine ? 'text-white/80' : 'text-gray-600'}`}>
+            <Eye className="w-4 h-4 text-gray-500" />
+            <span className="text-sm italic text-gray-600">
               📷 Photo opened
             </span>
           </div>
-        ) : isMine ? (
-          // Sender sees a placeholder (can't open their own image)
-          <div className="flex items-center gap-2 py-1">
-            <Camera className="w-4 h-4 text-white/70" />
-            <span className="text-sm text-white/80">📷 Photo</span>
-          </div>
         ) : (
-          // Receiver can tap to view
-          <div className="flex flex-col items-center gap-2 py-2">
-            <div className="w-16 h-16 bg-black/20 rounded-xl flex items-center justify-center border border-black/10">
-              <Camera className="w-8 h-8 text-gray-600" />
+          // Sender or Receiver can see thumbnail
+          <div className="flex flex-col items-start gap-2 py-1">
+            <div className="relative w-48 h-48 sm:w-64 sm:h-64 rounded-xl overflow-hidden bg-black/10 border border-black/10">
+               {hasImage ? (
+                 <>
+                   <img src={msg.imageData} alt="Photo" className={`w-full h-full object-cover ${!isMine && !isViewed ? 'blur-md scale-110' : ''}`} />
+                   {!isMine && !isViewed && (
+                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/20">
+                        <div className="bg-black/50 rounded-full p-3 mb-2">
+                          <Eye className="w-6 h-6 text-white" />
+                        </div>
+                        <span className="text-white font-bold text-sm drop-shadow-md">Tap to view</span>
+                     </div>
+                   )}
+                 </>
+               ) : (
+                 <div className="w-full h-full flex items-center justify-center text-gray-500">
+                    <Camera className="w-8 h-8 opacity-50" />
+                 </div>
+               )}
             </div>
-            <span className="text-xs font-bold text-gray-700">Tap to view</span>
           </div>
         )}
 
@@ -125,7 +136,7 @@ function ImageBubble({ msg, isMine, dateObj, userId, viewImage }: {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -211,6 +222,63 @@ const SwipeableMessage = ({ msg, isMine, color, dateObj, onReply, contactName, i
   );
 };
 
+// ---- File Bubble Component ----
+function FileBubble({ msg, isMine, dateObj }: { 
+  msg: any; 
+  isMine: boolean; 
+  dateObj: Date;
+}) {
+  const handleDownload = () => {
+    if (!msg.fileData || !msg.fileName) return;
+    const a = document.createElement("a");
+    a.href = msg.fileData;
+    a.download = msg.fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  return (
+    <div className={`flex items-center relative ${isMine ? 'justify-end' : 'justify-start'}`}>
+      <div 
+        className={`max-w-[85%] sm:max-w-[75%] px-4 py-3 z-10 cursor-pointer active:opacity-80 transition-opacity ${
+          isMine 
+            ? 'retro-bubble-green rounded-2xl rounded-br-sm' 
+            : 'retro-bubble-gray rounded-2xl rounded-bl-sm'
+        }`}
+        onClick={handleDownload}
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-black/10 rounded-lg flex items-center justify-center shrink-0">
+            <FileIcon className={`w-5 h-5 ${isMine ? 'text-white/80' : 'text-gray-600'}`} />
+          </div>
+          <div className="flex flex-col min-w-0">
+            <span className={`text-sm font-bold truncate ${isMine ? 'text-white' : 'text-gray-800'}`}>
+              {msg.fileName || "File"}
+            </span>
+            <span className={`text-xs ${isMine ? 'text-white/70' : 'text-gray-500'}`}>
+              {msg.fileSize ? formatFileSize(msg.fileSize) : "Unknown size"}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex justify-end items-center mt-2 space-x-1">
+          <span className={`text-[10px] ${isMine ? 'text-white/70' : 'text-gray-500'}`}>
+            {dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+          </span>
+          {isMine && (
+            <span className="text-[10px] flex items-center h-3">
+              {msg.status === "sent" && "✓"}
+              {msg.status === "delivered" && "✓✓"}
+              {msg.status === "read" && <span className="text-white font-bold">✓✓</span>}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function MessageList({ onReply, isStealthMode, conversationId, receiverId, contactName }: MessageListProps) {
   const { t } = useLanguage();
   const { user } = useAuth();
@@ -250,32 +318,42 @@ export default function MessageList({ onReply, isStealthMode, conversationId, re
           {messages.map((msg) => {
             const isMine = msg.senderId === user?.uid;
             const dateObj = msg.createdAt?.toDate ? msg.createdAt.toDate() : new Date();
-            const isImageMsg = msg.type === 'image';
+            
+            if (msg.type === 'image') {
+              return (
+                <ImageBubble 
+                  key={msg.id}
+                  msg={msg}
+                  isMine={isMine}
+                  dateObj={dateObj}
+                  userId={user?.uid || ""}
+                  viewImage={viewImage}
+                />
+              );
+            }
+
+            if (msg.type === 'file') {
+              return (
+                <FileBubble 
+                  key={msg.id}
+                  msg={msg}
+                  isMine={isMine}
+                  dateObj={dateObj}
+                />
+              );
+            }
             
             return (
-              <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                <div className="max-w-[85%] sm:max-w-[75%]">
-                  {isImageMsg ? (
-                    <ImageBubble 
-                      msg={msg}
-                      isMine={isMine}
-                      dateObj={dateObj}
-                      userId={user?.uid || ""}
-                      viewImage={viewImage}
-                    />
-                  ) : (
-                    <SwipeableMessage 
-                      msg={msg} 
-                      isMine={isMine} 
-                      color={color} 
-                      dateObj={dateObj} 
-                      onReply={onReply}
-                      contactName={contactName}
-                      isStealthMode={isStealthMode}
-                    />
-                  )}
-                </div>
-              </div>
+              <SwipeableMessage 
+                key={msg.id}
+                msg={msg} 
+                isMine={isMine} 
+                color={color} 
+                dateObj={dateObj} 
+                onReply={onReply}
+                contactName={contactName}
+                isStealthMode={isStealthMode}
+              />
             );
           })}
           {isOtherTyping && (
