@@ -152,6 +152,30 @@ export function useMessages(conversationId?: string, receiverId?: string) {
     });
   };
 
+  const sendFile = async (fileBase64: string, fileName: string, fileType: string, fileSize: number) => {
+    if (!user || !conversationId || !receiverId) return;
+
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24);
+
+    await addDoc(collection(db, "messages"), {
+      conversationId: conversationId,
+      senderId: user.uid,
+      receiverId,
+      text: `📎 ${fileName}`,
+      createdAt: serverTimestamp(),
+      expiresAt: expiresAt,
+      deliveredAt: null,
+      readAt: null,
+      status: "sent",
+      type: "file",
+      fileData: fileBase64,
+      fileName,
+      fileType,
+      fileSize
+    });
+  };
+
   const markAsRead = async () => {
     if (!user) return;
     
@@ -208,5 +232,5 @@ export function useMessages(conversationId?: string, receiverId?: string) {
     }
   };
 
-  return { messages, sendMessage, sendImage, viewImage, markAsRead, clearAllMessages };
+  return { messages, sendMessage, sendImage, sendFile, viewImage, markAsRead, clearAllMessages };
 }
