@@ -101,7 +101,7 @@ export default function MessageList({ onReply, isStealthMode, conversationId, re
   const { t } = useLanguage();
   const { user } = useAuth();
   const { messages, markAsRead } = useMessages(conversationId, receiverId);
-  const { isOtherTyping } = useTyping(receiverId);
+  const { isOtherTyping } = useTyping(receiverId, conversationId);
   const { color } = useChatColor();
   const bottomRef = useRef<HTMLDivElement>(null);
 
