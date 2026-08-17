@@ -21,17 +21,31 @@ export default function MessageInput({ replyTo, onCancelReply, isStealthMode, co
   const [sending, setSending] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const { sendMessage } = useMessages(conversationId, receiverId);
-  const { setTyping } = useTyping(receiverId);
+  const { setTyping } = useTyping(receiverId, conversationId);
   const pickerRef = useRef<HTMLDivElement>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isTypingRef = useRef(false);
 
-  // Debounce typing status
+  // Debounce typing status - only write to Firestore when state changes
   useEffect(() => {
     if (text.trim().length > 0) {
-      setTyping(true);
-      const timeout = setTimeout(() => setTyping(false), 2000);
-      return () => clearTimeout(timeout);
+      // Only set typing=true if not already typing (avoid repeated writes)
+      if (!isTypingRef.current) {
+        isTypingRef.current = true;
+        setTyping(true);
+      }
+      // Reset the auto-clear timeout
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => {
+        isTypingRef.current = false;
+        setTyping(false);
+      }, 2500);
     } else {
-      setTyping(false);
+      if (isTypingRef.current) {
+        isTypingRef.current = false;
+        setTyping(false);
+      }
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     }
   }, [text, setTyping]);
 

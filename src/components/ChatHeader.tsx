@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/hooks/useAuth";
 import { usePresence } from "@/hooks/usePresence";
+import { useTyping } from "@/hooks/useTyping";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 import { User, LogOut, Settings, Menu, X, EyeOff, Eye, ChevronLeft, Moon, Sun, Trash2 } from "lucide-react";
@@ -23,6 +24,7 @@ export default function ChatHeader({ isStealthMode, contactName, otherUid, conve
   const { t } = useLanguage();
   const { user } = useAuth();
   const { otherUserOnline } = usePresence(otherUid);
+  const { isOtherTyping } = useTyping(otherUid, conversationId);
   const { clearAllMessages } = useMessages(conversationId, otherUid);
   const [showClearModal, setShowClearModal] = useState(false);
   
@@ -54,8 +56,8 @@ export default function ChatHeader({ isStealthMode, contactName, otherUid, conve
         <p className={`text-white font-bold text-lg leading-tight truncate drop-shadow-md text-shadow-sm transition-all duration-300 ${isStealthMode ? 'blur-[5px] hover:blur-none active:blur-none' : ''}`}>
           {contactName}
         </p>
-        <span className={`text-[11px] leading-none font-bold ${otherUserOnline ? 'text-[#a4e565]' : 'text-gray-300'}`}>
-          {otherUserOnline ? t('online') : t('offline')}
+        <span className={`text-[11px] leading-none font-bold ${isOtherTyping ? 'text-[#a4e565]' : otherUserOnline ? 'text-[#a4e565]' : 'text-gray-300'}`}>
+          {isOtherTyping ? t('isTyping') || 'Typing...' : otherUserOnline ? t('online') : t('offline')}
         </span>
       </div>
 
