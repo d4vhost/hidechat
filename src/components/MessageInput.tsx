@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMessages } from "@/hooks/useMessages";
 import { useTyping } from "@/hooks/useTyping";
 import { Smile, X, Camera, Paperclip, Image as ImageIcon, File as FileIcon, Send } from "lucide-react";
 import EmojiPicker, { Theme, EmojiClickData } from "emoji-picker-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { compressImage, fileToBase64, formatFileSize } from "@/lib/imageUtils";
+import { compressImage, fileToBase64 } from "@/lib/imageUtils";
 
 interface MessageInputProps {
   replyTo?: any;
@@ -14,9 +14,11 @@ interface MessageInputProps {
   isStealthMode?: boolean;
   conversationId: string;
   receiverId: string;
+  droppedFile?: { data: string; type: 'image' | 'file'; name: string; rawFile?: File } | null;
+  onDroppedFileHandled?: () => void;
 }
 
-// ---- Image/File Preview Modal (Telegram-style) ----
+// ---- Preview Modal (Telegram-style) ----
 function PreviewModal({ previewData, previewType, previewFileName, caption, onCaptionChange, onSend, onCancel, sending }: {
   previewData: string;
   previewType: 'image' | 'file';
@@ -44,7 +46,7 @@ function PreviewModal({ previewData, previewType, previewFileName, caption, onCa
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onClick={onCancel}>
+    <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={onCancel}>
       <div 
         className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden"
         onClick={(e) => e.stopPropagation()}
@@ -72,8 +74,8 @@ function PreviewModal({ previewData, previewType, previewFileName, caption, onCa
             </div>
           ) : (
             <div className="flex items-center gap-3 bg-gray-100 dark:bg-gray-800 rounded-xl p-4">
-              <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/50 rounded-xl flex items-center justify-center">
-                <FileIcon className="w-6 h-6 text-orange-600" />
+              <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-xl flex items-center justify-center">
+                <FileIcon className="w-6 h-6 text-gray-500" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">{previewFileName || 'File'}</div>
@@ -91,12 +93,12 @@ function PreviewModal({ previewData, previewType, previewFileName, caption, onCa
             onChange={(e) => onCaptionChange(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Add a caption..."
-            className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-2.5 text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/50 border border-gray-200 dark:border-gray-700"
+            className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full px-4 py-2.5 text-sm text-gray-800 dark:text-gray-200 focus:outline-none border border-gray-200 dark:border-gray-700"
           />
           <button
             onClick={onSend}
             disabled={sending}
-            className="w-10 h-10 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center text-white disabled:opacity-50 transition-colors shrink-0"
+            className="w-10 h-10 bg-[#4a9d06] hover:bg-[#3d8405] rounded-full flex items-center justify-center text-white disabled:opacity-50 transition-colors shrink-0"
           >
             {sending ? (
               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -110,13 +112,12 @@ function PreviewModal({ previewData, previewType, previewFileName, caption, onCa
   );
 }
 
-export default function MessageInput({ replyTo, onCancelReply, isStealthMode, conversationId, receiverId }: MessageInputProps) {
+export default function MessageInput({ replyTo, onCancelReply, isStealthMode, conversationId, receiverId, droppedFile, onDroppedFileHandled }: MessageInputProps) {
   const { t } = useLanguage();
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
 
   // Preview state
   const [previewData, setPreviewData] = useState<string | null>(null);
@@ -138,7 +139,27 @@ export default function MessageInput({ replyTo, onCancelReply, isStealthMode, co
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const dropZoneRef = useRef<HTMLDivElement>(null);
+
+  // Handle dropped file from parent (chat page)
+  useEffect(() => {
+    if (droppedFile) {
+      setPreviewData(droppedFile.data);
+      setPreviewType(droppedFile.type);
+      setPreviewFileName(droppedFile.name);
+      if (droppedFile.type === 'file' && droppedFile.rawFile) {
+        setPreviewFileData({ 
+          base64: droppedFile.data, 
+          name: droppedFile.name, 
+          type: droppedFile.rawFile.type, 
+          size: droppedFile.rawFile.size 
+        });
+      } else {
+        setPreviewFileData(null);
+      }
+      setCaption("");
+      onDroppedFileHandled?.();
+    }
+  }, [droppedFile, onDroppedFileHandled]);
 
   // Debounce typing status
   useEffect(() => {
@@ -174,84 +195,6 @@ export default function MessageInput({ replyTo, onCancelReply, isStealthMode, co
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // ---- Drag & Drop ----
-  useEffect(() => {
-    const zone = dropZoneRef.current;
-    if (!zone) return;
-
-    let dragCounter = 0;
-
-    const handleDragEnter = (e: DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      dragCounter++;
-      if (e.dataTransfer?.types.includes('Files')) {
-        setIsDragging(true);
-      }
-    };
-
-    const handleDragLeave = (e: DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      dragCounter--;
-      if (dragCounter <= 0) {
-        dragCounter = 0;
-        setIsDragging(false);
-      }
-    };
-
-    const handleDragOver = (e: DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-    };
-
-    const handleDrop = async (e: DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      dragCounter = 0;
-      setIsDragging(false);
-
-      const file = e.dataTransfer?.files?.[0];
-      if (!file) return;
-
-      if (file.type.startsWith('image/')) {
-        try {
-          const compressed = await compressImage(file);
-          setPreviewData(compressed);
-          setPreviewType('image');
-          setPreviewFileName(file.name);
-          setPreviewFileData(null);
-          setCaption("");
-        } catch (err) {
-          console.error("Error processing dropped image:", err);
-        }
-      } else {
-        try {
-          const base64 = await fileToBase64(file);
-          setPreviewData(base64);
-          setPreviewType('file');
-          setPreviewFileName(file.name);
-          setPreviewFileData({ base64, name: file.name, type: file.type, size: file.size });
-          setCaption("");
-        } catch (err: any) {
-          alert(err.message || "Error processing file");
-        }
-      }
-    };
-
-    zone.addEventListener('dragenter', handleDragEnter);
-    zone.addEventListener('dragleave', handleDragLeave);
-    zone.addEventListener('dragover', handleDragOver);
-    zone.addEventListener('drop', handleDrop);
-
-    return () => {
-      zone.removeEventListener('dragenter', handleDragEnter);
-      zone.removeEventListener('dragleave', handleDragLeave);
-      zone.removeEventListener('dragover', handleDragOver);
-      zone.removeEventListener('drop', handleDrop);
-    };
   }, []);
 
   const handleSend = async (e?: React.FormEvent) => {
@@ -377,7 +320,7 @@ export default function MessageInput({ replyTo, onCancelReply, isStealthMode, co
   };
 
   return (
-    <div ref={dropZoneRef} className="retro-input-bar p-3 sm:p-4 shrink-0 relative flex flex-col">
+    <div className="retro-input-bar p-3 sm:p-4 shrink-0 relative flex flex-col">
       {/* Preview Modal */}
       {previewData && (
         <PreviewModal
@@ -390,16 +333,6 @@ export default function MessageInput({ replyTo, onCancelReply, isStealthMode, co
           onCancel={handlePreviewCancel}
           sending={sending}
         />
-      )}
-
-      {/* Drag Overlay */}
-      {isDragging && (
-        <div className="fixed inset-0 z-[90] bg-green-500/10 border-4 border-dashed border-green-500 flex items-center justify-center pointer-events-none">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl px-8 py-6 text-center">
-            <Paperclip className="w-10 h-10 text-green-500 mx-auto mb-2" />
-            <p className="text-lg font-bold text-gray-700 dark:text-gray-200">Drop here to send</p>
-          </div>
-        </div>
       )}
 
       {/* Reply Preview Box */}
@@ -435,7 +368,7 @@ export default function MessageInput({ replyTo, onCancelReply, isStealthMode, co
         </div>
       )}
 
-      {/* Attachment Menu - positioned right above the button */}
+      {/* Attachment Menu */}
       {showAttachmentMenu && (
         <div ref={menuRef} className="absolute bottom-[calc(100%-4px)] left-3 z-50 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 py-1 w-44 fade-in">
           <button 
@@ -443,7 +376,7 @@ export default function MessageInput({ replyTo, onCancelReply, isStealthMode, co
             className="w-full flex items-center px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
             onClick={() => { setShowAttachmentMenu(false); cameraInputRef.current?.click(); }}
           >
-            <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mr-2.5 text-blue-600 dark:text-blue-400">
+            <div className="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mr-2.5 text-gray-600 dark:text-gray-300">
               <Camera className="w-3.5 h-3.5" />
             </div>
             <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Take Photo</span>
@@ -454,7 +387,7 @@ export default function MessageInput({ replyTo, onCancelReply, isStealthMode, co
             className="w-full flex items-center px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
             onClick={() => { setShowAttachmentMenu(false); fileInputRef.current?.click(); }}
           >
-            <div className="w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center mr-2.5 text-purple-600 dark:text-purple-400">
+            <div className="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mr-2.5 text-gray-600 dark:text-gray-300">
               <ImageIcon className="w-3.5 h-3.5" />
             </div>
             <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Select Photo</span>
@@ -465,7 +398,7 @@ export default function MessageInput({ replyTo, onCancelReply, isStealthMode, co
             className="w-full flex items-center px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
             onClick={() => { setShowAttachmentMenu(false); documentInputRef.current?.click(); }}
           >
-            <div className="w-7 h-7 rounded-full bg-orange-100 dark:bg-orange-900/50 flex items-center justify-center mr-2.5 text-orange-600 dark:text-orange-400">
+            <div className="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mr-2.5 text-gray-600 dark:text-gray-300">
               <FileIcon className="w-3.5 h-3.5" />
             </div>
             <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Attach File</span>
