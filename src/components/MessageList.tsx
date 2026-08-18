@@ -44,12 +44,13 @@ function ImageViewerModal({ imageData, onClose }: { imageData: string; onClose: 
 }
 
 // ---- Image Bubble Component ----
-function ImageBubble({ msg, isMine, dateObj, userId, viewImage }: { 
+function ImageBubble({ msg, isMine, dateObj, userId, viewImage, isStealthMode }: { 
   msg: any; 
   isMine: boolean; 
   dateObj: Date;
   userId: string;
   viewImage: (id: string) => Promise<void>;
+  isStealthMode?: boolean;
 }) {
   const [showViewer, setShowViewer] = useState(false);
   const hasImage = msg.imageData && msg.imageData.length > 0;
@@ -81,7 +82,7 @@ function ImageBubble({ msg, isMine, dateObj, userId, viewImage }: {
         <ImageViewerModal imageData={msg.imageData} onClose={handleClose} />
       )}
       <div 
-        className={`max-w-[85%] sm:max-w-[75%] overflow-hidden z-10 ${
+        className={`max-w-[85%] sm:max-w-[75%] overflow-hidden z-10 transition-all duration-300 ${isStealthMode ? 'blur-[5px] hover:blur-none active:blur-none' : ''} ${
           isMine 
             ? 'rounded-2xl rounded-br-sm' 
             : 'rounded-2xl rounded-bl-sm'
@@ -240,10 +241,11 @@ const SwipeableMessage = ({ msg, isMine, color, dateObj, onReply, contactName, i
 };
 
 // ---- File Bubble Component ----
-function FileBubble({ msg, isMine, dateObj }: { 
+function FileBubble({ msg, isMine, dateObj, isStealthMode }: { 
   msg: any; 
   isMine: boolean; 
   dateObj: Date;
+  isStealthMode?: boolean;
 }) {
   const handleDownload = () => {
     if (!msg.fileData || !msg.fileName) return;
@@ -260,7 +262,7 @@ function FileBubble({ msg, isMine, dateObj }: {
   return (
     <div className={`flex items-center relative ${isMine ? 'justify-end' : 'justify-start'}`}>
       <div 
-        className={`max-w-[85%] sm:max-w-[75%] px-4 py-3 z-10 cursor-pointer active:opacity-80 transition-opacity ${
+        className={`max-w-[85%] sm:max-w-[75%] px-4 py-3 z-10 cursor-pointer active:opacity-80 transition-all duration-300 ${isStealthMode ? 'blur-[5px] hover:blur-none active:blur-none' : ''} ${
           isMine 
             ? 'retro-bubble-green rounded-2xl rounded-br-sm' 
             : 'retro-bubble-gray rounded-2xl rounded-bl-sm'
@@ -353,6 +355,7 @@ export default function MessageList({ onReply, isStealthMode, conversationId, re
                   dateObj={dateObj}
                   userId={user?.uid || ""}
                   viewImage={viewImage}
+                  isStealthMode={isStealthMode}
                 />
               );
             }
@@ -364,6 +367,7 @@ export default function MessageList({ onReply, isStealthMode, conversationId, re
                   msg={msg}
                   isMine={isMine}
                   dateObj={dateObj}
+                  isStealthMode={isStealthMode}
                 />
               );
             }
