@@ -244,8 +244,8 @@ const SwipeableMessage = ({ msg, isMine, color, dateObj, onReply, contactName, i
         <div 
           className={`px-4 py-2 transition-all duration-300 ${isStealthMode ? 'blur-[5px] hover:blur-none active:blur-none' : ''} ${
             isMine 
-              ? \`retro-bubble-green rounded-2xl rounded-br-sm\` 
-              : \`retro-bubble-gray rounded-2xl rounded-bl-sm\`
+              ? `retro-bubble-green rounded-2xl rounded-br-sm` 
+              : `retro-bubble-gray rounded-2xl rounded-bl-sm`
           }`}
         >
           <MessageMenu onReply={() => onReply({ id: msg.id, text: msg.text, senderName: contactName })} isMine={isMine} />
@@ -311,7 +311,7 @@ function FileBubble({ msg, isMine, dateObj, isStealthMode, onReply, contactName 
         }`}
         onClick={handleDownload}
       >
-        <MessageMenu onReply={() => onReply({ id: msg.id, text: captionText || \`📎 \${msg.fileName || 'File'}\`, senderName: contactName })} isMine={isMine} />
+        <MessageMenu onReply={() => onReply({ id: msg.id, text: captionText || `📎 ${msg.fileName || 'File'}`, senderName: contactName })} isMine={isMine} />
 
         <div className="flex items-center gap-3 pr-4">
           <div className="w-10 h-10 bg-black/10 rounded-lg flex items-center justify-center shrink-0">
