@@ -44,13 +44,15 @@ function ImageViewerModal({ imageData, onClose }: { imageData: string; onClose: 
 }
 
 // ---- Image Bubble Component ----
-function ImageBubble({ msg, isMine, dateObj, userId, viewImage, isStealthMode }: { 
+function ImageBubble({ msg, isMine, dateObj, userId, viewImage, isStealthMode, onReply, contactName }: { 
   msg: any; 
   isMine: boolean; 
   dateObj: Date;
   userId: string;
   viewImage: (id: string) => Promise<void>;
   isStealthMode?: boolean;
+  onReply: (msg: any) => void;
+  contactName: string;
 }) {
   const [showViewer, setShowViewer] = useState(false);
   const hasImage = msg.imageData && msg.imageData.length > 0;
@@ -77,7 +79,19 @@ function ImageBubble({ msg, isMine, dateObj, userId, viewImage, isStealthMode }:
   const captionText = msg.text && msg.text !== 'Photo' && msg.text !== '📷 Photo' ? msg.text : null;
 
   return (
-    <div className={`flex items-center relative ${isMine ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex items-center relative group ${isMine ? 'justify-end' : 'justify-start'}`}>
+      
+      {/* Quick Reply Arrow */}
+      {!isMine && (
+        <button
+          onClick={() => onReply({ id: msg.id, text: captionText || '📷 Photo', senderName: contactName })}
+          className="absolute left-[calc(100%+8px)] sm:opacity-0 sm:group-hover:opacity-100 opacity-100 top-2 p-1.5 text-gray-400 hover:text-[#4a9d06] bg-white/50 hover:bg-white rounded-full shadow-sm transition-all z-20"
+          title="Reply"
+        >
+          <Reply className="w-4 h-4" />
+        </button>
+      )}
+
       {showViewer && hasImage && (
         <ImageViewerModal imageData={msg.imageData} onClose={handleClose} />
       )}
@@ -185,7 +199,18 @@ const SwipeableMessage = ({ msg, isMine, color, dateObj, onReply, contactName, i
   };
 
   return (
-    <div className={`flex items-center relative ${isMine ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex items-center relative group ${isMine ? 'justify-end' : 'justify-start'}`}>
+      
+      {/* Quick Reply Arrow (Visible on hover/tap for the other person's messages) */}
+      {!isMine && (
+        <button
+          onClick={() => onReply({ id: msg.id, text: msg.text, senderName: contactName })}
+          className="absolute left-[calc(100%+8px)] sm:opacity-0 sm:group-hover:opacity-100 opacity-100 top-2 p-1.5 text-gray-400 hover:text-[#4a9d06] bg-white/50 hover:bg-white rounded-full shadow-sm transition-all z-20"
+          title="Reply"
+        >
+          <Reply className="w-4 h-4" />
+        </button>
+      )}
       
       {/* Reply Icon Background (shows when pulling) */}
       <div 
@@ -241,11 +266,13 @@ const SwipeableMessage = ({ msg, isMine, color, dateObj, onReply, contactName, i
 };
 
 // ---- File Bubble Component ----
-function FileBubble({ msg, isMine, dateObj, isStealthMode }: { 
+function FileBubble({ msg, isMine, dateObj, isStealthMode, onReply, contactName }: { 
   msg: any; 
   isMine: boolean; 
   dateObj: Date;
   isStealthMode?: boolean;
+  onReply: (msg: any) => void;
+  contactName: string;
 }) {
   const handleDownload = () => {
     if (!msg.fileData || !msg.fileName) return;
@@ -260,7 +287,19 @@ function FileBubble({ msg, isMine, dateObj, isStealthMode }: {
   const captionText = msg.text && !msg.text.startsWith('📎') ? msg.text : null;
 
   return (
-    <div className={`flex items-center relative ${isMine ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex items-center relative group ${isMine ? 'justify-end' : 'justify-start'}`}>
+      
+      {/* Quick Reply Arrow */}
+      {!isMine && (
+        <button
+          onClick={() => onReply({ id: msg.id, text: captionText || \`📎 \${msg.fileName || 'File'}\`, senderName: contactName })}
+          className="absolute left-[calc(100%+8px)] sm:opacity-0 sm:group-hover:opacity-100 opacity-100 top-2 p-1.5 text-gray-400 hover:text-[#4a9d06] bg-white/50 hover:bg-white rounded-full shadow-sm transition-all z-20"
+          title="Reply"
+        >
+          <Reply className="w-4 h-4" />
+        </button>
+      )}
+
       <div 
         className={`max-w-[85%] sm:max-w-[75%] px-4 py-3 z-10 cursor-pointer active:opacity-80 transition-all duration-300 ${isStealthMode ? 'blur-[5px] hover:blur-none active:blur-none' : ''} ${
           isMine 
@@ -356,6 +395,8 @@ export default function MessageList({ onReply, isStealthMode, conversationId, re
                   userId={user?.uid || ""}
                   viewImage={viewImage}
                   isStealthMode={isStealthMode}
+                  onReply={onReply}
+                  contactName={contactName}
                 />
               );
             }
@@ -368,6 +409,8 @@ export default function MessageList({ onReply, isStealthMode, conversationId, re
                   isMine={isMine}
                   dateObj={dateObj}
                   isStealthMode={isStealthMode}
+                  onReply={onReply}
+                  contactName={contactName}
                 />
               );
             }
