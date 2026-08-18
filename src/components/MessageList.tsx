@@ -292,7 +292,7 @@ function FileBubble({ msg, isMine, dateObj, isStealthMode, onReply, contactName 
       {/* Quick Reply Arrow */}
       {!isMine && (
         <button
-          onClick={() => onReply({ id: msg.id, text: captionText || \`📎 \${msg.fileName || 'File'}\`, senderName: contactName })}
+          onClick={() => onReply({ id: msg.id, text: captionText || `📎 ${msg.fileName || 'File'}`, senderName: contactName })}
           className="absolute left-[calc(100%+8px)] sm:opacity-0 sm:group-hover:opacity-100 opacity-100 top-2 p-1.5 text-gray-400 hover:text-[#4a9d06] bg-white/50 hover:bg-white rounded-full shadow-sm transition-all z-20"
           title="Reply"
         >
