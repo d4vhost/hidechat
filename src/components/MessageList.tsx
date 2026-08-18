@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useMessages } from "@/hooks/useMessages";
 import { useTyping } from "@/hooks/useTyping";
 import { useChatColor } from "@/hooks/useChatColor";
-import { Reply, Camera, Eye, File as FileIcon } from "lucide-react";
+import { Reply, Camera, Eye, File as FileIcon, ChevronDown } from "lucide-react";
 import { formatFileSize } from "@/lib/imageUtils";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -40,6 +40,36 @@ function ImageViewerModal({ imageData, onClose }: { imageData: string; onClose: 
         onClick={(e) => e.stopPropagation()}
       />
     </div>
+  );
+}
+
+// ---- Menu Component for Messages ----
+function MessageMenu({ onReply, isMine }: { onReply: () => void, isMine: boolean }) {
+  const [show, setShow] = useState(false);
+  return (
+    <>
+      <button 
+        onClick={(e) => { e.stopPropagation(); setShow(!show); }}
+        className={`absolute top-1 right-2 p-0.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 opacity-0 group-hover/bubble:opacity-100 transition-opacity rounded-full bg-white/50 hover:bg-white/80 dark:bg-black/30 dark:hover:bg-black/50 z-20 ${isMine ? 'hidden' : ''}`}
+      >
+        <ChevronDown className="w-4 h-4" />
+      </button>
+      
+      {show && (
+        <>
+          <div className="fixed inset-0 z-30" onClick={(e) => { e.stopPropagation(); setShow(false); }} />
+          <div className="absolute top-7 right-0 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 rounded-lg py-1 z-40 min-w-[120px] fade-in">
+            <button 
+              onClick={(e) => { e.stopPropagation(); setShow(false); onReply(); }}
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+            >
+              <Reply className="w-4 h-4" />
+              Reply
+            </button>
+          </div>
+        </>
+      )}
+    </>
   );
 }
 
@@ -79,93 +109,86 @@ function ImageBubble({ msg, isMine, dateObj, userId, viewImage, isStealthMode, o
   const captionText = msg.text && msg.text !== 'Photo' && msg.text !== '📷 Photo' ? msg.text : null;
 
   return (
-    <div className={`flex items-center relative group ${isMine ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex items-center relative ${isMine ? 'justify-end' : 'justify-start'}`}>
       
-      {/* Quick Reply Arrow */}
-      {!isMine && (
-        <button
-          onClick={() => onReply({ id: msg.id, text: captionText || '📷 Photo', senderName: contactName })}
-          className="absolute left-[calc(100%+8px)] sm:opacity-0 sm:group-hover:opacity-100 opacity-100 top-2 p-1.5 text-gray-400 hover:text-[#4a9d06] bg-white/50 hover:bg-white rounded-full shadow-sm transition-all z-20"
-          title="Reply"
-        >
-          <Reply className="w-4 h-4" />
-        </button>
-      )}
-
       {showViewer && hasImage && (
         <ImageViewerModal imageData={msg.imageData} onClose={handleClose} />
       )}
       <div 
-        className={`max-w-[85%] sm:max-w-[75%] overflow-hidden z-10 transition-all duration-300 ${isStealthMode ? 'blur-[5px] hover:blur-none active:blur-none' : ''} ${
+        className={`max-w-[85%] sm:max-w-[75%] overflow-visible z-10 transition-all duration-300 relative group/bubble ${isStealthMode ? 'blur-[5px] hover:blur-none active:blur-none' : ''} ${
           isMine 
             ? 'rounded-2xl rounded-br-sm' 
             : 'rounded-2xl rounded-bl-sm'
         } ${canView ? 'cursor-pointer active:opacity-80' : ''}`}
         onClick={handleOpen}
       >
-        {/* Image content */}
-        {isViewed && !isMine ? (
-          <div className={`flex items-center gap-2 px-4 py-3 ${
-            isMine ? 'retro-bubble-green' : 'retro-bubble-gray'
-          }`}>
-            <Eye className="w-4 h-4 text-gray-500" />
-            <span className="text-sm italic text-gray-600">
-              Photo opened
-            </span>
-          </div>
-        ) : (
-          <div className="relative">
-            {hasImage ? (
-              <>
-                <img 
-                  src={msg.imageData} 
-                  alt="Photo" 
-                  className={`w-full max-w-[280px] sm:max-w-[320px] h-auto object-cover ${
-                    !isMine && !isViewed ? 'blur-lg scale-105' : ''
-                  }`}
-                  style={{ minHeight: '120px', maxHeight: '360px' }}
-                />
-                {!isMine && !isViewed && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30">
-                    <div className="bg-black/50 rounded-full p-3 mb-2 backdrop-blur-sm">
-                      <Eye className="w-6 h-6 text-white" />
-                    </div>
-                    <span className="text-white font-bold text-sm drop-shadow-lg">Tap to view</span>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="w-48 h-32 flex items-center justify-center text-gray-400 bg-gray-100">
-                <Camera className="w-8 h-8 opacity-50" />
-              </div>
-            )}
-            {/* Caption overlay at bottom */}
-            {captionText && (
-              <div className={`px-3 py-2 text-sm ${
-                isMine 
-                  ? 'bg-[#4a9d06] text-white' 
-                  : 'bg-white/90 text-gray-800'
-              }`}>
-                {captionText}
-              </div>
-            )}
-          </div>
-        )}
+        <MessageMenu onReply={() => onReply({ id: msg.id, text: captionText || '📷 Photo', senderName: contactName })} isMine={isMine} />
 
-        {/* Timestamp and status */}
-        <div className={`flex justify-end items-center px-3 py-1.5 space-x-1 ${
-          isMine ? 'bg-[#4a9d06]' : 'bg-gray-200'
-        }`}>
-          <span className={`text-[10px] ${isMine ? 'text-white/70' : 'text-gray-500'}`}>
-            {dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-          </span>
-          {isMine && (
-            <span className="text-[10px] flex items-center h-3">
-              {msg.status === "sent" && "✓"}
-              {msg.status === "delivered" && "✓✓"}
-              {msg.status === "read" && <span className="text-white font-bold">✓✓</span>}
-            </span>
+        {/* Image content */}
+        <div className="overflow-hidden rounded-2xl">
+          {isViewed && !isMine ? (
+            <div className={`flex items-center gap-2 px-4 py-3 ${
+              isMine ? 'retro-bubble-green' : 'retro-bubble-gray'
+            }`}>
+              <Eye className="w-4 h-4 text-gray-500" />
+              <span className="text-sm italic text-gray-600">
+                Photo opened
+              </span>
+            </div>
+          ) : (
+            <div className="relative">
+              {hasImage ? (
+                <>
+                  <img 
+                    src={msg.imageData} 
+                    alt="Photo" 
+                    className={`w-full max-w-[280px] sm:max-w-[320px] h-auto object-cover ${
+                      !isMine && !isViewed ? 'blur-lg scale-105' : ''
+                    }`}
+                    style={{ minHeight: '120px', maxHeight: '360px' }}
+                  />
+                  {!isMine && !isViewed && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30">
+                      <div className="bg-black/50 rounded-full p-3 mb-2 backdrop-blur-sm">
+                        <Eye className="w-6 h-6 text-white" />
+                      </div>
+                      <span className="text-white font-bold text-sm drop-shadow-lg">Tap to view</span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="w-48 h-32 flex items-center justify-center text-gray-400 bg-gray-100">
+                  <Camera className="w-8 h-8 opacity-50" />
+                </div>
+              )}
+              {/* Caption overlay at bottom */}
+              {captionText && (
+                <div className={`px-3 py-2 text-sm ${
+                  isMine 
+                    ? 'bg-[#4a9d06] text-white' 
+                    : 'bg-white/90 text-gray-800'
+                }`}>
+                  {captionText}
+                </div>
+              )}
+            </div>
           )}
+
+          {/* Timestamp and status */}
+          <div className={`flex justify-end items-center px-3 py-1.5 space-x-1 ${
+            isMine ? 'bg-[#4a9d06]' : 'bg-gray-200'
+          }`}>
+            <span className={`text-[10px] ${isMine ? 'text-white/70' : 'text-gray-500'}`}>
+              {dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+            </span>
+            {isMine && (
+              <span className="text-[10px] flex items-center h-3">
+                {msg.status === "sent" && "✓"}
+                {msg.status === "delivered" && "✓✓"}
+                {msg.status === "read" && <span className="text-white font-bold">✓✓</span>}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -199,18 +222,7 @@ const SwipeableMessage = ({ msg, isMine, color, dateObj, onReply, contactName, i
   };
 
   return (
-    <div className={`flex items-center relative group ${isMine ? 'justify-end' : 'justify-start'}`}>
-      
-      {/* Quick Reply Arrow (Visible on hover/tap for the other person's messages) */}
-      {!isMine && (
-        <button
-          onClick={() => onReply({ id: msg.id, text: msg.text, senderName: contactName })}
-          className="absolute left-[calc(100%+8px)] sm:opacity-0 sm:group-hover:opacity-100 opacity-100 top-2 p-1.5 text-gray-400 hover:text-[#4a9d06] bg-white/50 hover:bg-white rounded-full shadow-sm transition-all z-20"
-          title="Reply"
-        >
-          <Reply className="w-4 h-4" />
-        </button>
-      )}
+    <div className={`flex items-center relative ${isMine ? 'justify-end' : 'justify-start'}`}>
       
       {/* Reply Icon Background (shows when pulling) */}
       <div 
@@ -223,7 +235,7 @@ const SwipeableMessage = ({ msg, isMine, color, dateObj, onReply, contactName, i
 
       {/* Message Bubble Container */}
       <div 
-        className={`max-w-[85%] sm:max-w-[75%] transition-transform duration-200 ease-out z-10 touch-pan-y`}
+        className={`max-w-[85%] sm:max-w-[75%] transition-transform duration-200 ease-out z-10 touch-pan-y relative group/bubble`}
         style={{ transform: `translateX(${translateX}px)` }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -232,10 +244,12 @@ const SwipeableMessage = ({ msg, isMine, color, dateObj, onReply, contactName, i
         <div 
           className={`px-4 py-2 transition-all duration-300 ${isStealthMode ? 'blur-[5px] hover:blur-none active:blur-none' : ''} ${
             isMine 
-              ? `retro-bubble-green rounded-2xl rounded-br-sm` 
-              : `retro-bubble-gray rounded-2xl rounded-bl-sm`
+              ? \`retro-bubble-green rounded-2xl rounded-br-sm\` 
+              : \`retro-bubble-gray rounded-2xl rounded-bl-sm\`
           }`}
         >
+          <MessageMenu onReply={() => onReply({ id: msg.id, text: msg.text, senderName: contactName })} isMine={isMine} />
+
           {/* Reply Quote Block */}
           {msg.replyTo && (
             <div className={`mb-2 p-2 rounded-lg text-xs border-l-4 ${isMine ? 'bg-black/20 border-white/50' : 'bg-black/5 dark:bg-black/30 border-gray-400 dark:border-gray-500'}`}>
@@ -244,7 +258,7 @@ const SwipeableMessage = ({ msg, isMine, color, dateObj, onReply, contactName, i
             </div>
           )}
 
-          <div className="text-[15px] leading-relaxed break-words whitespace-pre-wrap">
+          <div className="text-[15px] leading-relaxed break-words whitespace-pre-wrap pr-4">
             {msg.text}
           </div>
           <div className="flex justify-end items-center mt-1 space-x-1">
@@ -287,28 +301,19 @@ function FileBubble({ msg, isMine, dateObj, isStealthMode, onReply, contactName 
   const captionText = msg.text && !msg.text.startsWith('📎') ? msg.text : null;
 
   return (
-    <div className={`flex items-center relative group ${isMine ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex items-center relative ${isMine ? 'justify-end' : 'justify-start'}`}>
       
-      {/* Quick Reply Arrow */}
-      {!isMine && (
-        <button
-          onClick={() => onReply({ id: msg.id, text: captionText || `📎 ${msg.fileName || 'File'}`, senderName: contactName })}
-          className="absolute left-[calc(100%+8px)] sm:opacity-0 sm:group-hover:opacity-100 opacity-100 top-2 p-1.5 text-gray-400 hover:text-[#4a9d06] bg-white/50 hover:bg-white rounded-full shadow-sm transition-all z-20"
-          title="Reply"
-        >
-          <Reply className="w-4 h-4" />
-        </button>
-      )}
-
       <div 
-        className={`max-w-[85%] sm:max-w-[75%] px-4 py-3 z-10 cursor-pointer active:opacity-80 transition-all duration-300 ${isStealthMode ? 'blur-[5px] hover:blur-none active:blur-none' : ''} ${
+        className={`max-w-[85%] sm:max-w-[75%] px-4 py-3 z-10 cursor-pointer active:opacity-80 transition-all duration-300 relative group/bubble ${isStealthMode ? 'blur-[5px] hover:blur-none active:blur-none' : ''} ${
           isMine 
             ? 'retro-bubble-green rounded-2xl rounded-br-sm' 
             : 'retro-bubble-gray rounded-2xl rounded-bl-sm'
         }`}
         onClick={handleDownload}
       >
-        <div className="flex items-center gap-3">
+        <MessageMenu onReply={() => onReply({ id: msg.id, text: captionText || \`📎 \${msg.fileName || 'File'}\`, senderName: contactName })} isMine={isMine} />
+
+        <div className="flex items-center gap-3 pr-4">
           <div className="w-10 h-10 bg-black/10 rounded-lg flex items-center justify-center shrink-0">
             <FileIcon className={`w-5 h-5 ${isMine ? 'text-white/80' : 'text-gray-600'}`} />
           </div>
