@@ -50,7 +50,7 @@ function MessageMenu({ onReply, isMine }: { onReply: () => void, isMine: boolean
     <>
       <button 
         onClick={(e) => { e.stopPropagation(); setShow(!show); }}
-        className={`absolute top-1 right-2 p-0.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 opacity-0 group-hover/bubble:opacity-100 transition-opacity z-20 ${isMine ? 'hidden' : ''}`}
+        className={`absolute top-1 right-2 p-0.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 z-20 ${isMine ? 'hidden' : ''}`}
       >
         <ChevronDown className="w-4 h-4" />
       </button>
