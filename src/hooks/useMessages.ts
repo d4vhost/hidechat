@@ -118,7 +118,7 @@ export function useMessages(conversationId?: string, receiverId?: string) {
     await addDoc(collection(db, "messages"), messageData);
   };
 
-  const sendImage = async (imageBase64: string) => {
+  const sendImage = async (imageBase64: string, caption?: string) => {
     if (!user || !conversationId || !receiverId) return;
 
     const expiresAt = new Date();
@@ -128,7 +128,7 @@ export function useMessages(conversationId?: string, receiverId?: string) {
       conversationId: conversationId,
       senderId: user.uid,
       receiverId,
-      text: "📷 Photo",
+      text: caption || "Photo",
       createdAt: serverTimestamp(),
       expiresAt: expiresAt,
       deliveredAt: null,
@@ -146,13 +146,13 @@ export function useMessages(conversationId?: string, receiverId?: string) {
     await updateDoc(msgRef, {
       imageData: "",
       imageViewed: true,
-      text: "📷 Photo opened",
+      text: "Photo opened",
       status: "read",
       readAt: serverTimestamp()
     });
   };
 
-  const sendFile = async (fileBase64: string, fileName: string, fileType: string, fileSize: number) => {
+  const sendFile = async (fileBase64: string, fileName: string, fileType: string, fileSize: number, caption?: string) => {
     if (!user || !conversationId || !receiverId) return;
 
     const expiresAt = new Date();
@@ -162,7 +162,7 @@ export function useMessages(conversationId?: string, receiverId?: string) {
       conversationId: conversationId,
       senderId: user.uid,
       receiverId,
-      text: `📎 ${fileName}`,
+      text: caption || fileName,
       createdAt: serverTimestamp(),
       expiresAt: expiresAt,
       deliveredAt: null,
